@@ -33,13 +33,13 @@ namespace wey.Console
 
         public static ChoiceValue Start(ChoiceValue[] values)
         {
+            foreach (ChoiceValue choice in values)
+            {
+                System.Console.WriteLine($"[{choice.ID}] {choice.Name}");
+            }
+
             while (true)
             {
-                foreach (ChoiceValue choice in values)
-                {
-                    System.Console.WriteLine($"[{choice.ID}] {choice.Name}");
-                }
-
                 System.Console.Write("> ");
                 string key = Input.ReadString();
 
@@ -55,8 +55,6 @@ namespace wey.Console
                         return choice;
                     }
                 }
-
-                System.Console.Clear();
             }
         }
     }

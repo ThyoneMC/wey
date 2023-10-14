@@ -11,6 +11,12 @@ namespace wey.Client
     {
         // versions
 
+        public static class VersionType
+        {
+            public static string Release = "release";
+            public static string Snapshot = "snapshot";
+        }
+
         public class VersionLatest
         {
             [JsonPropertyName("release")]

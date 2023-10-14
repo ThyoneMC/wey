@@ -7,16 +7,16 @@ using wey.Core;
 
 namespace wey.Command
 {
-    class CreateNameSyntax: SubCommandSyntax
+    class CreateVersionSyntax: SubCommandSyntax
     {
         public override string GetName()
         {
-            return "name";
+            return "version";
         }
 
         public override string GetDescription()
         {
-            return "name of server provider";
+            return "version of minecraft";
         }
 
         public override bool GetRequired()

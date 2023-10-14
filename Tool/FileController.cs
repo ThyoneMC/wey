@@ -97,9 +97,9 @@ namespace wey.Tool
         {
             if (File.Exists(filePath)) return;
 
-            StaticBuildFolder(filePath);
+            StaticBuildFolder(Path.GetDirectoryName(filePath));
 
-            StreamWriter writer = File.CreateText(filePath);
+            using StreamWriter writer = File.CreateText(filePath);
             writer.Write(data);
         }
 
@@ -127,7 +127,7 @@ namespace wey.Tool
         {
             if (File.Exists(filePath)) return;
 
-            StaticBuildFolder(filePath);
+            StaticBuildFolder(Path.GetDirectoryName(filePath));
 
             File.WriteAllBytes(filePath, data);
         }

@@ -2,6 +2,7 @@
 using System.Text;
 using wey.Command;
 using wey.Core;
+using wey.Tool;
 
 namespace wey
 {
@@ -80,14 +81,31 @@ namespace wey
                             SubCommand subCommand = (SubCommand)commandBase;
                             string[] argsNext = args.Skip(index + 1).ToArray();
 
+                            //syntax
                             if (!handleSyntax(subCommand.GetSyntax(), argsNext))
                             {
                                 System.Console.WriteLine($"wey {string.Join(" ", args[0..index])} {GetSyntaxHelper(subCommand.GetSyntax())}");
-                            } 
-                            else
-                            {
-                                subCommand.Execute(argsNext, flags);
+                                return false;
                             }
+
+                            //flag
+                            foreach (string flag in subCommand.GetFlags())
+                            {
+                                if (flag.EndsWith("?")) continue;
+
+                                if (SubCommand.GetFlagContent(flags, flag) != "NO_INPUT") continue;
+
+                                System.Console.WriteLine($"Please insert value of {flag}");
+                                System.Console.WriteLine($"Example: --description=WeyIsTheBest");
+                                return false;
+                            }
+
+                            Task
+                                .Run(async () =>
+                                {
+                                    await subCommand.Execute(argsNext, flags);
+                                })
+                                .Wait();
 
                             return true;
                         }

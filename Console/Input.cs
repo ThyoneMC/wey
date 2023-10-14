@@ -20,6 +20,30 @@ namespace wey.Console
             }
         }
 
+        public static bool ReadBoolean(string? message = null, bool? defaultOption = true)
+        {
+            if (!string.IsNullOrEmpty(message)) System.Console.Write($"{message} (default: {defaultOption}) ");
+
+            while (true)
+            {
+                string read = ReadString().ToLower();
+
+                // contains "no"
+                if (defaultOption == true && read.Contains('n'))
+                {
+                    return false;
+                }
+
+                // contains "yes"
+                if (defaultOption == false && read.Contains('y'))
+                {
+                    return true;
+                }
+
+                return true;
+            }
+        }
+
         public static int ReadInteger(string? message = null, int? min = int.MinValue, int? max = int.MaxValue)
         {
             if (!string.IsNullOrEmpty(message)) System.Console.Write(message);
