@@ -20,7 +20,7 @@ namespace wey.Console
 
     class Choice
     {
-        public static string Start(string[] values)
+        public static string Start(params string[] values)
         {
             ChoiceValue[] choices = new ChoiceValue[values.Length];
             for (int i = 0; i < values.Length; i++)

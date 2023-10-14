@@ -7,7 +7,7 @@ using wey.Core;
 
 namespace wey.Command
 {
-    class EchoSyntax: SubCommandSyntax
+    class CreateNameSyntax: SubCommandSyntax
     {
         public override string GetName()
         {
@@ -16,7 +16,7 @@ namespace wey.Command
 
         public override string GetDescription()
         {
-            return "return pong";
+            return "name of server provider";
         }
 
         public override bool GetRequired()

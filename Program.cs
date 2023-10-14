@@ -60,7 +60,7 @@ namespace wey
             return stringBuilder.ToString();
         }
 
-        private static bool handleCommand(SubCommandBase[] subCommandsBase, string[] args, int index = 0)
+        private static bool handleCommand(SubCommandBase[] subCommandsBase, string[] args, string[] flags, int index = 0)
         {
             if (args.Length < (index + 1))
             {
@@ -86,7 +86,7 @@ namespace wey
                             } 
                             else
                             {
-                                subCommand.Execute(argsNext);
+                                subCommand.Execute(argsNext, flags);
                             }
 
                             return true;
@@ -95,7 +95,7 @@ namespace wey
                         {
                             SubCommandGroup subCommandGroup = (SubCommandGroup)commandBase;
 
-                            return handleCommand(subCommandGroup.GetSubCommand(), args, index + 1);
+                            return handleCommand(subCommandGroup.GetSubCommand(), args, flags, index + 1);
                         }
                 }
             }
@@ -107,12 +107,26 @@ namespace wey
 
         public static SubCommandBase[] SubCommands = new SubCommandBase[]
         {
-            
+            new Create()
         };
 
         public static void Main(string[] args)
         {
-            handleCommand(SubCommands, args);
+            List<string> arguments = new List<string>();
+            List<string> flags = new List<string>();
+
+            foreach (string arg in args)
+            {
+                if (arg.StartsWith("--"))
+                {
+                    flags.Add(arg.Remove(0, 2));
+                    continue;
+                }
+
+                arguments.Add(arg);
+            }
+
+            handleCommand(SubCommands, arguments.ToArray(), flags.ToArray());
         }
     }
 }
