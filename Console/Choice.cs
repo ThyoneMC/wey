@@ -3,70 +3,60 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wey.Style;
 
 namespace wey.Console
 {
     class ChoiceValue
     {
         public string Name { get; set; }
-        public ConsoleKey Key { get; set; }
-        public string KeyName { get; set; }
+        public string ID { get; set; }
 
-        public ChoiceValue(string name, ConsoleKey key, string keyName)
+        public ChoiceValue(string name, string id)
         {
             this.Name = name;
-            this.Key = key;
-            KeyName = keyName;
-
+            this.ID = id;
         }
     }
 
     class Choice
     {
-        private ChoiceValue[] values = Array.Empty<ChoiceValue>();
-
-        private readonly ConsoleKey[] keys = new ConsoleKey[]
+        public static string Start(string[] values)
         {
-            ConsoleKey.D1,
-            ConsoleKey.D2,
-            ConsoleKey.D3,
-            ConsoleKey.D4,
-            ConsoleKey.D5,
-            ConsoleKey.D6,
-            ConsoleKey.D7,
-            ConsoleKey.D8,
-            ConsoleKey.D9,
-        };
-
-        public Choice(string[] values)
-        {
-            this.values = new ChoiceValue[values.Length];
-
+            ChoiceValue[] choices = new ChoiceValue[values.Length];
             for (int i = 0; i < values.Length; i++)
             {
-                this.values[i] = new ChoiceValue(values[i], keys[i], (i + 1).ToString());
+                choices[i] = new ChoiceValue(values[i], (i + 1).ToString());
             }
+
+            return Start(choices).Name;
         }
 
-        public ChoiceValue Start()
+        public static ChoiceValue Start(ChoiceValue[] values)
         {
-            foreach (ChoiceValue choice in values)
-            {
-                System.Console.WriteLine($"[{choice.KeyName}] {choice.Name}");
-            }
-
             while (true)
             {
-                ConsoleKeyInfo key = System.Console.ReadKey();
+                foreach (ChoiceValue choice in values)
+                {
+                    System.Console.WriteLine($"[{choice.ID}] {choice.Name}");
+                }
+
+                System.Console.Write("> ");
+                string key = Input.ReadString();
 
                 foreach (ChoiceValue choice in values)
                 {
-                    if (key.Key == choice.Key)
+                    if (choice.ID == key)
+                    {
+                        return choice;
+                    }
+
+                    if (choice.Name == key)
                     {
                         return choice;
                     }
                 }
+
+                System.Console.Clear();
             }
         }
     }
