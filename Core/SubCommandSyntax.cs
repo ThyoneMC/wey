@@ -8,6 +8,11 @@ namespace wey.Core
 {
     public abstract class SubCommandSyntax: SubCommandBase
     {
-        public abstract bool IsRequired { get; set; }
+        public override SubCommandType GetType()
+        {
+            return SubCommandType.Syntax;
+        }
+
+        public abstract bool GetRequired();
     }
 }

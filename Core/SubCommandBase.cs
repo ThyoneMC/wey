@@ -6,9 +6,17 @@ using System.Threading.Tasks;
 
 namespace wey.Core
 {
+    public enum SubCommandType
+    {
+        Group,
+        Executable,
+        Syntax,
+    }
+
     public abstract class SubCommandBase
     {
-        public abstract string Name { get; set; }
-        public abstract string Description { get; set; }
+        public new abstract SubCommandType GetType();
+        public abstract string GetName();
+        public abstract string GetDescription();
     }
 }

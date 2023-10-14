@@ -8,6 +8,13 @@ namespace wey.Core
 {
     public abstract class SubCommand: SubCommandBase
     {
-        public abstract void Execute();
+        public override SubCommandType GetType()
+        {
+            return SubCommandType.Executable;
+        }
+
+        public abstract SubCommandSyntax[] GetSyntax();
+
+        public abstract void Execute(string[] args);
     }
 }

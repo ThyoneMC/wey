@@ -8,6 +8,11 @@ namespace wey.Core
 {
     public abstract class SubCommandGroup: SubCommandBase
     {
-        public abstract SubCommandBase[] SubCommands {  get; set; }
+        public override SubCommandType GetType()
+        {
+            return SubCommandType.Group;
+        }
+
+        public abstract SubCommandBase[] GetSubCommand();
     }
 }
