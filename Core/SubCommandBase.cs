@@ -11,6 +11,7 @@ namespace wey.Core
         Group,
         Executable,
         Syntax,
+        Flag
     }
 
     public abstract class SubCommandBase

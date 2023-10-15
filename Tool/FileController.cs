@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using wey.Console;
 
 namespace wey.Tool
 {
@@ -73,22 +74,46 @@ namespace wey.Tool
 
         public static void StaticBuildFolder(params string[] path)
         {
-            string filePath = Path.Combine(path);
+            string folderPath = Path.Combine(path);
 
-            if (!Directory.Exists(filePath))
+            if (!Directory.Exists(folderPath))
             {
-                Directory.CreateDirectory(filePath);
+                Directory.CreateDirectory(folderPath);
             }
         }
 
-        public static string[] StaticReadFolder(params string[] path)
+        public class ReadFolderReturn
         {
-            string filePath = Path.Combine(path);
+            public string[] Folders;
+            public string[] Files;
 
-            string[] folders = Directory.GetDirectories(filePath);
-            string[] files = Directory.GetFiles(filePath);
+            public ReadFolderReturn(string[] folders, string[] files)
+            {
+                this.Folders = folders;
+                this.Files = files;
+            }
+        }
 
-            return folders.Concat(files).ToArray();
+        public static ReadFolderReturn StaticReadFolder(params string[] path)
+        {
+            string folderPath = Path.Combine(path);
+
+            return new ReadFolderReturn(
+                    Directory.GetDirectories(folderPath),
+                    Directory.GetFiles(folderPath)
+                );
+        }
+
+        public static void StaticWaitFolder(params string[] path)
+        {
+            string folderPath = Path.Combine(path);
+
+            Logger.Info($"Waiting for {folderPath}");
+
+            while (!Directory.Exists(folderPath))
+            {
+                return;
+            }
         }
 
         // file
@@ -119,6 +144,18 @@ namespace wey.Tool
             if (!File.Exists(filePath)) return string.Empty;
 
             return File.ReadAllText(filePath);
+        }
+
+        public static void StaticWaitFile(params string[] path)
+        {
+            string filePath = Path.Combine(path);
+
+            Logger.Info($"Waiting for {filePath}");
+
+            while (!File.Exists(filePath))
+            {
+                return;
+            }
         }
 
         // byte

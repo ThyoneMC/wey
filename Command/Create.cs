@@ -28,55 +28,40 @@ namespace wey.Command
         {
             return new SubCommandSyntax[]
             {
-                new CreateServerSyntax(),
-                new CreateVersionSyntax()
+                new CreateProviderSyntax(),
+                new CreateVersionSyntax(),
+                new CreateNameSyntax(),
             };
         }
 
-        public override string[] GetFlags()
+        public override SubCommandFlag[] GetFlags()
         {
-            return new string[]
+            return new SubCommandFlag[]
             {
-                "eula",
-                "snapshot?",
-                "version"
+                new CreateEulaFlag()
             };
         }
 
-        public override async Task Execute(string[] args, string[] flags)
+        public override void Execute(string[] args, string[] flags)
         {   
-            if (GetFlagContent(flags, "eula").ToLower() != "true" && !Input.ReadBoolean("Do you accept to Minecraft End User License Agreement?")) return;
+            if (SubCommandFlag.GetContent(flags, "eula").ToLower() != "true" && !Input.ReadBoolean("Do you accept to Minecraft End User License Agreement?")) return;
 
-            bool IsSnapshot = GetFlagUsed(flags, "snapshot");
-            bool IsVersionSelected = GetFlagUsed(flags, "version");
+            string Server_Provider = args[0];
+            string Server_Version = args[1];
+            string Server_Name = args[2];
 
-            string ServerType;
-            if (args.Length > 0)
-            {
-                ServerType = args[0];
-            }
-            else
-            {
-                if (IsSnapshot)
-                {
-                    ServerType = Choice.Start("vanilla", "fabric");
-                } else
-                {
-                    ServerType = Choice.Start("vanilla", "paper", "fabric");
-                }
-            }
+            string Server_Path = Path.Join(Directory.GetCurrentDirectory(), Server_Name);
 
-            switch (ServerType)
+            switch (Server_Provider)
             {
-                case "vanilla":
+                case ServerProvider.Vanilla:
                     {
                         //version
-                        Vanilla.Version? GameVersions = await Vanilla.GetVersions();
-                        if (GameVersions == null) return;
+                        Vanilla.Version GameVersions = Vanilla.GetVersions();
 
-                        string TargetGameVersion = GameVersions.LatestVersion.Release;
-                        if (IsSnapshot) TargetGameVersion = GameVersions.LatestVersion.Snapshot;
-                        if (IsVersionSelected) TargetGameVersion = GetFlagContent(flags, "version");
+                        string TargetGameVersion = Server_Version;
+                        if (Server_Version == Vanilla.VersionType.Release) TargetGameVersion = GameVersions.LatestVersion.Release;
+                        else if (Server_Version == Vanilla.VersionType.Snapshot) TargetGameVersion = GameVersions.LatestVersion.Snapshot;
 
                         //server
                         string URL = string.Empty;
@@ -91,116 +76,113 @@ namespace wey.Command
                         if (string.IsNullOrEmpty(URL)) return;
 
                         //download
-                        Vanilla.VersionMeta? VersionMeta = await Rest.StaticGet<Vanilla.VersionMeta>(URL);
-                        if (VersionMeta == null) return;
+                        Vanilla.VersionMeta VersionMeta = Rest.StaticGet<Vanilla.VersionMeta>(URL);
 
-                        byte[]? ServerFile = await Rest.StaticDownload(VersionMeta.Downloads.Server.URL);
-                        if (ServerFile == null) return;
+                        byte[] ServerFile = Rest.StaticDownload(VersionMeta.Downloads.Server.URL);
 
-                        FileController.StaticBuildByte(
-                                Path.Combine(
-                                        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                                        "Downloads",
-                                        "server.jar"
-                                    ),
-                                ServerFile
+                        ServerManager server = new ServerManager(
+                                new ServerData(
+                                        Server_Name, 
+                                        ServerProvider.Vanilla, 
+                                        new string[] { TargetGameVersion },
+                                        Server_Path
+                                    )
                             );
+                        server.AddServer(ServerFile);
 
                         break;
                     }
-                case "paper":
+                case ServerProvider.PaperMC:
                     {
                         string TargetProject = "paper";
 
                         //version
-                        PaperMC.Project? GameVersions = await PaperMC.GetProject(TargetProject);
-                        if (GameVersions == null) return;
+                        PaperMC.Project GameVersions = PaperMC.GetProject(TargetProject);
 
-                        string TargetGameVersion = GameVersions.Versions[GameVersions.Versions.Length - 1];
-                        if (IsVersionSelected) TargetGameVersion = GetFlagContent(flags, "version");
+                        string TargetGameVersion = Server_Version;
+                        if (Server_Version == Vanilla.VersionType.Release) TargetGameVersion = GameVersions.Versions[GameVersions.Versions.Length - 1];
+                        else if (Server_Version == Vanilla.VersionType.Snapshot)
+                        {
+                            Logger.Error("paper did not have a snapshot version");
+                            return;
+                        }
 
                         //build
-                        PaperMC.Build? ServerBuild = await PaperMC.GetBuilds(TargetProject, TargetGameVersion);
-                        if (ServerBuild == null) return;
+                        PaperMC.Build ServerBuild = PaperMC.GetBuilds(TargetProject, TargetGameVersion);
 
                         PaperMC.BuildData LastestBuild = ServerBuild.Builds[ServerBuild.Builds.Length - 1];
                         string TargetBuild = LastestBuild.ID.ToString();
                         string TargetDownload = LastestBuild.Download.Application.Name;
 
                         //download
-                        byte[]? ServerFile = await PaperMC.Download(TargetProject, TargetGameVersion, TargetBuild, TargetDownload);
-                        if (ServerFile == null) return;
+                        byte[] ServerFile = PaperMC.Download(TargetProject, TargetGameVersion, TargetBuild, TargetDownload);
 
-                        FileController.StaticBuildByte(
-                                Path.Combine(
-                                        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                                        "Downloads",
-                                        TargetDownload
-                                    ),
-                                ServerFile
+                        ServerManager server = new ServerManager(
+                                new ServerData(
+                                        Server_Name,
+                                        ServerProvider.PaperMC,
+                                        new string[] { Server_Version, TargetGameVersion, TargetBuild, TargetDownload },
+                                        Server_Path
+                                    )
                             );
+                        server.AddServer(ServerFile);
 
                         break;
                     }
-                case "fabric":
+                case ServerProvider.FabricMC:
                     {
                         //version
-                        FabricMC.GameVersions[]? GameVersions = await FabricMC.GetGameVersions();
-                        if (GameVersions == null) return;
+                        FabricMC.GameVersions[] GameVersions = FabricMC.GetGameVersions();
 
-                        string TargetGameVersion = string.Empty;
-                        if (IsVersionSelected)
-                        {
-                            TargetGameVersion = GetFlagContent(flags, "version");
-                        }
-                        else
+                        string TargetGameVersion = Server_Version;
+                        if (Server_Version == Vanilla.VersionType.Release)
                         {
                             foreach (FabricMC.GameVersions Version in GameVersions)
                             {
-                                if (IsSnapshot && !Version.IsStable)
-                                {
-                                    TargetGameVersion = Version.Version;
-                                    break;
-                                }
-
-                                if (!IsSnapshot && Version.IsStable)
+                                if (Version.IsStable)
                                 {
                                     TargetGameVersion = Version.Version;
                                     break;
                                 }
                             }
                         }
-                        if (string.IsNullOrEmpty(TargetGameVersion)) return;
+                        else if (Server_Version == Vanilla.VersionType.Snapshot)
+                        {
+                            foreach (FabricMC.GameVersions Version in GameVersions)
+                            {
+                                if (!Version.IsStable)
+                                {
+                                    TargetGameVersion = Version.Version;
+                                    break;
+                                }
+                            }
+                        }
 
                         //server
-                        FabricMC.Loaders[]? ServerLoader = await FabricMC.GetLoaders(TargetGameVersion);
-                        if (ServerLoader == null) return;
-
+                        FabricMC.Loaders[] ServerLoader = FabricMC.GetLoaders(TargetGameVersion);
                         string TargetLoader = ServerLoader[0].Loader.Version;
 
-                        FabricMC.Installer[]? ServerInstaller = await FabricMC.GetInstaller();
-                        if (ServerInstaller == null) return;
-
+                        FabricMC.Installer[] ServerInstaller = FabricMC.GetInstaller();
                         string TargetInstaller = ServerInstaller[0].Version;
 
                         //download
-                        byte[]? ServerFile = await FabricMC.Download(TargetGameVersion, TargetLoader, TargetInstaller);
-                        if (ServerFile == null) return;
+                        byte[] ServerFile = FabricMC.Download(TargetGameVersion, TargetLoader, TargetInstaller);
 
-                        FileController.StaticBuildByte(
-                                Path.Combine(
-                                        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                                        "Downloads",
-                                        $"fabric-server-mc.{TargetGameVersion}-loader.{TargetLoader}-launcher.{TargetInstaller}.jar"
-                                    ),
-                                ServerFile
+                        ServerManager server = new ServerManager(
+                                new ServerData(
+                                        Server_Name,
+                                        ServerProvider.FabricMC,
+                                        new string[] { Server_Version, TargetLoader, TargetInstaller },
+                                        Server_Path
+                                    )
                             );
+                        server.AddServer(ServerFile);
 
                         break;
                     }
                 default:
                     {
-                        System.Console.WriteLine("Not Found");
+                        Logger.Error("Provider Not Found");
                         return;
                     }
             }

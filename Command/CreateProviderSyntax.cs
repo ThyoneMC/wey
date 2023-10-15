@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wey.Client;
 using wey.Core;
+using wey.Tool;
 
 namespace wey.Command
 {
-    class CreateVersionSyntax : SubCommandSyntax
+    class CreateProviderSyntax : SubCommandSyntax
     {
         public override string GetName()
         {
-            return "version";
+            return "provider";
         }
 
         public override string GetDescription()
         {
-            return "game version";
+            return "name of server provider";
         }
 
         public override bool GetRequired()
@@ -29,10 +29,9 @@ namespace wey.Command
         {
             return new string[]
             {
-                Vanilla.VersionType.Release,
-                Vanilla.VersionType.Snapshot,
-                "1.8.9",
-                "..."
+                ServerProvider.Vanilla,
+                ServerProvider.PaperMC,
+                ServerProvider.FabricMC
             };
         }
     }

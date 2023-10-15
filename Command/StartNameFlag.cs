@@ -7,21 +7,26 @@ using wey.Core;
 
 namespace wey.Command
 {
-    class CreateServerSyntax: SubCommandSyntax
+    class StartNameFlag: SubCommandFlag
     {
+        public override SubCommandFlagType GetFlagType()
+        {
+            return SubCommandFlagType.String;
+        }
+
         public override string GetName()
         {
-            return "server";
+            return "name";
         }
 
         public override string GetDescription()
         {
-            return "name of server provider";
+            return "name of the server";
         }
 
-        public override bool GetRequired()
+        public override bool GetRequiredValue()
         {
-            return false;
+            return true;
         }
     }
 }

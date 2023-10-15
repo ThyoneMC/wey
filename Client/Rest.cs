@@ -11,35 +11,51 @@ namespace wey.Client
     {
         // static
 
-        private static readonly RestClient StaticClient = new();
+        private static readonly RestClient StaticClient = new(
+                new RestClientOptions()
+                {
+                    ThrowOnAnyError = true,
+                    ThrowOnDeserializationError = true,
+                }
+            );
 
-        public static Task<T?> StaticGet<T>(string url)
+        public static T StaticGet<T>(string url)
         {
-            return StaticClient.GetAsync<T>(new RestRequest(url));
+            Task<T?> Data = StaticClient.GetAsync<T>(new RestRequest(url));
+
+            if (Data == null) throw new Exception();
+            if (Data.Result == null) throw new Exception();
+
+            return Data.Result;
         }
 
-        public static Task<byte[]?> StaticDownload(string url)
+        public static byte[] StaticDownload(string url)
         {
-            return StaticClient.DownloadDataAsync(new RestRequest(url));
+            Task<byte[]?> Data = StaticClient.DownloadDataAsync(new RestRequest(url));
+
+            if (Data == null) throw new Exception();
+            if (Data.Result == null) throw new Exception();
+
+            return Data.Result;
         }
 
         // class
 
-        private string baseUrl;
+        private readonly string baseUrl;
 
         public Rest(string baseUrl)
         {
             this.baseUrl = baseUrl;
         }
 
-        public Task<T?> Get<T>(string url)
+        public T Get<T>(string url)
         {
-            return StaticClient.GetAsync<T>(new RestRequest($"{baseUrl}{url}"));
+            return StaticGet<T>($"{baseUrl}{url}");
         }
 
-        public Task<byte[]?> Download(string url)
+        public byte[] Download(string url)
         {
-            return StaticClient.DownloadDataAsync(new RestRequest($"{baseUrl}{url}"));
+            return StaticDownload($"{baseUrl}{url}");
         }
     }
 }

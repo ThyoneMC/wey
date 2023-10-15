@@ -1,6 +1,9 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
+using System.Linq;
 using System.Text;
 using wey.Command;
+using wey.Console;
 using wey.Core;
 using wey.Tool;
 
@@ -8,20 +11,116 @@ namespace wey
 {
     class Program
     {
-        private static string GetSyntaxHelper(SubCommandSyntax[] subCommandsSyntax)
+        private static void WriteHelper(SubCommandBase subCommandBase, string[] parent)
         {
-            string[] syntaxNextName = subCommandsSyntax.Select(syntax =>
+            Logger.WriteMultiple(
+                    "NAME:",
+                    $"{LoggerUtil.Tab}{subCommandBase.GetName()}",
+                    "",
+                    "DESCRIPTION:",
+                    $"{LoggerUtil.Tab}{subCommandBase.GetDescription()}"
+                );
+
+            switch (subCommandBase.GetType())
             {
-                StringBuilder stringBuilder = new();
-                stringBuilder.Append($"<{syntax.GetName()}");
+                case SubCommandType.Executable:
+                    {
+                        SubCommand subCommand = (SubCommand)subCommandBase;
 
-                if (!syntax.GetRequired()) stringBuilder.Append('?');
+                        Logger.WriteMultiple(
+                                "",
+                                "USAGE:",
+                                $"{LoggerUtil.Tab}wey {string.Join(" ", parent)} {string.Join(" ", subCommand.GetSyntax().Select(syntax => $"<{syntax.GetName()}{(syntax.GetRequired() ? string.Empty : "?")}>"))}"
+                            );
 
-                stringBuilder.Append(">");
-                return stringBuilder.ToString();
-            }).ToArray();
+                        if (subCommand.GetSyntax().Length > 0)
+                        {
+                            Logger.WriteMultiple(
+                                "",
+                                "ARGUMENT:"
+                            );
 
-            return string.Join(" ", syntaxNextName);
+                            Logger.WriteMultiple(
+                                    subCommand.GetSyntax().Select(
+                                            syntax =>
+                                            {
+                                                if (syntax.GetHelp().Length > 0)
+                                                {
+                                                    return $"{LoggerUtil.Tab}{syntax.GetName()} - {syntax.GetDescription()} ({string.Join("|", syntax.GetHelp())})";
+                                                }
+
+                                                return $"{LoggerUtil.Tab}{syntax.GetName()} - {syntax.GetDescription()}";
+                                            }
+                                        ).ToArray()
+                                );
+                        }
+
+                        if (subCommand.GetFlags().Length > 0)
+                        {
+                            Logger.WriteMultiple(
+                                "",
+                                "OPTIONS:"
+                            );
+
+                            Logger.WriteMultiple(
+                                    subCommand.GetFlags().Select(
+                                            flag =>
+                                            {
+                                                string baseString = $"{LoggerUtil.Tab}{flag.GetName()}";
+
+                                                if (!flag.GetRequiredValue()) return baseString;
+
+                                                switch (flag.GetFlagType())
+                                                {
+                                                    case SubCommandFlagType.String:
+                                                        {
+                                                            return $"{baseString} (--{flag.GetName()}=\"Hello World\")";
+                                                        }
+                                                    case SubCommandFlagType.Integer:
+                                                        {
+                                                            return $"{baseString} (--{flag.GetName()}=2019)";
+                                                        }
+                                                    case SubCommandFlagType.Decimal:
+                                                        {
+                                                            return $"{baseString} (--{flag.GetName()}=16.25)";
+                                                        }
+                                                    case SubCommandFlagType.Boolean:
+                                                        {
+                                                            return $"{baseString} (--{flag.GetName()}=true)";
+                                                        }
+                                                    default:
+                                                        {
+                                                            return baseString;
+                                                        }
+                                                }
+                                            }
+                                        ).ToArray()
+                                );
+                        }
+
+                        break;
+                    }
+                case SubCommandType.Group:
+                    {
+                        SubCommandGroup subCommandGroup = (SubCommandGroup)subCommandBase;
+
+                        Logger.WriteMultiple(
+                                "",
+                                "USAGE:",
+                                $"{LoggerUtil.Tab}wey {string.Join(" ", parent)} [{string.Join("|", subCommandGroup.GetSubCommand().Select(command => command.GetName()))}]",
+                                "",
+                                "SUB COMMAND:"
+                            );
+
+                        Logger.WriteMultiple(
+                                subCommandGroup.GetSubCommand().Select(
+                                        command => $"{LoggerUtil.Tab}{command.GetName()} - {command.GetDescription()}"
+                                    ).ToArray()
+                            );
+
+                        break;
+                    }
+            }
         }
 
         private static bool handleSyntax(SubCommandSyntax[] subCommandsSyntax, string[] args)
@@ -41,32 +140,14 @@ namespace wey
             return true;
         }
 
-        private static string GetCommandHelper(SubCommandBase[] subCommandsBase, string[] args, int index)
+        private static bool handleCommand(SubCommandGroup subCommandBaseGroup, string[] args, string[] flags, int index = 0)
         {
-            string[] argsNextName = subCommandsBase.Select(subCommand => subCommand.GetName()).ToArray();
+            SubCommandBase[] subCommandsBase = subCommandBaseGroup.GetSubCommand();
 
-            StringBuilder stringBuilder = new();
-            stringBuilder.Append("wey ");
-
-            string[] argsTrue = args[0..index];
-            if (argsTrue.Length > 0)
-            {
-                stringBuilder.AppendJoin(' ', argsTrue);
-                stringBuilder.Append(' ');
-            }
-
-            string argFalse = string.Join(" | ", argsNextName);
-            if (argsNextName.Length > 0) stringBuilder.Append($"[ {argFalse} ]");
-
-            return stringBuilder.ToString();
-        }
-
-        private static bool handleCommand(SubCommandBase[] subCommandsBase, string[] args, string[] flags, int index = 0)
-        {
             if (args.Length < (index + 1))
             {
                 // no args
-                System.Console.WriteLine(GetCommandHelper(subCommandsBase, args, index));
+                WriteHelper(subCommandBaseGroup, args);
                 return false;
             }
 
@@ -81,31 +162,43 @@ namespace wey
                             SubCommand subCommand = (SubCommand)commandBase;
                             string[] argsNext = args.Skip(index + 1).ToArray();
 
+                            string[] argsParent = (index == 0) ? args[0..] : args[0..index];
+
                             //syntax
                             if (!handleSyntax(subCommand.GetSyntax(), argsNext))
                             {
-                                System.Console.WriteLine($"wey {string.Join(" ", args[0..index])} {GetSyntaxHelper(subCommand.GetSyntax())}");
+                                WriteHelper(subCommand, argsParent);
                                 return false;
                             }
 
                             //flag
-                            foreach (string flag in subCommand.GetFlags())
+                            foreach (SubCommandFlag flag in subCommand.GetFlags())
                             {
-                                if (flag.EndsWith("?")) continue;
+                                if (!flag.GetRequiredValue()) continue;
 
-                                if (SubCommand.GetFlagContent(flags, flag) != "NO_INPUT") continue;
+                                Logger.Info($"\"{SubCommandFlag.GetContent(flags, flag.GetName())}\"");
+                                if (SubCommandFlag.GetContent(flags, flag.GetName()) != string.Empty) continue;
 
-                                System.Console.WriteLine($"Please insert value of {flag}");
-                                System.Console.WriteLine($"Example: --description=WeyIsTheBest");
+                                WriteHelper(subCommand, argsParent);
                                 return false;
                             }
 
-                            Task
-                                .Run(async () =>
-                                {
-                                    await subCommand.Execute(argsNext, flags);
-                                })
-                                .Wait();
+                            //help flag
+                            if (SubCommandFlag.GetUsed(flags, "help"))
+                            {
+                                WriteHelper(subCommand, argsParent);
+                                return true;
+                            }
+
+                            try
+                            {
+                                subCommand.Execute(argsNext, flags);
+                            }
+                            catch (Exception)
+                            {
+                                Logger.Error("Server Error");
+                                return false;
+                            }
 
                             return true;
                         }
@@ -113,25 +206,20 @@ namespace wey
                         {
                             SubCommandGroup subCommandGroup = (SubCommandGroup)commandBase;
 
-                            return handleCommand(subCommandGroup.GetSubCommand(), args, flags, index + 1);
+                            return handleCommand(subCommandGroup, args, flags, index + 1);
                         }
                 }
             }
 
             // command not found
-            System.Console.WriteLine(GetCommandHelper(subCommandsBase, args, index));
+            WriteHelper(subCommandBaseGroup, args);
             return false;
         }
 
-        public static SubCommandBase[] SubCommands = new SubCommandBase[]
-        {
-            new Create()
-        };
-
         public static void Main(string[] args)
         {
-            List<string> arguments = new List<string>();
-            List<string> flags = new List<string>();
+            List<string> arguments = new();
+            List<string> flags = new();
 
             foreach (string arg in args)
             {
@@ -144,7 +232,7 @@ namespace wey
                 arguments.Add(arg);
             }
 
-            handleCommand(SubCommands, arguments.ToArray(), flags.ToArray());
+            handleCommand(new Wey(), arguments.ToArray(), flags.ToArray());
         }
     }
 }

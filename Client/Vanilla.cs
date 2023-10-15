@@ -50,7 +50,7 @@ namespace wey.Client
             public VersionData[] Versions { get; set; }
         }
 
-        public static Task<Version?> GetVersions()
+        public static Version GetVersions()
         {
             return Rest.StaticGet<Version>($"https://launchermeta.mojang.com/mc/game/version_manifest.json");
         }

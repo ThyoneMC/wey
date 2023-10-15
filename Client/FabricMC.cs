@@ -22,7 +22,7 @@ namespace wey.Client
             public bool IsStable { get; set; }
         }
 
-        public static Task<GameVersions[]?> GetGameVersions()
+        public static GameVersions[] GetGameVersions()
         {
             return Client.Get<GameVersions[]>($"game");
         }
@@ -50,7 +50,7 @@ namespace wey.Client
             public LoadersData Loader { get; set; }
         }
 
-        public static Task<Loaders[]?> GetLoaders(string gameVersion)
+        public static Loaders[] GetLoaders(string gameVersion)
         {
             return Client.Get<Loaders[]>($"loader/{gameVersion}");
         }
@@ -69,14 +69,14 @@ namespace wey.Client
             public bool IsStable { get; set; }
         }
 
-        public static Task<Installer[]?> GetInstaller()
+        public static Installer[] GetInstaller()
         {
             return Client.Get<Installer[]>($"installer");
         }
 
         // download
 
-        public static Task<byte[]?> Download(string gameVersion, string loaderVersion, string installerVersion)
+        public static byte[] Download(string gameVersion, string loaderVersion, string installerVersion)
         {
             return Client.Download($"loader/{gameVersion}/{loaderVersion}/{installerVersion}/server/jar");
         }

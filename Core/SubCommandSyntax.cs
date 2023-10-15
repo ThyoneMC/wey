@@ -14,5 +14,7 @@ namespace wey.Core
         }
 
         public abstract bool GetRequired();
+
+        public abstract string[] GetHelp();
     }
 }
