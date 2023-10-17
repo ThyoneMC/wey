@@ -3,27 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wey.Console;
 using wey.Core;
 
 namespace wey.Command
 {
-    class Wey: SubCommandGroup
+    class Tunnel : SubCommandGroup
     {
         public override string GetName()
         {
-            return "wey";
+            return "tunnel";
         }
 
         public override string GetDescription()
         {
-            return "wey is server manager for minecraft";
+            return "auto port forwarding";
         }
 
         public override SubCommandBase[] GetSubCommand()
         {
             return new SubCommandBase[]
             {
-                new Create(), new Start(), new Tunnel()
+                new TunnelNgrok(),
+                new TunnelPlayIt(),
+                new TunnelHamachi()
             };
         }
     }

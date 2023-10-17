@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using wey.Client;
@@ -42,9 +43,9 @@ namespace wey.Command
             };
         }
 
-        public override void Execute(string[] args, string[] flags)
+        public override void Execute(string[] args, Dictionary<string, string?> flags)
         {   
-            if (SubCommandFlag.GetContent(flags, "eula").ToLower() != "true" && !Input.ReadBoolean("Do you accept to Minecraft End User License Agreement?")) return;
+            if (!SubCommandFlag.GetUsed(flags, "eula") && !Input.ReadBoolean("Do you accept to Minecraft End User License Agreement?")) return;
 
             string Server_Provider = args[0];
             string Server_Version = args[1];
@@ -73,14 +74,18 @@ namespace wey.Command
                                 break;
                             }
                         }
-                        if (string.IsNullOrEmpty(URL)) return;
+                        if (string.IsNullOrEmpty(URL))
+                        {
+                            Logger.Error("game version not found");
+                            return;
+                        }
 
                         //download
                         Vanilla.VersionMeta VersionMeta = Rest.StaticGet<Vanilla.VersionMeta>(URL);
 
                         byte[] ServerFile = Rest.StaticDownload(VersionMeta.Downloads.Server.URL);
 
-                        ServerManager server = new ServerManager(
+                        ServerManager server = new(
                                 new ServerData(
                                         Server_Name, 
                                         ServerProvider.Vanilla, 
@@ -100,7 +105,7 @@ namespace wey.Command
                         PaperMC.Project GameVersions = PaperMC.GetProject(TargetProject);
 
                         string TargetGameVersion = Server_Version;
-                        if (Server_Version == Vanilla.VersionType.Release) TargetGameVersion = GameVersions.Versions[GameVersions.Versions.Length - 1];
+                        if (Server_Version == Vanilla.VersionType.Release) TargetGameVersion = GameVersions.Versions[^1];
                         else if (Server_Version == Vanilla.VersionType.Snapshot)
                         {
                             Logger.Error("paper did not have a snapshot version");
@@ -109,15 +114,20 @@ namespace wey.Command
 
                         //build
                         PaperMC.Build ServerBuild = PaperMC.GetBuilds(TargetProject, TargetGameVersion);
-
-                        PaperMC.BuildData LastestBuild = ServerBuild.Builds[ServerBuild.Builds.Length - 1];
+                        if (ServerBuild.Builds == null)
+                        {
+                            Logger.Error("game version not found");
+                            return;
+                        }
+                        
+                        PaperMC.BuildData LastestBuild = ServerBuild.Builds[^1];
                         string TargetBuild = LastestBuild.ID.ToString();
                         string TargetDownload = LastestBuild.Download.Application.Name;
 
                         //download
                         byte[] ServerFile = PaperMC.Download(TargetProject, TargetGameVersion, TargetBuild, TargetDownload);
 
-                        ServerManager server = new ServerManager(
+                        ServerManager server = new(
                                 new ServerData(
                                         Server_Name,
                                         ServerProvider.PaperMC,
@@ -160,6 +170,12 @@ namespace wey.Command
 
                         //server
                         FabricMC.Loaders[] ServerLoader = FabricMC.GetLoaders(TargetGameVersion);
+                        if (ServerLoader.Length == 0)
+                        {
+                            Logger.Error("game version not found");
+                            return;
+                        }
+
                         string TargetLoader = ServerLoader[0].Loader.Version;
 
                         FabricMC.Installer[] ServerInstaller = FabricMC.GetInstaller();
@@ -168,7 +184,7 @@ namespace wey.Command
                         //download
                         byte[] ServerFile = FabricMC.Download(TargetGameVersion, TargetLoader, TargetInstaller);
 
-                        ServerManager server = new ServerManager(
+                        ServerManager server = new(
                                 new ServerData(
                                         Server_Name,
                                         ServerProvider.FabricMC,

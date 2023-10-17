@@ -29,11 +29,11 @@ namespace wey.Core
 
         // static
 
-        public static bool GetUsed(string[] flags, string flagFind)
+        public static bool GetUsed(IDictionary<string, string?> flags, string flagFind)
         {
-            foreach (string flag in flags)
+            foreach(string flagString in flags.Keys)
             {
-                if (flag.StartsWith(flagFind))
+                if (flagString == flagFind)
                 {
                     return true;
                 }
@@ -42,54 +42,22 @@ namespace wey.Core
             return false;
         }
 
-        public static string? GetContent(string[] flags, string flagFind)
+        public static string? GetContent(IDictionary<string, string?> flags, string flagFind)
         {
-            foreach (string flag in flags)
+            foreach (string flagString in flags.Keys)
             {
-                // used flag
-                if (flag.StartsWith(flagFind))
+                if (flagString == flagFind)
                 {
-                    int indexOfEqualSign = flag.IndexOf("=");
-                    if (indexOfEqualSign == -1)
-                    {
-                        // no value
-                        return string.Empty;
-                    }
-
-                    string content = flag[(indexOfEqualSign + "=".Length)..];
-                    if (!content.StartsWith("\"")) return content;
-
-                    // in quote
-                    List<string> stringBuilder = new();
-
-                    int indexOf = Array.IndexOf(flags, flag);
-
-                    bool isInQuote = false;
-                    foreach (string flagArg in flags[indexOf..])
-                    {
-                        if (flagArg.StartsWith("\""))
-                        {
-                            isInQuote = true;
-
-                            stringBuilder.Add(flagArg[1..]);
-                        }
-
-                        if (isInQuote) stringBuilder.Add(flagArg);
-
-                        if (flagArg.EndsWith("\""))
-                        {
-                            // 2 --> (1 from index) + (1 from quote sign)
-                            stringBuilder.Add(flagArg[..(flagArg.Length - 2)]);
-
-                            break;
-                        }
-                    }
-
-                    return string.Join(" ", stringBuilder);
+                    return flags[flagString];
                 }
             }
 
             return null;
+        }
+
+        public static string GetContentRequired(IDictionary<string, string?> flags, string flagFind)
+        {
+            return GetContent(flags, flagFind) ?? string.Empty;
         }
     }
 }

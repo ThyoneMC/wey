@@ -19,6 +19,6 @@ namespace wey.Core
 
         public abstract SubCommandFlag[] GetFlags();
 
-        public abstract void Execute(string[] args, string[] flags);
+        public abstract void Execute(string[] args, Dictionary<string, string?> flags);
     }
 }

@@ -41,7 +41,7 @@ namespace wey.Console
             }
         }
 
-        private static void MakeWriteLine(string mode, params string[] message)
+        public static void CreateWriteLine(string mode, params string[] message)
         {
             WriteSingle(
                     Bracket(
@@ -52,33 +52,42 @@ namespace wey.Console
                 );
         }
 
-        private static void MakeWriteLine(string mode, ConsoleColor color, string[] message)
+        public static void CreateWriteLine(string mode, ConsoleColor color, string[] message)
         {
             System.Console.ForegroundColor = color;
 
-            MakeWriteLine(mode, message);
+            CreateWriteLine(mode, message);
+
+            System.Console.ResetColor();
+        }
+
+        public static void CreateWriteLine(string message, ConsoleColor color)
+        {
+            System.Console.ForegroundColor = color;
+
+            WriteSingle(message);
 
             System.Console.ResetColor();
         }
 
         public static void Info(params string[] message)
         {
-            MakeWriteLine("INFO", ConsoleColor.White, message);
+            CreateWriteLine("INFO", ConsoleColor.White, message);
         }
 
         public static void Help(params string[] message)
         {
-            MakeWriteLine("HELP", ConsoleColor.Cyan, message);
+            CreateWriteLine("HELP", ConsoleColor.Cyan, message);
         }
 
         public static void Warn(params string[] message)
         {
-            MakeWriteLine("WARN", ConsoleColor.Yellow, message);
+            CreateWriteLine("WARN", ConsoleColor.Yellow, message);
         }
 
         public static void Error(params string[] message)
         {
-            MakeWriteLine("ERROR", ConsoleColor.Red, message);
+            CreateWriteLine("ERROR", ConsoleColor.Red, message);
         }
     }
 }

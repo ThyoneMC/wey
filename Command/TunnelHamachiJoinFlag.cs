@@ -7,24 +7,26 @@ using wey.Core;
 
 namespace wey.Command
 {
-    class Wey: SubCommandGroup
+    class TunnelHamachiJoinFlag : SubCommandFlag
     {
+        public override SubCommandFlagType GetFlagType()
+        {
+            return SubCommandFlagType.String;
+        }
+
         public override string GetName()
         {
-            return "wey";
+            return "join";
         }
 
         public override string GetDescription()
         {
-            return "wey is server manager for minecraft";
+            return "join info";
         }
 
-        public override SubCommandBase[] GetSubCommand()
+        public override bool GetRequiredValue()
         {
-            return new SubCommandBase[]
-            {
-                new Create(), new Start(), new Tunnel()
-            };
+            return true;
         }
     }
 }

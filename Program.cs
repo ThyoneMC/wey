@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using wey.Command;
 using wey.Console;
 using wey.Core;
@@ -66,7 +67,7 @@ namespace wey
                                     subCommand.GetFlags().Select(
                                             flag =>
                                             {
-                                                string baseString = $"{LoggerUtil.Tab}{flag.GetName()}";
+                                                string baseString = $"{LoggerUtil.Tab}{flag.GetName()} - {flag.GetDescription()}";
 
                                                 if (!flag.GetRequiredValue()) return baseString;
 
@@ -123,7 +124,7 @@ namespace wey
             }
         }
 
-        private static bool handleSyntax(SubCommandSyntax[] subCommandsSyntax, string[] args)
+        private static bool HandleSyntax(SubCommandSyntax[] subCommandsSyntax, string[] args)
         {
             int index = 0;
 
@@ -140,7 +141,7 @@ namespace wey
             return true;
         }
 
-        private static bool handleCommand(SubCommandGroup subCommandBaseGroup, string[] args, string[] flags, int index = 0)
+        private static bool HandleCommand(SubCommandGroup subCommandBaseGroup, string[] args, string[] flags, int index = 0)
         {
             SubCommandBase[] subCommandsBase = subCommandBaseGroup.GetSubCommand();
 
@@ -162,41 +163,73 @@ namespace wey
                             SubCommand subCommand = (SubCommand)commandBase;
                             string[] argsNext = args.Skip(index + 1).ToArray();
 
-                            string[] argsParent = (index == 0) ? args[0..] : args[0..index];
+                            string[] argsParent = (index == 0) ? (new string[] { args[0] }) : args[0..(index + 1)];
 
                             //syntax
-                            if (!handleSyntax(subCommand.GetSyntax(), argsNext))
+                            if (!HandleSyntax(subCommand.GetSyntax(), argsNext))
                             {
                                 WriteHelper(subCommand, argsParent);
                                 return false;
                             }
 
                             //flag
-                            foreach (SubCommandFlag flag in subCommand.GetFlags())
+                            Dictionary<string, string?> flagDictionary = new();
+
+                            foreach (string flagString in flags)
                             {
-                                if (!flag.GetRequiredValue()) continue;
+                                int indexOfEqualSign = flagString.IndexOf("=");
+                                if (indexOfEqualSign == -1)
+                                {
+                                    // no value
+                                    flagDictionary.Add(flagString, string.Empty);
+                                    continue;
+                                }
 
-                                Logger.Info($"\"{SubCommandFlag.GetContent(flags, flag.GetName())}\"");
-                                if (SubCommandFlag.GetContent(flags, flag.GetName()) != string.Empty) continue;
+                                // value
+                                string content = flagString[(indexOfEqualSign + "=".Length)..];
+                                if (string.IsNullOrWhiteSpace(content))
+                                {
+                                    flagDictionary.Add(flagString[..indexOfEqualSign], string.Empty);
+                                    continue;
+                                }
 
-                                WriteHelper(subCommand, argsParent);
-                                return false;
+                                flagDictionary.Add(flagString[..indexOfEqualSign], content);
                             }
 
-                            //help flag
-                            if (SubCommandFlag.GetUsed(flags, "help"))
+                            //flag help 
+                            if (SubCommandFlag.GetUsed(flagDictionary, "help"))
                             {
                                 WriteHelper(subCommand, argsParent);
                                 return true;
                             }
 
+                            // flag check
+                            foreach (SubCommandFlag subCommandFlag in subCommand.GetFlags())
+                            {
+                                if (!subCommandFlag.GetRequiredValue()) continue;
+
+                                foreach (string flagString in flagDictionary.Keys)
+                                {
+                                    if (subCommandFlag.GetName() == flagString)
+                                    {
+                                        if (flagDictionary[flagString] == string.Empty)
+                                        {
+                                            WriteHelper(subCommand, argsParent);
+                                            return false;
+                                        }
+                                    }
+                                }
+                            }
+
                             try
                             {
-                                subCommand.Execute(argsNext, flags);
+                                subCommand.Execute(argsNext, flagDictionary);
                             }
-                            catch (Exception)
+                            catch (Exception exception)
                             {
-                                Logger.Error("Server Error");
+                                Logger.Error(exception.Message);
+                                if (exception.StackTrace != null) Logger.CreateWriteLine(exception.StackTrace, ConsoleColor.Red);
+
                                 return false;
                             }
 
@@ -206,7 +239,7 @@ namespace wey
                         {
                             SubCommandGroup subCommandGroup = (SubCommandGroup)commandBase;
 
-                            return handleCommand(subCommandGroup, args, flags, index + 1);
+                            return HandleCommand(subCommandGroup, args, flags, index + 1);
                         }
                 }
             }
@@ -232,7 +265,7 @@ namespace wey
                 arguments.Add(arg);
             }
 
-            handleCommand(new Wey(), arguments.ToArray(), flags.ToArray());
+            HandleCommand(new Wey(), arguments.ToArray(), flags.ToArray());
         }
     }
 }

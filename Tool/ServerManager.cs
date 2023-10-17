@@ -60,11 +60,11 @@ namespace wey.Tool
 
             FileController.StaticWaitFile(Data.FolderPath, "server.jar");
 
-            CommandPrompt.Execute(
+            CommandPrompt.StaticExecute(
                     new CommandPrompt.CommandPromptOptions()
                     {
                         FileName = $"java.exe",
-                        Arguments = $"-jar server.jar",
+                        Arguments = $"-jar server.jar --nogui",
                         WorkDirectory = Data.FolderPath
                     }
                 );

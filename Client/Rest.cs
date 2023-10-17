@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using wey.Console;
 
 namespace wey.Client
 {
@@ -23,8 +25,8 @@ namespace wey.Client
         {
             Task<T?> Data = StaticClient.GetAsync<T>(new RestRequest(url));
 
-            if (Data == null) throw new Exception();
-            if (Data.Result == null) throw new Exception();
+            if (Data == null) throw new NullReferenceException();
+            if (Data.Result == null) throw new NullReferenceException();
 
             return Data.Result;
         }
@@ -33,8 +35,8 @@ namespace wey.Client
         {
             Task<byte[]?> Data = StaticClient.DownloadDataAsync(new RestRequest(url));
 
-            if (Data == null) throw new Exception();
-            if (Data.Result == null) throw new Exception();
+            if (Data == null) throw new NullReferenceException();
+            if (Data.Result == null) throw new NullReferenceException();
 
             return Data.Result;
         }

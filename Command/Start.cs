@@ -24,7 +24,7 @@ namespace wey.Command
 
         public override SubCommandSyntax[] GetSyntax()
         {
-            return new SubCommandSyntax[0];
+            return Array.Empty<SubCommandSyntax>();
         }
 
         public override SubCommandFlag[] GetFlags()
@@ -35,7 +35,7 @@ namespace wey.Command
             };
         }
 
-        public override void Execute(string[] args, string[] flags)
+        public override void Execute(string[] args, Dictionary<string, string?> flags)
         {
             string TargetServerConfigPath;
 
@@ -46,7 +46,7 @@ namespace wey.Command
             }
             else if (SubCommandFlag.GetUsed(flags, "name"))
             {
-                TargetServerConfigPath = SubCommandFlag.GetContent(flags, "name");
+                TargetServerConfigPath = SubCommandFlag.GetContentRequired(flags, "name");
 
                 if (!File.Exists(TargetServerConfigPath))
                 {
