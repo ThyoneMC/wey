@@ -31,7 +31,8 @@ namespace wey.Command
         {
             return new SubCommandFlag[]
             {
-                new StartNameFlag()
+                new StartNameFlag(),
+                new StartServerOnlyFlag()
             };
         }
 
@@ -87,6 +88,7 @@ namespace wey.Command
 
             ServerManager server = new(JsonSerializer.Deserialize<ServerData>(FileController.StaticReadFile(TargetServerConfigPath)));
             server.Start();
+            if (!SubCommandFlag.GetUsed(flags, "server-only")) server.StartTunnel();
         }
     }
 }

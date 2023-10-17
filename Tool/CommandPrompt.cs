@@ -11,15 +11,15 @@ using wey.Console;
 
 namespace wey.Tool
 {
+    public class CommandPromptOptions
+    {
+        public string FileName { get; set; } = string.Empty;
+        public string Arguments { get; set; } = string.Empty;
+        public string WorkDirectory { get; set; } = Directory.GetCurrentDirectory();
+    }
+
     class CommandPrompt
     {
-        public class CommandPromptOptions
-        {
-            public string FileName { get; set; } = string.Empty;
-            public string Arguments { get; set; } = string.Empty;
-            public string WorkDirectory { get; set; } = Directory.GetCurrentDirectory();
-        }
-
         public static string? Where(string fileName, string variable = "PATH")
         {
             string? AllPath = Environment.GetEnvironmentVariable(variable);
@@ -42,24 +42,20 @@ namespace wey.Tool
             return null;
         }
 
-        public static void StaticExecute(CommandPromptOptions config)
+        public static Process? StaticExecute(CommandPromptOptions config)
         {
-            Process process = new()
+            ProcessStartInfo StartInfo = new()
             {
-                StartInfo = new ProcessStartInfo()
-                {
-                    FileName = config.FileName,
-                    RedirectStandardInput = true,
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    Arguments = config.Arguments,
-                    WorkingDirectory = config.WorkDirectory
-                }
+                UseShellExecute = true,
+                CreateNoWindow = false,
+                WindowStyle = ProcessWindowStyle.Normal,
+
+                FileName = config.FileName,
+                Arguments = config.Arguments,
+                WorkingDirectory = config.WorkDirectory
             };
 
-            process.Start();
-            process.WaitForExit();
+            return Process.Start(StartInfo);
         }
 
         private Process process = new();

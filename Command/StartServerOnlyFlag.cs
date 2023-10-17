@@ -7,26 +7,26 @@ using wey.Core;
 
 namespace wey.Command
 {
-    class TunnelHamachiJoinFlag : SubCommandFlag
+    class StartServerOnlyFlag : SubCommandFlag
     {
         public override SubCommandFlagType GetFlagType()
         {
-            return SubCommandFlagType.String;
+            return SubCommandFlagType.Boolean;
         }
 
         public override string GetName()
         {
-            return "join";
+            return "server-only";
         }
 
         public override string GetDescription()
         {
-            return "join info";
+            return "start server without starting tunnel";
         }
 
         public override bool GetRequiredValue()
         {
-            return true;
+            return false;
         }
     }
 }

@@ -26,7 +26,9 @@ namespace wey.Command
             {
                 new TunnelNgrok(),
                 new TunnelPlayIt(),
-                new TunnelHamachi()
+                new TunnelHamachi(),
+
+                new TunnelList()
             };
         }
     }

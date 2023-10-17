@@ -11,7 +11,7 @@ namespace wey.Command
     {
         public override SubCommandFlagType GetFlagType()
         {
-            return SubCommandFlagType.String;
+            return SubCommandFlagType.Boolean;
         }
 
         public override string GetName()

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -74,22 +75,6 @@ namespace wey.Command
                 );
 
             Logger.Warn("please connect to your account before using");
-        }
-
-        public static string StartTunnel(int port = 25565)
-        {
-            string PlayIt_Path = Config.Get().PlayIt;
-
-            CommandPrompt.StaticExecute(
-                    new CommandPrompt.CommandPromptOptions()
-                    {
-                        FileName = Path.GetFileName(PlayIt_Path),
-                        Arguments = $"tcp {port}",
-                        WorkDirectory = Path.GetDirectoryName(PlayIt_Path)
-                    }
-                );
-
-            return $"{port}";
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -47,10 +48,10 @@ namespace wey
                                             {
                                                 if (syntax.GetHelp().Length > 0)
                                                 {
-                                                    return $"{LoggerUtil.Tab}{syntax.GetName()} - {syntax.GetDescription()} ({string.Join("|", syntax.GetHelp())})";
+                                                    return $"{LoggerUtil.Tab}{syntax.GetName()} -> {syntax.GetDescription()} ({string.Join("|", syntax.GetHelp())})";
                                                 }
 
-                                                return $"{LoggerUtil.Tab}{syntax.GetName()} - {syntax.GetDescription()}";
+                                                return $"{LoggerUtil.Tab}{syntax.GetName()} -> {syntax.GetDescription()}";
                                             }
                                         ).ToArray()
                                 );
@@ -67,7 +68,7 @@ namespace wey
                                     subCommand.GetFlags().Select(
                                             flag =>
                                             {
-                                                string baseString = $"{LoggerUtil.Tab}{flag.GetName()} - {flag.GetDescription()}";
+                                                string baseString = $"{LoggerUtil.Tab}--{flag.GetName()} -> {flag.GetDescription()}";
 
                                                 if (!flag.GetRequiredValue()) return baseString;
 

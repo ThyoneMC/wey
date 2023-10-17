@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -73,19 +74,6 @@ namespace wey.Command
                 );
 
             Logger.Warn("please connect to your account before using");
-        }
-
-        public static void StartTunnel()
-        {
-            string PlayIt_Path = Config.Get().PlayIt;
-
-            CommandPrompt.StaticExecute(
-                    new CommandPrompt.CommandPromptOptions()
-                    {
-                        FileName = Path.GetFileName(PlayIt_Path),
-                        WorkDirectory = Path.GetDirectoryName(PlayIt_Path)
-                    }
-                );
         }
     }
 }
