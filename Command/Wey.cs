@@ -23,7 +23,7 @@ namespace wey.Command
         {
             return new SubCommandBase[]
             {
-                new Create(), new Start(), new Tunnel()
+                new Create(), new Start(), new Stop(), new Tunnel()
             };
         }
     }

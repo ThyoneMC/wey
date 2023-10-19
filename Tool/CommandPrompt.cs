@@ -20,6 +20,8 @@ namespace wey.Tool
 
     class CommandPrompt
     {
+        // tools
+
         public static string? Where(string fileName, string variable = "PATH")
         {
             string? AllPath = Environment.GetEnvironmentVariable(variable);
@@ -41,6 +43,29 @@ namespace wey.Tool
 
             return null;
         }
+
+        public static bool IsProcessExists(int pid)
+        {
+            return Process.GetProcesses().Any(process => process.Id == pid);
+        }
+
+        public static void KillProcess(int? pid = -1)
+        {
+            if (pid == null || pid == -1) return;
+
+            try
+            {
+                Process process = Process.GetProcessById((int)pid);
+
+                if (!process.HasExited) process.Kill(true);
+            }
+            catch (Exception exception)
+            {
+                Logger.Error(exception);
+            }
+        }
+
+        // command
 
         public static Process? StaticExecute(CommandPromptOptions config)
         {

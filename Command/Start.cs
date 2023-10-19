@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using wey.Console;
 using wey.Core;
+using wey.Server;
 using wey.Tool;
 
 namespace wey.Command
@@ -32,63 +33,40 @@ namespace wey.Command
             return new SubCommandFlag[]
             {
                 new StartNameFlag(),
+                new StartForceFlag(),
                 new StartServerOnlyFlag()
             };
         }
 
         public override void Execute(string[] args, Dictionary<string, string?> flags)
         {
-            string TargetServerConfigPath;
+            ServerData TargetServer = GetTargetServer(flags);
+            if (!SubCommandFlag.GetUsed(flags, "force") && !Input.ReadBoolean($"Are you sure to start {TargetServer.Name}?")) return;
 
-            string local = Path.Join(Directory.GetCurrentDirectory(), ".wey", "config.json");
-            if (File.Exists(local))
-            {
-                TargetServerConfigPath = local;
-            }
-            else if (SubCommandFlag.GetUsed(flags, "name"))
-            {
-                TargetServerConfigPath = SubCommandFlag.GetContentRequired(flags, "name");
-
-                if (!File.Exists(TargetServerConfigPath))
-                {
-                    Logger.Error("Server Not Found");
-                    return;
-                }
-            }
-            else
-            {
-                List<string> choices = new();
-
-                foreach (string itemName in FileController.StaticReadFolder(Directory.GetCurrentDirectory()).Folders)
-                {
-                    if (File.Exists(Path.Join(itemName, ".wey", "config.json")))
-                    {
-                        choices.Add(Path.GetFileName(itemName));
-                    }
-                }
-
-                if (choices.Count == 0)
-                {
-                    Logger.Error("Server Not Found");
-                    return;
-                }
-
-                string selectedChoice;
-                if (choices.Count == 1)
-                {
-                    selectedChoice = choices.ToArray()[0];
-                }
-                else
-                {
-                    selectedChoice = Choice.Start(choices.ToArray());
-                }
-
-                TargetServerConfigPath = Path.Join(Directory.GetCurrentDirectory(), selectedChoice, ".wey", "config.json");
-            }
-
-            ServerManager server = new(JsonSerializer.Deserialize<ServerData>(FileController.StaticReadFile(TargetServerConfigPath)));
+            ServerManager server = new(TargetServer);
             server.Start();
-            if (!SubCommandFlag.GetUsed(flags, "server-only")) server.StartTunnel();
+
+            if (!SubCommandFlag.GetUsed(flags, "server-only"))
+            {
+                ServerTunnel tunnel = new(TargetServer);
+                tunnel.Start();
+            }
+        }
+
+        // static
+
+        public static ServerData GetTargetServer(Dictionary<string, string?> flags)
+        {
+            if (SubCommandFlag.GetUsed(flags, "name"))
+            {
+                string TargetServerConfigPath = ServerManager.FindServer(SubCommandFlag.GetContentRequired(flags, "name"));
+
+                return ServerManager.GetServer(TargetServerConfigPath);
+            }
+
+            ServerData[] TargetServerData = ServerManager.GetServer(ServerManager.FindServer());
+
+            return TargetServerData[Choice.StartGetIndex(TargetServerData.Select(data => data.FolderPath).ToArray())];
         }
     }
 }

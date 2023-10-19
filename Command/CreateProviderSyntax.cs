@@ -4,10 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wey.Core;
-using wey.Tool;
+using wey.Server;
 
 namespace wey.Command
 {
+    public static class ServerProvider
+    {
+        public const string Vanilla = "vanilla";
+        public const string PaperMC = "paper";
+        public const string FabricMC = "fabric";
+    }
+
     class CreateProviderSyntax : SubCommandSyntax
     {
         public override string GetName()

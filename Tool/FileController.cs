@@ -158,6 +158,13 @@ namespace wey.Tool
             }
         }
 
+        public static void StaticDeleteFile(string filePath)
+        {
+            if (!File.Exists(filePath)) return;
+
+            File.Delete(filePath);
+        }
+
         // byte
 
         public static void StaticBuildByte(string filePath, byte[] data)

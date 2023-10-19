@@ -89,5 +89,11 @@ namespace wey.Console
         {
             CreateWriteLine("ERROR", ConsoleColor.Red, message);
         }
+
+        public static void Error(Exception exception)
+        {
+            Error(exception.Message);
+            if (exception.StackTrace != null) CreateWriteLine(exception.StackTrace, ConsoleColor.Red);
+        }
     }
 }

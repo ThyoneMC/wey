@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using wey.Client;
 using wey.Console;
 using wey.Core;
-using wey.Tool;
+using wey.Server;
 using static wey.Client.FabricMC;
 
 namespace wey.Command
@@ -50,8 +50,9 @@ namespace wey.Command
             string Server_Provider = args[0];
             string Server_Version = args[1];
             string Server_Name = args[2];
-
             string Server_Path = Path.Join(Directory.GetCurrentDirectory(), Server_Name);
+
+            if (Server_Version.StartsWith("last")) Server_Version = Vanilla.VersionType.Release;
 
             switch (Server_Provider)
             {
@@ -93,7 +94,7 @@ namespace wey.Command
                                         Server_Path
                                     )
                             );
-                        server.AddServer(ServerFile);
+                        server.AddServerFile(ServerFile);
 
                         break;
                     }
@@ -135,7 +136,7 @@ namespace wey.Command
                                         Server_Path
                                     )
                             );
-                        server.AddServer(ServerFile);
+                        server.AddServerFile(ServerFile);
 
                         break;
                     }
@@ -192,7 +193,7 @@ namespace wey.Command
                                         Server_Path
                                     )
                             );
-                        server.AddServer(ServerFile);
+                        server.AddServerFile(ServerFile);
 
                         break;
                     }

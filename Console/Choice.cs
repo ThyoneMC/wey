@@ -20,7 +20,17 @@ namespace wey.Console
 
     class Choice
     {
-        public static string Start(params string[] values)
+        public static int StartGetIndex(params string[] values)
+        {
+            return int.Parse(Start(values).ID) - 1;
+        }
+
+        public static string StartGetValue(params string[] values)
+        {
+            return Start(values).Name;
+        }
+
+        public static ChoiceValue Start(string[] values)
         {
             ChoiceValue[] choices = new ChoiceValue[values.Length];
             for (int i = 0; i < values.Length; i++)
@@ -28,11 +38,14 @@ namespace wey.Console
                 choices[i] = new ChoiceValue(values[i], (i + 1).ToString());
             }
 
-            return Start(choices).Name;
+            return Start(choices);
         }
 
         public static ChoiceValue Start(ChoiceValue[] values)
         {
+            if (values.Length == 0) throw new Exception($"values is empty");
+            if (values.Length == 1) return values[0];
+
             foreach (ChoiceValue choice in values)
             {
                 System.Console.WriteLine($"[{choice.ID}] {choice.Name}");

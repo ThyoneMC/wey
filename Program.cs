@@ -228,9 +228,7 @@ namespace wey
                             }
                             catch (Exception exception)
                             {
-                                Logger.Error(exception.Message);
-                                if (exception.StackTrace != null) Logger.CreateWriteLine(exception.StackTrace, ConsoleColor.Red);
-
+                                Logger.Error(exception);
                                 return false;
                             }
 
