@@ -37,9 +37,9 @@ namespace wey.Command
 
             ConfigData config = Config.Get();
 
-            if (!string.IsNullOrEmpty(config.Ngrok)) tunnels.Add($"ngrok -> {config.Ngrok}");
-            if (!string.IsNullOrEmpty(config.PlayIt)) tunnels.Add($"playit.gg -> {config.PlayIt}");
-            if (!string.IsNullOrEmpty(config.Hamachi)) tunnels.Add($"hamachi -> {config.Hamachi}");
+            if (!string.IsNullOrEmpty(config.Tunnel.Ngrok)) tunnels.Add($"ngrok -> {config.Tunnel.Ngrok}");
+            if (!string.IsNullOrEmpty(config.Tunnel.PlayIt)) tunnels.Add($"playit.gg -> {config.Tunnel.PlayIt}");
+            if (!string.IsNullOrEmpty(config.Tunnel.Hamachi)) tunnels.Add($"hamachi -> {config.Tunnel.Hamachi}");
 
             Logger.WriteMultiple(tunnels.ToArray());
         }

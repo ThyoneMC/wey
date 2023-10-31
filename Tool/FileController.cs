@@ -9,70 +9,68 @@ using wey.Console;
 
 namespace wey.Tool
 {
-    class FileController
+    class StaticFileController
     {
-        private readonly string filePath;
-
-        private static string Rename(string fileName)
+        public static void Build(string filePath, string data)
         {
-            if (Path.GetExtension(fileName) == "json")
-            {
-                return fileName;
-            }
+            if (File.Exists(filePath)) return;
 
-            return $"{Path.GetFileNameWithoutExtension(fileName)}.json";
+            StaticFolderController.Build(Path.GetDirectoryName(filePath));
+
+            using StreamWriter writer = File.CreateText(filePath);
+            writer.Write(data);
         }
 
-        public FileController(string fileName)
+        public static void Build(string filePath, byte[] data)
         {
-            filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "@ThyoneMC", "wey", Rename(fileName));
+            if (File.Exists(filePath)) return;
+
+            StaticFolderController.Build(Path.GetDirectoryName(filePath));
+
+            File.WriteAllBytes(filePath, data);
         }
 
-        public FileController(string filePath, string fileName)
-        {
-            this.filePath = Path.Combine(filePath, Rename(fileName));
-        }
-
-        // class
-
-        public void BuildFile<T>()
-        {
-            StaticBuildFile(filePath, JsonSerializer.Serialize(CreateTypeInstance<T>()));
-        }
-
-        public void EditFile<T>(T data)
+        public static void Edit(string filePath, string data)
         {
             if (!File.Exists(filePath))
             {
-                StaticBuildFile(filePath, JsonSerializer.Serialize(data));
+                Build(filePath, data);
+                return;
             }
-            else
-            {
-                StaticEditFile(filePath, JsonSerializer.Serialize(data));
-            }
+
+            File.WriteAllText(filePath, data);
         }
 
-        public T? ReadFile<T>()
+        public static string Read(string filePath)
         {
-            if (!File.Exists(filePath))
-            {
-                this.BuildFile<T>();
-                return CreateTypeInstance<T>();
-            }
+            if (!File.Exists(filePath)) return string.Empty;
 
-            return JsonSerializer.Deserialize<T>(StaticReadFile(filePath));
+            return File.ReadAllText(filePath);
         }
 
-        // static
-
-        private static T CreateTypeInstance<T>()
+        public static void Wait(params string[] path)
         {
-            return Activator.CreateInstance<T>();
+            string filePath = Path.Combine(path);
+
+            Logger.Info($"Waiting for {filePath}");
+
+            while (!File.Exists(filePath))
+            {
+                return;
+            }
         }
 
-        // folder
+        public static void DeleteFile(string filePath)
+        {
+            if (!File.Exists(filePath)) return;
 
-        public static void StaticBuildFolder(params string[] path)
+            File.Delete(filePath);
+        }
+    }
+
+    class StaticFolderController
+    {
+        public static void Build(params string[] path)
         {
             string folderPath = Path.Combine(path);
 
@@ -94,7 +92,7 @@ namespace wey.Tool
             }
         }
 
-        public static ReadFolderReturn StaticReadFolder(params string[] path)
+        public static ReadFolderReturn Read(params string[] path)
         {
             string folderPath = Path.Combine(path);
 
@@ -104,7 +102,7 @@ namespace wey.Tool
                 );
         }
 
-        public static void StaticWaitFolder(params string[] path)
+        public static void Wait(params string[] path)
         {
             string folderPath = Path.Combine(path);
 
@@ -115,65 +113,83 @@ namespace wey.Tool
                 return;
             }
         }
+    }
 
-        // file
-
-        public static void StaticBuildFile(string filePath, string data)
+    class FileController<T>
+    {
+        private static T CreateTypeInstance()
         {
-            if (File.Exists(filePath)) return;
-
-            StaticBuildFolder(Path.GetDirectoryName(filePath));
-
-            using StreamWriter writer = File.CreateText(filePath);
-            writer.Write(data);
+            return Activator.CreateInstance<T>();
         }
 
-        public static void StaticEditFile(string filePath, string data)
+        private static string Rename(string fileName)
+        {
+            if (Path.GetExtension(fileName) == "json")
+            {
+                return fileName;
+            }
+
+            return $"{Path.GetFileNameWithoutExtension(fileName)}.json";
+        }
+
+        // class
+
+        private readonly string filePath;
+
+        public FileController(string fileName)
+        {
+            filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "@ThyoneMC", "wey", Rename(fileName));
+        }
+
+        public FileController(string filePath, string fileName)
+        {
+            this.filePath = Path.Combine(filePath, Rename(fileName));
+        }
+
+        public void Build()
+        {
+            StaticFileController.Build(filePath, JsonSerializer.Serialize(CreateTypeInstance()));
+        }
+
+        public void Edit(T data)
         {
             if (!File.Exists(filePath))
             {
-                StaticBuildFile(filePath, data);
-                return;
+                StaticFileController.Build(filePath, JsonSerializer.Serialize(data));
             }
-
-            File.WriteAllText(filePath, data);
-        }
-
-        public static string StaticReadFile(string filePath)
-        {
-            if (!File.Exists(filePath)) return string.Empty;
-
-            return File.ReadAllText(filePath);
-        }
-
-        public static void StaticWaitFile(params string[] path)
-        {
-            string filePath = Path.Combine(path);
-
-            Logger.Info($"Waiting for {filePath}");
-
-            while (!File.Exists(filePath))
+            else
             {
-                return;
+                StaticFileController.Edit(filePath, JsonSerializer.Serialize(data));
             }
         }
 
-        public static void StaticDeleteFile(string filePath)
+        public void Edit(Func<T, T> callback)
         {
-            if (!File.Exists(filePath)) return;
-
-            File.Delete(filePath);
+            Edit(callback(ReadRequired()));
         }
 
-        // byte
-
-        public static void StaticBuildByte(string filePath, byte[] data)
+        public T? Read()
         {
-            if (File.Exists(filePath)) return;
+            if (!File.Exists(filePath))
+            {
+                Build();
+                return CreateTypeInstance();
+            }
 
-            StaticBuildFolder(Path.GetDirectoryName(filePath));
+            return JsonSerializer.Deserialize<T>(StaticFileController.Read(filePath));
+        }
 
-            File.WriteAllBytes(filePath, data);
+        public T ReadRequired()
+        {
+            T? read = Read();
+            if (read == null) throw new NullReferenceException();
+
+            return read;
+        }
+        
+        public void Delete()
+        {
+            StaticFileController.DeleteFile(filePath);
         }
     }
 }

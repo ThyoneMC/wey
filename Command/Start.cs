@@ -34,7 +34,8 @@ namespace wey.Command
             {
                 new StartNameFlag(),
                 new StartForceFlag(),
-                new StartServerOnlyFlag()
+                new StartServerOnlyFlag(),
+                new StartRestartFlag()
             };
         }
 
@@ -43,14 +44,16 @@ namespace wey.Command
             ServerData TargetServer = GetTargetServer(flags);
             if (!SubCommandFlag.GetUsed(flags, "force") && !Input.ReadBoolean($"Are you sure to start {TargetServer.Name}?")) return;
 
-            ServerManager server = new(TargetServer);
-            server.Start();
-
+            //tunnel
             if (!SubCommandFlag.GetUsed(flags, "server-only"))
             {
                 ServerTunnel tunnel = new(TargetServer);
                 tunnel.Start();
             }
+
+            //server
+            ServerManager server = new(TargetServer);
+            server.Start(SubCommandFlag.GetUsed(flags, "auto-restart"));
         }
 
         // static

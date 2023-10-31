@@ -9,7 +9,6 @@ using wey.Client;
 using wey.Console;
 using wey.Core;
 using wey.Server;
-using static wey.Client.FabricMC;
 
 namespace wey.Command
 {

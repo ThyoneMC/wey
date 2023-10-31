@@ -42,7 +42,7 @@ namespace wey.Command
             {
                 Config.Edit(
                     (data) => {
-                        data.PlayIt = string.Empty;
+                        data.Tunnel.PlayIt = string.Empty;
                         return data;
                     }
                 );
@@ -68,7 +68,7 @@ namespace wey.Command
             //config
             Config.Edit(
                     (data) => {
-                        data.PlayIt = PlayIt_Path;
+                        data.Tunnel.PlayIt = PlayIt_Path;
                         return data;
                     }
                 );

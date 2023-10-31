@@ -42,11 +42,13 @@ namespace wey.Command
             ServerData TargetServer = Start.GetTargetServer(flags);
             if (!SubCommandFlag.GetUsed(flags, "force") && !Input.ReadBoolean($"Are you sure to stop {TargetServer.Name}?")) return;
 
-            ServerManager server = new(TargetServer);
-            server.Stop();
-
+            //tunnel
             ServerTunnel tunnel = new(TargetServer);
             tunnel.Stop();
+
+            //server
+            ServerManager server = new(TargetServer);
+            server.Stop();
         }
     }
 }

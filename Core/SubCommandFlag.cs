@@ -59,5 +59,19 @@ namespace wey.Core
         {
             return GetContent(flags, flagFind) ?? string.Empty;
         }
+
+        public static Dictionary<string, string?> GenerateDictionary(params SubCommandFlag[] flags)
+        {
+            Dictionary<string, string?> flagDictionary = new();
+
+            foreach (SubCommandFlag flag in flags)
+            {
+                if (flag.GetRequiredValue()) throw new ArgumentException($"{flag.GetName()} flag needs value");
+
+                flagDictionary.Add(flag.GetName(), string.Empty);
+            }
+
+            return flagDictionary;
+        }
     }
 }

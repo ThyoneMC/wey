@@ -43,7 +43,7 @@ namespace wey.Command
             {
                 Config.Edit(
                     (data) => {
-                        data.Hamachi = string.Empty;
+                        data.Tunnel.Hamachi = string.Empty;
                         return data;
                     }
                 );
@@ -65,7 +65,7 @@ namespace wey.Command
             //config
             Config.Edit(
                     (data) => {
-                        data.Hamachi = Hamachi_Path;
+                        data.Tunnel.Hamachi = Hamachi_Path;
                         return data;
                     }
                 );

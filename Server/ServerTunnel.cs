@@ -85,7 +85,7 @@ namespace wey.Server
 
         public static void StopHamachi(string name)
         {
-            string Hamachi_Path = Config.Get().Hamachi;
+            string Hamachi_Path = Config.Get().Tunnel.Hamachi;
             CommandPrompt Hamachi_Command = new(
                     new ProcessStartInfo()
                     {
@@ -107,7 +107,7 @@ namespace wey.Server
 
             public static TunnelOpeningData Get(string path)
             {
-                string read = FileController.StaticReadFile(path);
+                string read = StaticFileController.Read(path);
                 if (string.IsNullOrEmpty(read)) return new();
 
                 TunnelOpeningData? openingData = JsonSerializer.Deserialize<TunnelOpeningData>(read);
@@ -131,18 +131,18 @@ namespace wey.Server
             ConfigData config = Config.Get();
             TunnelOpeningData openingData = TunnelOpeningData.Get(DataPath);
 
-            if (!string.IsNullOrEmpty(config.Ngrok) && !CommandPrompt.IsProcessExists(openingData.Ngrok)) openingData.Ngrok = StartNgrok(config.Ngrok);
+            if (!string.IsNullOrEmpty(config.Tunnel.Ngrok) && !CommandPrompt.IsProcessExists(openingData.Ngrok)) openingData.Ngrok = StartNgrok(config.Tunnel.Ngrok);
 
-            if (!string.IsNullOrEmpty(config.PlayIt) && !CommandPrompt.IsProcessExists(openingData.PlayIt)) openingData.PlayIt = StartPlayIt(config.PlayIt);
+            if (!string.IsNullOrEmpty(config.Tunnel.PlayIt) && !CommandPrompt.IsProcessExists(openingData.PlayIt)) openingData.PlayIt = StartPlayIt(config.Tunnel.PlayIt);
 
             int password = Math.Max(Data.CreateAt.Millisecond, Data.CreateAt.Second) + 111;
-            if (!string.IsNullOrEmpty(config.Hamachi))
+            if (!string.IsNullOrEmpty(config.Tunnel.Hamachi))
             {
-                openingData.Hamachi = StartHamachi(config.Hamachi, Data.SpecificName, password.ToString(), openingData.IsHamachiCreated);
+                openingData.Hamachi = StartHamachi(config.Tunnel.Hamachi, Data.SpecificName, password.ToString(), openingData.IsHamachiCreated);
                 openingData.IsHamachiCreated = true;
             }
 
-            FileController.StaticEditFile(DataPath, JsonSerializer.Serialize(openingData));
+            StaticFileController.Edit(DataPath, JsonSerializer.Serialize(openingData));
         }
 
         public void Stop()

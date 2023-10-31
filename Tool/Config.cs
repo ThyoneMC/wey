@@ -8,7 +8,7 @@ using wey.Console;
 
 namespace wey.Tool
 {
-    class ConfigData
+    class ConfigTunnelData
     {
         [JsonPropertyName("ngrok")]
         public string Ngrok { get; set; } = string.Empty;
@@ -19,14 +19,22 @@ namespace wey.Tool
         [JsonPropertyName("hamachi")]
         public string Hamachi { get; set; } = string.Empty;
     }
+    class ConfigData
+    {
+        [JsonPropertyName("tunnel")]
+        public ConfigTunnelData Tunnel { get; set; } = new();
+
+        [JsonPropertyName("auto_restart_delay")]
+        public int AutoRestartDelay { get; set; } = 30; // every min
+    }
 
     class Config
     {
-        private static readonly FileController File = new("config");
+        private static readonly FileController<ConfigData> File = new("config");
 
         public static ConfigData Get()
         {
-            ConfigData? read = File.ReadFile<ConfigData>();
+            ConfigData? read = File.Read();
 
             if (read == null) return new();
 
@@ -40,7 +48,7 @@ namespace wey.Tool
 
         public static void Set(ConfigData data)
         {
-            File.EditFile(data);
+            File.Edit(data);
 
             Logger.Info("config saved");
         }

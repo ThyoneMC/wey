@@ -43,7 +43,7 @@ namespace wey.Command
             {
                 Config.Edit(
                     (data) => {
-                        data.Ngrok = string.Empty;
+                        data.Tunnel.Ngrok = string.Empty;
                         return data;
                     }
                 );
@@ -69,7 +69,7 @@ namespace wey.Command
             //config
             Config.Edit(
                     (data) => { 
-                        data.Ngrok = Ngrok_Path;
+                        data.Tunnel.Ngrok = Ngrok_Path;
                         return data;
                     }
                 );

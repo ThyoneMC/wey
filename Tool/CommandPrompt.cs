@@ -30,7 +30,7 @@ namespace wey.Tool
             foreach (string folderPath in AllPath.Split(";"))
             {
                 if (!Directory.Exists(folderPath)) continue;
-                string[] folderFiles = FileController.StaticReadFolder(folderPath).Files;
+                string[] folderFiles = StaticFolderController.Read(folderPath).Files;
 
                 foreach (string filePath in folderFiles)
                 {
