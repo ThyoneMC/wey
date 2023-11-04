@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using wey.Tool;
 
-namespace wey.Client
+namespace wey.Provider
 {
     class FabricMC
     {

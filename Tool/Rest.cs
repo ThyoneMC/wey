@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using wey.Console;
 
-namespace wey.Client
+namespace wey.Tool
 {
     class Rest
     {

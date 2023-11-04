@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using wey.Command;
 using wey.Console;
-using wey.Core;
+using wey.Model;
 using wey.Tool;
 
 namespace wey.Server

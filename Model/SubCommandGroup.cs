@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace wey.Core
+namespace wey.Model
 {
     public abstract class SubCommandGroup: SubCommandBase
     {

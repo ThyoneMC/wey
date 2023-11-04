@@ -83,19 +83,21 @@ namespace wey.Tool
             return Process.Start(StartInfo);
         }
 
-        private Process process = new();
+        private readonly Process process = new();
 
         public CommandPrompt(ProcessStartInfo startInfo)
         {
             process.StartInfo = startInfo;
         }
 
-        public void Execute(params string[] args)
+        public Process Execute(params string[] args)
         {
             process.StartInfo.Arguments = string.Join(" ", args);
 
             process.Start();
             process.WaitForExit();
+
+            return process;
         }
     }
 }

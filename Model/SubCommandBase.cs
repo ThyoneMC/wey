@@ -4,14 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace wey.Core
+namespace wey.Model
 {
     public enum SubCommandType
     {
         Group,
         Executable,
         Syntax,
-        Flag
+        Flag,
+        Tunnel
     }
 
     public abstract class SubCommandBase

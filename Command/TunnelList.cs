@@ -4,8 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wey.Console;
-using wey.Core;
-using wey.Tool;
+using wey.Model;
 
 namespace wey.Command
 {

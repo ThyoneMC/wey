@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wey.Core;
+using wey.Model;
 using wey.Server;
 
 namespace wey.Command

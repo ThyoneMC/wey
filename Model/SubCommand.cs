@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using wey.Console;
 
-namespace wey.Core
+namespace wey.Model
 {
     public abstract class SubCommand: SubCommandBase
     {

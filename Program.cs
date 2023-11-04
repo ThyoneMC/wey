@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json;
 using wey.Command;
 using wey.Console;
-using wey.Core;
+using wey.Model;
 using wey.Tool;
 
 namespace wey

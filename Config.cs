@@ -5,8 +5,9 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using wey.Console;
+using wey.Tool;
 
-namespace wey.Tool
+namespace wey
 {
     class ConfigTunnelData
     {

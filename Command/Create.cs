@@ -5,10 +5,11 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using wey.Client;
+using wey.Provider;
 using wey.Console;
-using wey.Core;
+using wey.Model;
 using wey.Server;
+using wey.Tool;
 
 namespace wey.Command
 {

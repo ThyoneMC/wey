@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wey.Client;
-using wey.Core;
+using wey.Provider;
+using wey.Model;
 
 namespace wey.Command
 {
