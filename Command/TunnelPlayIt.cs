@@ -35,7 +35,7 @@ namespace wey.Command
             };
         }
 
-        public override void Execute(string[] args, Dictionary<string, string?> flags)
+        public override void Execute(string[] args, ISubCommandFlags flags)
         {
             //delete flag
             if (SubCommandFlag.GetUsed(flags, "delete"))
@@ -52,18 +52,7 @@ namespace wey.Command
             }
 
             //path
-            string? PlayIt_Path = CommandPrompt.Where("playit.exe");
-            if (PlayIt_Path == null)
-            {
-                string InputPath = Path.GetFullPath(Input.ReadString("playit.exe path: "));
-                if (!File.Exists(InputPath))
-                {
-                    Logger.Error($"{InputPath} not found");
-                    return;
-                }
-
-                PlayIt_Path = InputPath;
-            }
+            string PlayIt_Path = TunnelPathFlag.GetRequiredPath(flags, "playit.exe");
 
             //config
             Config.Edit(

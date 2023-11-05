@@ -36,7 +36,7 @@ namespace wey.Command
             };
         }
 
-        public override void Execute(string[] args, Dictionary<string, string?> flags)
+        public override void Execute(string[] args, ISubCommandFlags flags)
         {
             //delete flag
             if (SubCommandFlag.GetUsed(flags, "delete"))
@@ -53,18 +53,7 @@ namespace wey.Command
             }
 
             //path
-            string? Ngrok_Path = CommandPrompt.Where("ngrok.exe");
-            if (Ngrok_Path == null)
-            {
-                string InputPath = Path.GetFullPath(Input.ReadString("ngrok.exe path: "));
-                if (!File.Exists(InputPath))
-                {
-                    Logger.Error($"{InputPath} not found");
-                    return;
-                }
-
-                Ngrok_Path = InputPath;
-            }
+            string Ngrok_Path = TunnelPathFlag.GetRequiredPath(flags, "ngrok.exe");
 
             //config
             Config.Edit(

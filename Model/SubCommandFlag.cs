@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace wey.Model
 {
+    public class ISubCommandFlags : Dictionary<string, string?>
+    {
+       
+    }
+
     public enum SubCommandFlagType
     {
         String,
@@ -14,7 +19,7 @@ namespace wey.Model
         Boolean
     }
 
-    public abstract class SubCommandFlag: SubCommandBase
+    public abstract class SubCommandFlag : SubCommandBase
     {
         // class
 
@@ -29,7 +34,7 @@ namespace wey.Model
 
         // static
 
-        public static bool GetUsed(IDictionary<string, string?> flags, string flagFind)
+        public static bool GetUsed(ISubCommandFlags flags, string flagFind)
         {
             foreach(string flagString in flags.Keys)
             {
@@ -42,7 +47,7 @@ namespace wey.Model
             return false;
         }
 
-        public static string? GetContent(IDictionary<string, string?> flags, string flagFind)
+        public static string? GetContent(ISubCommandFlags flags, string flagFind)
         {
             foreach (string flagString in flags.Keys)
             {
@@ -55,14 +60,14 @@ namespace wey.Model
             return null;
         }
 
-        public static string GetContentRequired(IDictionary<string, string?> flags, string flagFind)
+        public static string GetContentRequired(ISubCommandFlags flags, string flagFind)
         {
             return GetContent(flags, flagFind) ?? string.Empty;
         }
 
-        public static Dictionary<string, string?> GenerateDictionary(params SubCommandFlag[] flags)
+        public static ISubCommandFlags GenerateDictionary(params SubCommandFlag[] flags)
         {
-            Dictionary<string, string?> flagDictionary = new();
+            ISubCommandFlags flagDictionary = new();
 
             foreach (SubCommandFlag flag in flags)
             {

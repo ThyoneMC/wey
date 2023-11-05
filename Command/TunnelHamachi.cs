@@ -32,10 +32,11 @@ namespace wey.Command
             return new SubCommandFlag[]
             {
                 new TunnelDeleteFlag(),
+                new TunnelPathFlag()
             };
         }
 
-        public override void Execute(string[] args, Dictionary<string, string?> flags)
+        public override void Execute(string[] args, ISubCommandFlags flags)
         {
             //delete flag
             if (SubCommandFlag.GetUsed(flags, "delete"))
@@ -53,13 +54,7 @@ namespace wey.Command
 
             //path
             Logger.Warn("make sure it not shortcut or ui");
-            string Hamachi_Path = Path.GetFullPath(Input.ReadString("hamachi path: "));
-
-            if (!File.Exists(Hamachi_Path))
-            {
-                Logger.Error($"{Hamachi_Path} not found");
-                return;
-            }
+            string Hamachi_Path = TunnelPathFlag.GetRequiredPath(flags, "hamachi-2.exe");
 
             //config
             Config.Edit(

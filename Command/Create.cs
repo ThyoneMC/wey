@@ -43,7 +43,7 @@ namespace wey.Command
             };
         }
 
-        public override void Execute(string[] args, Dictionary<string, string?> flags)
+        public override void Execute(string[] args, ISubCommandFlags flags)
         {   
             if (!SubCommandFlag.GetUsed(flags, "eula") && !Input.ReadBoolean("Do you accept to Minecraft End User License Agreement?")) return;
 

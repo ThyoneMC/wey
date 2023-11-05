@@ -19,6 +19,6 @@ namespace wey.Model
 
         public abstract SubCommandFlag[] GetFlags();
 
-        public abstract void Execute(string[] args, Dictionary<string, string?> flags);
+        public abstract void Execute(string[] args, ISubCommandFlags flags);
     }
 }

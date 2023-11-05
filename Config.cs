@@ -27,6 +27,9 @@ namespace wey
 
         [JsonPropertyName("auto_restart_delay")]
         public int AutoRestartDelay { get; set; } = 30; // every min
+
+        [JsonPropertyName("port")]
+        public int ServerPort { get; set; } = 25565;
     }
 
     class Config

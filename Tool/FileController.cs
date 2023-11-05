@@ -60,7 +60,7 @@ namespace wey.Tool
             }
         }
 
-        public static void DeleteFile(string filePath)
+        public static void Delete(string filePath)
         {
             if (!File.Exists(filePath)) return;
 
@@ -112,6 +112,25 @@ namespace wey.Tool
             {
                 return;
             }
+        }
+
+        public static void Temporary(params string[] path)
+        {
+            string folderPath = Path.Combine(path);
+
+            if (!Directory.Exists(folderPath)) return;
+
+            string tempPath = Path.Join(Path.GetTempPath(), $"wey_temp_{Path.GetFileName(folderPath)}_{DateTime.UtcNow.ToFileTime()}".ToLower());
+            Directory.Move(folderPath, tempPath);
+        }
+
+        public static void Delete(params string[] path)
+        {
+            string folderPath = Path.Combine(path);
+
+            if (!Directory.Exists(folderPath)) return;
+
+            Directory.Delete(folderPath, true);
         }
     }
 
@@ -189,7 +208,7 @@ namespace wey.Tool
         
         public void Delete()
         {
-            StaticFileController.DeleteFile(filePath);
+            StaticFileController.Delete(filePath);
         }
     }
 }

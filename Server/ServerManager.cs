@@ -51,6 +51,9 @@ namespace wey.Server
         [JsonPropertyName("pid")]
         public int ProcessId { get; set; } = -1;
 
+        [JsonPropertyName("wey_pid")]
+        public int WeyProcessId { get; set; } = -1;
+
         [JsonPropertyName("auto_restart")]
         public bool AutoRestart { get; set; } = false;
     }
@@ -159,6 +162,7 @@ namespace wey.Server
             ProcessData.Edit((data) =>
             {
                 data.ProcessId = process.Id;
+                data.WeyProcessId = Environment.ProcessId;
                 data.AutoRestart = autoRestart;
                 return data;
             });
@@ -226,9 +230,10 @@ namespace wey.Server
         {
             Logger.Info($"Stoping Server: {Data.Name}");
 
-            int pid = ProcessData.ReadRequired().ProcessId;
+            ServerProcessData processData = ProcessData.ReadRequired();
 
-            if (CommandPrompt.IsProcessExists(pid)) CommandPrompt.KillProcess(pid);
+            if (processData.AutoRestart) CommandPrompt.KillProcess(processData.WeyProcessId);
+            CommandPrompt.KillProcess(processData.ProcessId);
 
             ProcessData.Delete();
         }

@@ -39,7 +39,7 @@ namespace wey.Command
             };
         }
 
-        public override void Execute(string[] args, Dictionary<string, string?> flags)
+        public override void Execute(string[] args, ISubCommandFlags flags)
         {
             ServerData TargetServer = GetTargetServer(flags);
             if (!SubCommandFlag.GetUsed(flags, "force") && !Input.ReadBoolean($"Are you sure to start {TargetServer.Name}?")) return;
@@ -58,7 +58,7 @@ namespace wey.Command
 
         // static
 
-        public static ServerData GetTargetServer(Dictionary<string, string?> flags)
+        public static ServerData GetTargetServer(ISubCommandFlags flags)
         {
             if (SubCommandFlag.GetUsed(flags, "name"))
             {

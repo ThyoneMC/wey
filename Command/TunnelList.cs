@@ -30,7 +30,7 @@ namespace wey.Command
             return Array.Empty<SubCommandFlag>();
         }
 
-        public override void Execute(string[] args, Dictionary<string, string?> flags)
+        public override void Execute(string[] args, ISubCommandFlags flags)
         {
             List<string> tunnels = new();
 

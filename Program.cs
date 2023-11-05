@@ -174,7 +174,7 @@ namespace wey
                             }
 
                             //flag
-                            Dictionary<string, string?> flagDictionary = new();
+                            ISubCommandFlags flagDictionary = new();
 
                             foreach (string flagString in flags)
                             {

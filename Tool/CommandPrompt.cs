@@ -16,6 +16,7 @@ namespace wey.Tool
         public string FileName { get; set; } = string.Empty;
         public string Arguments { get; set; } = string.Empty;
         public string WorkDirectory { get; set; } = Directory.GetCurrentDirectory();
+        public ProcessWindowStyle WindowStyle { get; set; } = ProcessWindowStyle.Normal;
     }
 
     class CommandPrompt
@@ -52,11 +53,17 @@ namespace wey.Tool
         public static void KillProcess(int? pid = -1)
         {
             if (pid == null || pid == -1) return;
+            if (!IsProcessExists((int)pid)) return;
+
+            KillProcess(Process.GetProcessById((int)pid));
+        }
+
+        public static void KillProcess(Process? process)
+        {
+            if (process == null) return;
 
             try
             {
-                Process process = Process.GetProcessById((int)pid);
-
                 if (!process.HasExited) process.Kill(true);
             }
             catch (Exception exception)
@@ -73,7 +80,7 @@ namespace wey.Tool
             {
                 UseShellExecute = true,
                 CreateNoWindow = false,
-                WindowStyle = ProcessWindowStyle.Normal,
+                WindowStyle = config.WindowStyle,
 
                 FileName = config.FileName,
                 Arguments = config.Arguments,

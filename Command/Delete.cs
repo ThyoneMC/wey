@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using wey.Console;
 using wey.Model;
@@ -11,16 +10,16 @@ using wey.Tool;
 
 namespace wey.Command
 {
-    class Stop : SubCommand
+    class Delete : SubCommand
     {
         public override string GetName()
         {
-            return "stop";
+            return "delete";
         }
 
         public override string GetDescription()
         {
-            return "stop the server";
+            return "delete the server";
         }
 
         public override SubCommandSyntax[] GetSyntax()
@@ -40,15 +39,16 @@ namespace wey.Command
         public override void Execute(string[] args, ISubCommandFlags flags)
         {
             ServerData TargetServer = Start.GetTargetServer(flags);
-            if (!SubCommandFlag.GetUsed(flags, "force") && !Input.ReadBoolean($"Are you sure to stop {TargetServer.Name}?")) return;
+            if (!SubCommandFlag.GetUsed(flags, "force") && !Input.ReadBoolean($"Are you sure to delete {TargetServer.Name}?")) return;
 
             //tunnel
             ServerTunnel tunnel = new(TargetServer);
-            tunnel.Stop();
 
-            //server
-            ServerManager server = new(TargetServer);
-            server.Stop();
+            tunnel.Hamachi.Delete();
+
+            //folder
+            if (!SubCommandFlag.GetUsed(flags, "force")) StaticFolderController.Temporary(TargetServer.FolderPath);
+            StaticFolderController.Delete(TargetServer.FolderPath);
         }
     }
 }
