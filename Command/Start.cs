@@ -69,7 +69,8 @@ namespace wey.Command
 
             ServerData[] TargetServerData = ServerManager.GetServer(ServerManager.FindServer());
 
-            return TargetServerData[Choice.StartGetIndex(TargetServerData.Select(data => data.FolderPath).ToArray())];
+            string[] ServerSelection = TargetServerData.Select(data => $"{data.Name} ({data.Provider}, {data.BuildInfo[0]}, {data.CreateAt.ToLocalTime()})").ToArray();
+            return TargetServerData[Choice.StartGetIndex(ServerSelection)];
         }
     }
 }

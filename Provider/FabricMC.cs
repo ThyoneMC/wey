@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using wey.Console;
+using wey.Model;
 using wey.Tool;
 
 namespace wey.Provider
 {
-    class FabricMC
+    class FabricMC : ProviderBase
     {
         private static readonly Rest Client = new("https://meta.fabricmc.net/v2/versions/");
 
@@ -80,6 +82,61 @@ namespace wey.Provider
         public static byte[] Download(string gameVersion, string loaderVersion, string installerVersion)
         {
             return Client.Download($"loader/{gameVersion}/{loaderVersion}/{installerVersion}/server/jar");
+        }
+
+        //#class
+
+        public override ProviderBaseDownload GetServerJar(string TargetGameVersion)
+        {
+            //version
+            FabricMC.GameVersions[] GameVersions = FabricMC.GetGameVersions();
+
+            if (TargetGameVersion == Vanilla.VersionType.Release)
+            {
+                foreach (FabricMC.GameVersions Version in GameVersions)
+                {
+                    // first that are stable
+                    if (Version.IsStable)
+                    {
+                        TargetGameVersion = Version.Version;
+                        break;
+                    }
+                }
+            }
+            else if (TargetGameVersion == Vanilla.VersionType.Snapshot)
+            {
+                foreach (FabricMC.GameVersions Version in GameVersions)
+                {
+                    if (!Version.IsStable)
+                    {
+                        TargetGameVersion = Version.Version;
+                        break;
+                    }
+                }
+            }
+
+            //server
+            FabricMC.Loaders[] ServerLoader = FabricMC.GetLoaders(TargetGameVersion);
+            if (ServerLoader.Length == 0) throw new ArgumentException("game version not found");
+
+            string TargetLoader = ServerLoader[0].Loader.Version;
+
+            FabricMC.Installer[] ServerInstaller = FabricMC.GetInstaller();
+            string TargetInstaller = ServerInstaller[0].Version;
+
+            //download
+            return GetServerJar(new string[] { TargetGameVersion, TargetLoader, TargetInstaller });
+        }
+
+        public override ProviderBaseDownload GetServerJar(string[] buildInfo)
+        {
+            // [version, loader, installer]
+
+            return new ProviderBaseDownload()
+            {
+                BuildInfo = buildInfo,
+                ServerJar = FabricMC.Download(gameVersion: buildInfo[0], loaderVersion: buildInfo[1], installerVersion: buildInfo[2])
+            };
         }
     }
 }

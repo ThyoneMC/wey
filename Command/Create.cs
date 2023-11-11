@@ -58,145 +58,52 @@ namespace wey.Command
             {
                 case ServerProvider.Vanilla:
                     {
-                        //version
-                        Vanilla.Version GameVersions = Vanilla.GetVersions();
-
-                        string TargetGameVersion = Server_Version;
-                        if (Server_Version == Vanilla.VersionType.Release) TargetGameVersion = GameVersions.LatestVersion.Release;
-                        else if (Server_Version == Vanilla.VersionType.Snapshot) TargetGameVersion = GameVersions.LatestVersion.Snapshot;
-
-                        //server
-                        string URL = string.Empty;
-                        foreach (Vanilla.VersionData Version in GameVersions.Versions)
-                        {
-                            if (Version.ID == TargetGameVersion)
-                            {
-                                URL = Version.URL;
-                                break;
-                            }
-                        }
-                        if (string.IsNullOrEmpty(URL))
-                        {
-                            Logger.Error("game version not found");
-                            return;
-                        }
-
-                        //download
-                        Vanilla.VersionMeta VersionMeta = Rest.StaticGet<Vanilla.VersionMeta>(URL);
-
-                        byte[] ServerFile = Rest.StaticDownload(VersionMeta.Downloads.Server.URL);
+                        ProviderBaseDownload ServerFile = new Vanilla().GetServerJar(Server_Version);
 
                         ServerManager server = new(
                                 new ServerData(
                                         Server_Name, 
-                                        ServerProvider.Vanilla, 
-                                        new string[] { TargetGameVersion },
+                                        ServerProvider.Vanilla,
+                                        ServerFile.BuildInfo,
                                         Server_Path
                                     )
                             );
                         server.Create();
-                        server.AddServerFile(ServerFile);
+                        server.AddServerFile(ServerFile.ServerJar);
 
                         break;
                     }
                 case ServerProvider.PaperMC:
                     {
-                        string TargetProject = "paper";
-
-                        //version
-                        PaperMC.Project GameVersions = PaperMC.GetProject(TargetProject);
-
-                        string TargetGameVersion = Server_Version;
-                        if (Server_Version == Vanilla.VersionType.Release) TargetGameVersion = GameVersions.Versions[^1];
-                        else if (Server_Version == Vanilla.VersionType.Snapshot)
-                        {
-                            Logger.Error("paper did not have a snapshot version");
-                            return;
-                        }
-
-                        //build
-                        PaperMC.Build ServerBuild = PaperMC.GetBuilds(TargetProject, TargetGameVersion);
-                        if (ServerBuild.Builds == null)
-                        {
-                            Logger.Error("game version not found");
-                            return;
-                        }
-                        
-                        PaperMC.BuildData LastestBuild = ServerBuild.Builds[^1];
-                        string TargetBuild = LastestBuild.ID.ToString();
-                        string TargetDownload = LastestBuild.Download.Application.Name;
-
-                        //download
-                        byte[] ServerFile = PaperMC.Download(TargetProject, TargetGameVersion, TargetBuild, TargetDownload);
+                        ProviderBaseDownload ServerFile = new PaperMC().GetServerJar(Server_Version);
 
                         ServerManager server = new(
                                 new ServerData(
                                         Server_Name,
                                         ServerProvider.PaperMC,
-                                        new string[] { Server_Version, TargetGameVersion, TargetBuild, TargetDownload },
+                                        ServerFile.BuildInfo,
                                         Server_Path
                                     )
                             );
                         server.Create();
-                        server.AddServerFile(ServerFile);
+                        server.AddServerFile(ServerFile.ServerJar);
 
                         break;
                     }
                 case ServerProvider.FabricMC:
                     {
-                        //version
-                        FabricMC.GameVersions[] GameVersions = FabricMC.GetGameVersions();
-
-                        string TargetGameVersion = Server_Version;
-                        if (Server_Version == Vanilla.VersionType.Release)
-                        {
-                            foreach (FabricMC.GameVersions Version in GameVersions)
-                            {
-                                if (Version.IsStable)
-                                {
-                                    TargetGameVersion = Version.Version;
-                                    break;
-                                }
-                            }
-                        }
-                        else if (Server_Version == Vanilla.VersionType.Snapshot)
-                        {
-                            foreach (FabricMC.GameVersions Version in GameVersions)
-                            {
-                                if (!Version.IsStable)
-                                {
-                                    TargetGameVersion = Version.Version;
-                                    break;
-                                }
-                            }
-                        }
-
-                        //server
-                        FabricMC.Loaders[] ServerLoader = FabricMC.GetLoaders(TargetGameVersion);
-                        if (ServerLoader.Length == 0)
-                        {
-                            Logger.Error("game version not found");
-                            return;
-                        }
-
-                        string TargetLoader = ServerLoader[0].Loader.Version;
-
-                        FabricMC.Installer[] ServerInstaller = FabricMC.GetInstaller();
-                        string TargetInstaller = ServerInstaller[0].Version;
-
-                        //download
-                        byte[] ServerFile = FabricMC.Download(TargetGameVersion, TargetLoader, TargetInstaller);
+                        ProviderBaseDownload ServerFile = new FabricMC().GetServerJar(Server_Version);
 
                         ServerManager server = new(
                                 new ServerData(
                                         Server_Name,
                                         ServerProvider.FabricMC,
-                                        new string[] { Server_Version, TargetLoader, TargetInstaller },
+                                        ServerFile.BuildInfo,
                                         Server_Path
                                     )
                             );
                         server.Create();
-                        server.AddServerFile(ServerFile);
+                        server.AddServerFile(ServerFile.ServerJar);
 
                         break;
                     }

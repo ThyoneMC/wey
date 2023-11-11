@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using wey.Console;
+using wey.Model;
 using wey.Tool;
 
 namespace wey.Provider
 {
-    class Vanilla
+    class Vanilla : ProviderBase
     {
         // versions
 
@@ -74,6 +76,45 @@ namespace wey.Provider
         {
             [JsonPropertyName("downloads")]
             public VersionMetaDownload Downloads { get; set; }
+        }
+
+        //#class
+
+        public override ProviderBaseDownload GetServerJar(string TargetGameVersion)
+        {
+            //version
+            Vanilla.Version GameVersions = Vanilla.GetVersions();
+
+            if (TargetGameVersion == Vanilla.VersionType.Release) TargetGameVersion = GameVersions.LatestVersion.Release;
+            else if (TargetGameVersion == Vanilla.VersionType.Snapshot) TargetGameVersion = GameVersions.LatestVersion.Snapshot;
+
+            //server
+            string URL = string.Empty;
+            foreach (Vanilla.VersionData Version in GameVersions.Versions)
+            {
+                if (Version.ID == TargetGameVersion)
+                {
+                    URL = Version.URL;
+                    break;
+                }
+            }
+            if (string.IsNullOrEmpty(URL)) throw new ArgumentException("game version not found");
+
+            //download
+            Vanilla.VersionMeta VersionMeta = Rest.StaticGet<Vanilla.VersionMeta>(URL);
+
+            return GetServerJar(new string[] { TargetGameVersion, VersionMeta.Downloads.Server.URL });
+        }
+
+        public override ProviderBaseDownload GetServerJar(string[] buildInfo)
+        {
+            // [version, downloadURL]
+
+            return new ProviderBaseDownload()
+            {
+                BuildInfo = buildInfo,
+                ServerJar = Rest.StaticDownload(buildInfo[1]),
+            };
         }
     }
 }

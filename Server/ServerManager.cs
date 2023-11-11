@@ -163,6 +163,15 @@ namespace wey.Server
             StaticFileController.Build(Path.Join(Data.FolderPath, "server.jar"), jarData);
         }
 
+        public void AddServerFile(ProviderBaseDownload downloadData)
+        {
+            this.Data.BuildInfo = downloadData.BuildInfo;
+            StaticFileController.Edit(Path.Join(DataPath, "config.json"), JsonSerializer.Serialize(Data));
+
+            StaticFileController.Delete(Path.Join(Data.FolderPath, "server.jar"));
+            AddServerFile(downloadData.ServerJar);
+        }
+
         public void Start(bool autoRestart = false)
         {
             if (CommandPrompt.IsProcessExists(ProcessData.ReadRequired().ProcessId)) Stop();
