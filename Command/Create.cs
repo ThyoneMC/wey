@@ -94,6 +94,7 @@ namespace wey.Command
                                         Server_Path
                                     )
                             );
+                        server.Create();
                         server.AddServerFile(ServerFile);
 
                         break;
@@ -136,6 +137,7 @@ namespace wey.Command
                                         Server_Path
                                     )
                             );
+                        server.Create();
                         server.AddServerFile(ServerFile);
 
                         break;
@@ -193,6 +195,7 @@ namespace wey.Command
                                         Server_Path
                                     )
                             );
+                        server.Create();
                         server.AddServerFile(ServerFile);
 
                         break;

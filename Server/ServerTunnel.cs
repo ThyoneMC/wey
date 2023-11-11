@@ -10,6 +10,7 @@ using wey.Console;
 using wey.Tool;
 using System.Security.Cryptography;
 using wey.Tunnel;
+using wey.Global;
 
 namespace wey.Server
 {

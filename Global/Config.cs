@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using wey.Console;
 using wey.Tool;
 
-namespace wey
+namespace wey.Global
 {
     class ConfigTunnelData
     {
@@ -54,7 +54,7 @@ namespace wey
         {
             File.Edit(data);
 
-            Logger.Info("config saved");
+            Logger.Log("config saved");
         }
     }
 }

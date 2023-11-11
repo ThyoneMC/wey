@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wey.Global;
 
 namespace wey.Console
 {
@@ -30,7 +31,7 @@ namespace wey.Console
 
         public static void WriteSingle(params string[] message)
         {
-            System.Console.WriteLine(string.Join(" ", message));
+            System.Console.WriteLine(string.Join(' ', message));
         }
 
         public static void WriteMultiple(params string[] message)
@@ -48,7 +49,7 @@ namespace wey.Console
                             DateTime.UtcNow.ToLocalTime().ToLongTimeString(),
                             mode
                         ),
-                    string.Join(" ", message)
+                    Log(message)
                 );
         }
 
@@ -70,6 +71,15 @@ namespace wey.Console
             System.Console.ResetColor();
         }
 
+        public static string Log(params string[] message)
+        {
+            string text = string.Join(' ', message);
+
+            Logs.Add($"{DateTime.UtcNow.ToFileTime()} : {text}");
+
+            return text;
+        }
+
         public static void Info(params string[] message)
         {
             CreateWriteLine("INFO", ConsoleColor.White, message);
@@ -83,6 +93,12 @@ namespace wey.Console
         public static void Warn(params string[] message)
         {
             CreateWriteLine("WARN", ConsoleColor.Yellow, message);
+        }
+
+        public static void Warn(Exception exception)
+        {
+            Warn(exception.Message);
+            if (exception.StackTrace != null) CreateWriteLine(exception.StackTrace, ConsoleColor.Yellow);
         }
 
         public static void Error(params string[] message)

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using wey.Command;
 using wey.Console;
+using wey.Global;
 using wey.Model;
 using wey.Tool;
 
@@ -64,27 +65,30 @@ namespace wey.Server
 
         public static string[] FindServer()
         {
-            List<string> path = new();
-
             //current folder
             string local = Path.Join(Directory.GetCurrentDirectory(), ".wey", "config.json");
             if (File.Exists(local))
             {
-                path.Add(local);
+                return new string[] { local };
             }
 
-            //in folder (depth=1)
-            foreach (string itemName in StaticFolderController.Read(Directory.GetCurrentDirectory()).Folders)
-            {
-                string itemPath = Path.Join(itemName, ".wey", "config.json");
+            //find config.json
+            List<string> path = new();
 
-                if (File.Exists(itemPath))
+            string[] localList = StaticFolderController.Read(Directory.GetCurrentDirectory()).Folders; //in folder (depth=1)
+            string[] serverLists = ServerList.Get().ToArray(); //server list
+
+            foreach (string itemPath in localList.Concat(serverLists))
+            {
+                string configPath = Path.Join(itemPath, ".wey", "config.json");
+
+                if (File.Exists(configPath))
                 {
-                    path.Add(itemPath);
+                    path.Add(configPath);
                 }
             }
 
-            return path.ToArray();
+            return path.Distinct().ToArray();
         }
 
         public static string FindServer(string name)
@@ -128,13 +132,34 @@ namespace wey.Server
             ProcessData = new(DataPath, "process_info");
         }
 
-        public void AddServerFile(byte[] jarData)
+        public void Create()
         {
             Logger.Info($"Creating: {Data.Name}");
 
             StaticFileController.Build(Path.Join(DataPath, "config.json"), JsonSerializer.Serialize(Data));
-
             StaticFileController.Build(Path.Join(Data.FolderPath, "eula.txt"), "eula=true");
+
+            ServerList.Add(Data.FolderPath);
+        }
+
+        public void Delete(bool temporary)
+        {
+            Logger.Info($"Deleting: {Data.Name}");
+
+            if (temporary)
+            {
+                StaticFolderController.Temporary(Data.FolderPath);
+            }
+            else
+            {
+                StaticFolderController.Delete(Data.FolderPath);
+            }
+
+            ServerList.Remove(Data.FolderPath);
+        }
+
+        public void AddServerFile(byte[] jarData)
+        {
             StaticFileController.Build(Path.Join(Data.FolderPath, "server.jar"), jarData);
         }
 

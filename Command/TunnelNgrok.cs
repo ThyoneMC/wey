@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using wey.Console;
+using wey.Global;
 using wey.Model;
 using wey.Tool;
 

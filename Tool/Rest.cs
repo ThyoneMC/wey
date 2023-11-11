@@ -23,6 +23,8 @@ namespace wey.Tool
 
         public static T StaticGet<T>(string url)
         {
+            Logger.Log($"GET: {url}");
+
             Task<T?> Data = StaticClient.GetAsync<T>(new RestRequest(url));
 
             if (Data == null) throw new NullReferenceException();
@@ -33,6 +35,8 @@ namespace wey.Tool
 
         public static byte[] StaticDownload(string url)
         {
+            Logger.Log($"DOWNLOAD: {url}");
+
             Task<byte[]?> Data = StaticClient.DownloadDataAsync(new RestRequest(url));
 
             if (Data == null) throw new NullReferenceException();

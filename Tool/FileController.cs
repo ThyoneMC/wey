@@ -70,6 +70,8 @@ namespace wey.Tool
 
     class StaticFolderController
     {
+        public static string AppdataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ".wey");
+
         public static void Build(params string[] path)
         {
             string folderPath = Path.Combine(path);
@@ -120,8 +122,20 @@ namespace wey.Tool
 
             if (!Directory.Exists(folderPath)) return;
 
-            string tempPath = Path.Join(Path.GetTempPath(), $"wey_temp_{Path.GetFileName(folderPath)}_{DateTime.UtcNow.ToFileTime()}".ToLower());
-            Directory.Move(folderPath, tempPath);
+            string tempFolderPath = Path.Combine(Path.GetTempPath(), ".wey");
+            if (!Directory.Exists(tempFolderPath)) StaticFolderController.Build(tempFolderPath);
+
+            try
+            {
+                string tempPath = Path.Join(tempFolderPath, $"{Path.GetFileName(folderPath)}_{DateTime.UtcNow.ToFileTime()}".ToLower());
+                Directory.Move(folderPath, tempPath);
+            }
+            catch (Exception exception)
+            {
+                Logger.Warn(exception);
+            }
+
+            StaticFolderController.Delete(folderPath);
         }
 
         public static void Delete(params string[] path)
@@ -138,6 +152,11 @@ namespace wey.Tool
     {
         private static T CreateTypeInstance()
         {
+            if (typeof(T) == typeof(string))
+            {
+                return (T) (object) string.Empty;
+            }
+
             return Activator.CreateInstance<T>();
         }
 
@@ -157,7 +176,7 @@ namespace wey.Tool
 
         public FileController(string fileName)
         {
-            filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "@ThyoneMC", "wey", Rename(fileName));
+            filePath = Path.Combine(StaticFolderController.AppdataPath, Rename(fileName));
         }
 
         public FileController(string filePath, string fileName)

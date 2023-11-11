@@ -46,9 +46,10 @@ namespace wey.Command
 
             tunnel.Hamachi.Delete();
 
-            //folder
-            if (!SubCommandFlag.GetUsed(flags, "force")) StaticFolderController.Temporary(TargetServer.FolderPath);
-            StaticFolderController.Delete(TargetServer.FolderPath);
+            //server
+            ServerManager server = new(TargetServer);
+
+            server.Delete(!SubCommandFlag.GetUsed(flags, "force"));
         }
     }
 }

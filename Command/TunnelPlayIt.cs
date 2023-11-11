@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wey.Console;
+using wey.Global;
 using wey.Model;
 using wey.Tool;
 
