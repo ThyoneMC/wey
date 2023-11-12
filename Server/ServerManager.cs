@@ -160,6 +160,7 @@ namespace wey.Server
 
         public void AddServerFile(byte[] jarData)
         {
+            StaticFileController.Delete(Path.Join(Data.FolderPath, "server.jar"));
             StaticFileController.Build(Path.Join(Data.FolderPath, "server.jar"), jarData);
         }
 
@@ -168,7 +169,6 @@ namespace wey.Server
             this.Data.BuildInfo = downloadData.BuildInfo;
             StaticFileController.Edit(Path.Join(DataPath, "config.json"), JsonSerializer.Serialize(Data));
 
-            StaticFileController.Delete(Path.Join(Data.FolderPath, "server.jar"));
             AddServerFile(downloadData.ServerJar);
         }
 

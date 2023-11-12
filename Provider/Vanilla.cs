@@ -80,10 +80,17 @@ namespace wey.Provider
 
         //#class
 
+        public override bool GetIsMod()
+        {
+            return false;
+        }
+
         public override ProviderBaseDownload GetServerJar(string TargetGameVersion)
         {
             //version
             Vanilla.Version GameVersions = Vanilla.GetVersions();
+
+            if (TargetGameVersion.StartsWith("last")) TargetGameVersion = Vanilla.VersionType.Release;
 
             if (TargetGameVersion == Vanilla.VersionType.Release) TargetGameVersion = GameVersions.LatestVersion.Release;
             else if (TargetGameVersion == Vanilla.VersionType.Snapshot) TargetGameVersion = GameVersions.LatestVersion.Snapshot;

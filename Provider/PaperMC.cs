@@ -78,10 +78,17 @@ namespace wey.Provider
 
         //#class
 
+        public override bool GetIsMod()
+        {
+            return false;
+        }
+
         public override ProviderBaseDownload GetServerJar(string TargetGameVersion)
         {
             //version
             PaperMC.Project GameVersions = PaperMC.GetProject();
+
+            if (TargetGameVersion.StartsWith("last")) TargetGameVersion = Vanilla.VersionType.Release;
 
             if (TargetGameVersion == Vanilla.VersionType.Release) TargetGameVersion = GameVersions.Versions[GameVersions.Versions.Length - 1];
             else if (TargetGameVersion == Vanilla.VersionType.Snapshot) throw new ArgumentException("paper did not have a snapshot version");

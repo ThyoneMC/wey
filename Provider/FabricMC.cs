@@ -86,10 +86,17 @@ namespace wey.Provider
 
         //#class
 
+        public override bool GetIsMod()
+        {
+            return true;
+        }
+
         public override ProviderBaseDownload GetServerJar(string TargetGameVersion)
         {
             //version
             FabricMC.GameVersions[] GameVersions = FabricMC.GetGameVersions();
+
+            if (TargetGameVersion.StartsWith("last")) TargetGameVersion = Vanilla.VersionType.Release;
 
             if (TargetGameVersion == Vanilla.VersionType.Release)
             {

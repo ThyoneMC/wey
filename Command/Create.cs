@@ -52,67 +52,20 @@ namespace wey.Command
             string Server_Name = args[2];
             string Server_Path = Path.Join(Directory.GetCurrentDirectory(), Server_Name);
 
-            if (Server_Version.StartsWith("last")) Server_Version = Vanilla.VersionType.Release;
+            // download
 
-            switch (Server_Provider)
-            {
-                case ServerProvider.Vanilla:
-                    {
-                        ProviderBaseDownload ServerFile = new Vanilla().GetServerJar(Server_Version);
+            ProviderBaseDownload ServerFile = ServerProvider.GetProvider(Server_Provider).GetServerJar(Server_Version);
 
-                        ServerManager server = new(
-                                new ServerData(
-                                        Server_Name, 
-                                        ServerProvider.Vanilla,
-                                        ServerFile.BuildInfo,
-                                        Server_Path
-                                    )
-                            );
-                        server.Create();
-                        server.AddServerFile(ServerFile.ServerJar);
-
-                        break;
-                    }
-                case ServerProvider.PaperMC:
-                    {
-                        ProviderBaseDownload ServerFile = new PaperMC().GetServerJar(Server_Version);
-
-                        ServerManager server = new(
+            ServerManager server = new(
                                 new ServerData(
                                         Server_Name,
-                                        ServerProvider.PaperMC,
+                                        Server_Provider,
                                         ServerFile.BuildInfo,
                                         Server_Path
                                     )
                             );
-                        server.Create();
-                        server.AddServerFile(ServerFile.ServerJar);
-
-                        break;
-                    }
-                case ServerProvider.FabricMC:
-                    {
-                        ProviderBaseDownload ServerFile = new FabricMC().GetServerJar(Server_Version);
-
-                        ServerManager server = new(
-                                new ServerData(
-                                        Server_Name,
-                                        ServerProvider.FabricMC,
-                                        ServerFile.BuildInfo,
-                                        Server_Path
-                                    )
-                            );
-                        server.Create();
-                        server.AddServerFile(ServerFile.ServerJar);
-
-                        break;
-                    }
-                default:
-                    {
-                        Logger.Error("Provider Not Found");
-                        return;
-                    }
-            }
+            server.Create();
+            server.AddServerFile(ServerFile.ServerJar);
         }
     }
 }

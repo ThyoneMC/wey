@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wey.Console;
+using wey.Provider;
 
 namespace wey.Model
 {
@@ -14,6 +16,8 @@ namespace wey.Model
 
     public abstract class ProviderBase
     {
+        public abstract bool GetIsMod();
+
         public abstract ProviderBaseDownload GetServerJar(string[] buildInfo);
 
         public abstract ProviderBaseDownload GetServerJar(string gameVersion);

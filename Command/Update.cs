@@ -48,31 +48,7 @@ namespace wey.Command
 
             ServerManager server = new(TargetServer);
 
-            ProviderBaseDownload ServerFile;
-            switch (server.Data.Provider)
-            {
-                case ServerProvider.Vanilla:
-                    {
-                        ServerFile = new Vanilla().GetServerJar(Server_Version);
-                        break;
-                    }
-                case ServerProvider.PaperMC:
-                    {
-                        ServerFile = new PaperMC().GetServerJar(Server_Version);
-                        break;
-                    }
-                case ServerProvider.FabricMC:
-                    {
-                        ServerFile = new FabricMC().GetServerJar(Server_Version);
-                        break;
-                    }
-                default:
-                    {
-                        Logger.Error("Provider Not Found");
-                        return;
-                    }
-            }
-
+            ProviderBaseDownload ServerFile = ServerProvider.GetProvider(server.Data.Provider).GetServerJar(Server_Version);
             server.AddServerFile(ServerFile);
         }
     }
