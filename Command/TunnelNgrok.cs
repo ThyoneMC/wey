@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -54,7 +55,8 @@ namespace wey.Command
             }
 
             //path
-            string Ngrok_Path = TunnelPathFlag.GetRequiredPath(flags, "ngrok.exe");
+            string Ngrok_ExecuteName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ngrok.exe" : "ngrok";
+            string Ngrok_Path = TunnelPathFlag.GetRequiredPath(flags, Ngrok_ExecuteName);
 
             //config
             Config.Edit(

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using wey.Console;
@@ -53,7 +54,8 @@ namespace wey.Command
             }
 
             //path
-            string PlayIt_Path = TunnelPathFlag.GetRequiredPath(flags, "playit.exe");
+            string PlayIt_ExecuteName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "playit.exe" : "playit";
+            string PlayIt_Path = TunnelPathFlag.GetRequiredPath(flags, PlayIt_ExecuteName);
 
             //config
             Config.Edit(

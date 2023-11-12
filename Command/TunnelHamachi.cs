@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -55,7 +56,9 @@ namespace wey.Command
 
             //path
             Logger.Warn("make sure it not shortcut or ui");
-            string Hamachi_Path = TunnelPathFlag.GetRequiredPath(flags, "hamachi-2.exe");
+
+            string Hamachi_ExecuteName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "hamachi-2.exe" : "hamachi";
+            string Hamachi_Path = TunnelPathFlag.GetRequiredPath(flags, Hamachi_ExecuteName);
 
             //config
             Config.Edit(
