@@ -38,6 +38,8 @@ namespace wey.Command
             };
         }
 
+        public static string __ExecuteName = new ExecutablePlatform("ngrok.exe", "ngrok").Get();
+
         public override void Execute(string[] args, ISubCommandFlags flags)
         {
             //delete flag
@@ -55,8 +57,7 @@ namespace wey.Command
             }
 
             //path
-            string Ngrok_ExecuteName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ngrok.exe" : "ngrok";
-            string Ngrok_Path = TunnelPathFlag.GetRequiredPath(flags, Ngrok_ExecuteName);
+            string Ngrok_Path = TunnelPathFlag.GetRequiredPath(flags, __ExecuteName);
 
             //config
             Config.Edit(

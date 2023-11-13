@@ -37,6 +37,8 @@ namespace wey.Command
             };
         }
 
+        public static string __ExecuteName = new ExecutablePlatform("playit.exe", "playit").Get();
+
         public override void Execute(string[] args, ISubCommandFlags flags)
         {
             //delete flag
@@ -54,8 +56,7 @@ namespace wey.Command
             }
 
             //path
-            string PlayIt_ExecuteName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "playit.exe" : "playit";
-            string PlayIt_Path = TunnelPathFlag.GetRequiredPath(flags, PlayIt_ExecuteName);
+            string PlayIt_Path = TunnelPathFlag.GetRequiredPath(flags, __ExecuteName);
 
             //config
             Config.Edit(

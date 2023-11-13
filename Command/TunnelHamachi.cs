@@ -9,6 +9,7 @@ using System.Xml.Linq;
 using wey.Console;
 using wey.Global;
 using wey.Model;
+using wey.Tool;
 
 namespace wey.Command
 {
@@ -38,6 +39,8 @@ namespace wey.Command
             };
         }
 
+        public static string __ExecuteName = new ExecutablePlatform("hamachi-2.exe", "hamachi").Get();
+
         public override void Execute(string[] args, ISubCommandFlags flags)
         {
             //delete flag
@@ -55,10 +58,7 @@ namespace wey.Command
             }
 
             //path
-            Logger.Warn("make sure it not shortcut or ui");
-
-            string Hamachi_ExecuteName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "hamachi-2.exe" : "hamachi";
-            string Hamachi_Path = TunnelPathFlag.GetRequiredPath(flags, Hamachi_ExecuteName);
+            string Hamachi_Path = TunnelPathFlag.GetRequiredPath(flags, __ExecuteName);
 
             //config
             Config.Edit(

@@ -17,7 +17,7 @@ namespace wey.Tunnel
 
         public static void Import(int pid)
         {
-            if (!CommandPrompt.IsProcessExists(pid)) return;
+            if (!Executable.IsExists(pid)) return;
 
             process = Process.GetProcessById(pid);
         }
@@ -56,7 +56,7 @@ namespace wey.Tunnel
 
             Logger.Info("Stopping PlayIt Tunnel");
 
-            CommandPrompt.KillProcess(process);
+            Executable.Kill(process);
         }
     }
 }

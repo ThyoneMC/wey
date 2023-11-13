@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using wey.Console;
@@ -21,59 +22,6 @@ namespace wey.Tool
 
     class CommandPrompt
     {
-        // tools
-
-        public static string? Where(string fileName, string variable = "PATH")
-        {
-            string? AllPath = Environment.GetEnvironmentVariable(variable);
-            if (AllPath == null) return null;
-
-            foreach (string folderPath in AllPath.Split(";"))
-            {
-                if (!Directory.Exists(folderPath)) continue;
-                string[] folderFiles = StaticFolderController.Read(folderPath).Files;
-
-                foreach (string filePath in folderFiles)
-                {
-                    if (Path.GetFileName(filePath).StartsWith(fileName))
-                    {
-                        return Path.GetFullPath(filePath);
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        public static bool IsProcessExists(int pid)
-        {
-            return Process.GetProcesses().Any(process => process.Id == pid);
-        }
-
-        public static void KillProcess(int? pid = -1)
-        {
-            if (pid == null || pid == -1) return;
-            if (!IsProcessExists((int)pid)) return;
-
-            KillProcess(Process.GetProcessById((int)pid));
-        }
-
-        public static void KillProcess(Process? process)
-        {
-            if (process == null) return;
-
-            try
-            {
-                if (!process.HasExited) process.Kill(true);
-            }
-            catch (Exception exception)
-            {
-                Logger.Error(exception);
-            }
-        }
-
-        // command
-
         public static Process? StaticExecute(CommandPromptOptions config)
         {
             ProcessStartInfo StartInfo = new()

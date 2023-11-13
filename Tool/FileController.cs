@@ -70,7 +70,7 @@ namespace wey.Tool
 
     class StaticFolderController
     {
-        public static string AppdataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "@ThyoneMC", ".wey");
+        public static string AppdataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ".thyonemc", "wey");
 
         public static void Build(params string[] path)
         {

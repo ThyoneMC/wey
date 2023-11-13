@@ -43,7 +43,7 @@ namespace wey.Command
             //system env
             if (!string.IsNullOrEmpty(path))
             {
-                executable = CommandPrompt.Where(path);
+                executable = Executable.Where(path);
 
                 if (!string.IsNullOrEmpty(executable)) return executable;
             }
@@ -55,6 +55,8 @@ namespace wey.Command
             }
             else
             {
+                Logger.Warn("Make sure it is not a shortcut or just UI");
+
                 executable = Input.ReadString($"{path} path: ");
             }
 

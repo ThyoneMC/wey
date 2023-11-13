@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -174,14 +175,15 @@ namespace wey.Server
 
         public void Start(bool autoRestart = false)
         {
-            if (CommandPrompt.IsProcessExists(ProcessData.ReadRequired().ProcessId)) Stop();
+            if (Executable.IsExists(ProcessData.ReadRequired().ProcessId)) Stop();
 
             Logger.Info($"Starting Server: {Data.Name} ({Data.Provider} {Data.BuildInfo[0]})");
 
             StaticFileController.Wait(Data.FolderPath, "server.jar");
 
-            string? javaExecute = CommandPrompt.Where("java.exe");
-            if (javaExecute == null) throw new FileNotFoundException("java.exe not found");
+            string javaExecuteName = new ExecutablePlatform("java.exe", "java").Get();
+            string? javaExecute = Executable.Where(javaExecuteName);
+            if (javaExecute == null) throw new FileNotFoundException($"{javaExecuteName} not found");
 
             Process? process = CommandPrompt.StaticExecute(
                     new CommandPromptOptions()
@@ -242,7 +244,7 @@ namespace wey.Server
                 {
                     Logger.Info($"Auto Restart Checking: {Data.Name}");
 
-                    if (!CommandPrompt.IsProcessExists(ProcessData.ReadRequired().ProcessId))
+                    if (!Executable.IsExists(ProcessData.ReadRequired().ProcessId))
                     {
                         Logger.Info($"Auto Restart: {Data.Name}");
                         Start(false);
@@ -266,8 +268,8 @@ namespace wey.Server
 
             ServerProcessData processData = ProcessData.ReadRequired();
 
-            if (processData.AutoRestart) CommandPrompt.KillProcess(processData.WeyProcessId);
-            CommandPrompt.KillProcess(processData.ProcessId);
+            if (processData.AutoRestart) Executable.Kill(processData.WeyProcessId);
+            Executable.Kill(processData.ProcessId);
 
             ProcessData.Delete();
         }
