@@ -19,7 +19,7 @@ namespace wey.Interface
             if (!IsLoaded)
             {
                 IsLoaded = true;
-                KeyReader.TimestampRange = 10000;
+                KeyReader.TimestampRange = 17500;
 
                 OnLoad();
             }
@@ -32,8 +32,8 @@ namespace wey.Interface
             return PageType.Page;
         }
 
-        public abstract void OnLoad();
-
         public abstract void OnViewing();
+
+        public abstract void OnLoad();
     }
 }

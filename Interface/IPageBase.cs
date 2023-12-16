@@ -10,6 +10,7 @@ namespace wey.Interface
     enum PageType
     {
         Page,
+        Command,
         Group
     }
 

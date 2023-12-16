@@ -9,7 +9,7 @@ namespace wey.Interface
 {
     abstract class IPageGroup : IPageBase
     {
-        private Selection<string> Selector;
+        private readonly Selection<string> Selector;
 
         public IPageBase? Selection
         {
@@ -19,11 +19,6 @@ namespace wey.Interface
                 if (Selector.Result.Index == -1) return null;
 
                 return GetPages()[Selector.Result.Index];
-            }
-            protected set
-            {
-                if (Selection == value) return;
-                Selection = value;
             }
         }
 

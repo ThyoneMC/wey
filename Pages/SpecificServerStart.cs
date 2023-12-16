@@ -12,7 +12,7 @@ namespace wey.Pages
     {
         public SpecificServerStart(string name) : base(name)
         {
-            
+
         }
 
         public override string GetName()

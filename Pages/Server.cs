@@ -16,21 +16,15 @@ namespace wey.Pages
 
         public override string GetDescription()
         {
-            return "servers list";
+            return "server";
         }
 
         public override IPageBase[] GetPages()
         {
-            List<IPageBase> list = new();
-
-            string[] fakeServerList = new string[] { "pete", "is", "my", "mom" };
-
-            foreach (string fakeServer in fakeServerList)
-            {
-                list.Add(new SpecificServer(fakeServer));
-            }
-
-            return list.ToArray(); 
+            return new IPageBase[] {
+                    new ServerCreate(),
+                    new ServerList()
+            };
         }
     }
 }

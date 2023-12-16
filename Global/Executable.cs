@@ -13,6 +13,10 @@ namespace wey.Global
 {
     public class ExecutablePlatformNotFoundException : Exception
     {
+        public ExecutablePlatformNotFoundException(string? message = null) : base(message)
+        {
+
+        }
     }
 
     public class ExecutablePlatform
@@ -43,6 +47,14 @@ namespace wey.Global
         public string Arguments { get; set; } = string.Empty;
         public string WorkDirectory { get; set; } = Directory.GetCurrentDirectory();
         public int OutputSaved { get; set; } = 25;
+    }
+
+    public class ExecutableNotFoundException : Exception
+    {
+        public ExecutableNotFoundException(string? message = null) : base(message)
+        {
+
+        }
     }
 
     class Executable : Process
@@ -76,6 +88,23 @@ namespace wey.Global
             IsStarted = IsExists();
         }
 
+        protected static Dictionary<int, Executable> ExecutableList = new();
+
+        public void Export()
+        {
+            ExecutableList.Add(Id, this);
+        }
+
+        public static Executable Import(int pid)
+        {
+            if (ExecutableList[pid] == null)
+            {
+                throw new ExecutableNotFoundException();
+            }
+
+            return ExecutableList[pid];
+        }
+
         public bool IsExists()
         {
             if (!IsStarted) return false;
@@ -103,6 +132,8 @@ namespace wey.Global
 
             Kill(true);
             WaitForExit();
+
+            ExecutableList.Remove(Id);
         }
 
         public string[] GetOutput()

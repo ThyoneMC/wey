@@ -62,13 +62,25 @@ namespace wey.Console
         private int StartingCursorPosition = -1;
         private int _TempSelectionIndex = -1;
 
+        private int StartIndex = 0;
+        private int EndIndex = 0;
+
         private void OnLoad()
         {
             System.Console.CursorVisible = false;
 
             StartingCursorPosition = System.Console.GetCursorPosition().Top;
 
-            KeyReader.TimestampRange = 5000;
+            KeyReader.TimestampRange = 4250;
+
+            if (Choices.Count > 10)
+            {
+                EndIndex = 9;
+            }
+            else
+            {
+                EndIndex = Choices.Count - 1;
+            }
         }
 
         private void OnViewing()
@@ -78,11 +90,15 @@ namespace wey.Console
                 _TempSelectionIndex = SelectionIndex;
 
                 System.Console.SetCursorPosition(0, StartingCursorPosition);
-                foreach (SelectionChoice<T> choice in Choices)
+
+                int index = StartIndex;
+                while (index != EndIndex + 1)
                 {
+                    SelectionChoice<T> choice = Choices[index];
+
                     string BaseString = $"[{choice.Index + 1}] {choice.Value}";
 
-                    if (choice.Index == SelectionIndex)
+                    if (index == SelectionIndex)
                     {
                         Logger.WriteSingle($" > {BaseString}");
                     }
@@ -90,6 +106,8 @@ namespace wey.Console
                     {
                         Logger.WriteSingle($"   {BaseString}");
                     }
+
+                    index++;
                 }
             }
 
@@ -98,35 +116,81 @@ namespace wey.Console
             switch (KeyReader.Get())
             {
                 case KeyCode.VcUp:
-                case KeyCode.VcW:
                     {
                         SelectionIndex--;
+
+                        if (SelectionIndex < 0)
+                        {
+                            SelectionIndex = Choices.Count - 1;
+
+                            if (Choices.Count > 10)
+                            {
+                                StartIndex = (int)(Choices.Count / 10) * 10;
+                                EndIndex = Choices.Count - 1;
+                            }
+                            else
+                            {
+                                EndIndex = Choices.Count - 1;
+                            }
+
+                            Logger.ClearFromLine(StartingCursorPosition + 1);
+                        }
+                        else if (SelectionIndex < StartIndex)
+                        {
+                            StartIndex = StartIndex - 10;
+                            EndIndex = StartIndex + 9;
+
+                            Logger.ClearFromLine(StartingCursorPosition + 1);
+                        }
 
                         break;
                     }
                 case KeyCode.VcDown:
-                case KeyCode.VcS:
                     {
                         SelectionIndex++;
+
+                        if (SelectionIndex > Choices.Count - 1)
+                        {
+                            SelectionIndex = 0;
+
+                            StartIndex = 0;
+                            if (Choices.Count > 10)
+                            {
+                                EndIndex = 9;
+                            }
+                            else
+                            {
+                                EndIndex = Choices.Count - 1;
+                            }
+
+                            Logger.ClearFromLine(StartingCursorPosition + 1);
+                        }
+                        else if (SelectionIndex > EndIndex)
+                        {
+                            int IndexLeft = (Choices.Count - 1) - EndIndex;
+
+                            if (IndexLeft > 10)
+                            {
+                                StartIndex = EndIndex + 1;
+                                EndIndex = EndIndex + 10;
+                            }
+                            else
+                            {
+                                StartIndex = EndIndex + 1;
+                                EndIndex = Choices.Count - 1;
+                            }
+
+                            Logger.ClearFromLine(StartingCursorPosition + 1);
+                        }
 
                         break;
                     }
                 case KeyCode.VcEnter:
-                case KeyCode.VcTab:
+                case KeyCode.VcRight:
                     {
                         Result = Choices[SelectionIndex];
                         return;
                     }
-            }
-
-            if (SelectionIndex > Choices.Count - 1)
-            {
-                SelectionIndex = 0;
-            }
-
-            if (SelectionIndex < 0)
-            {
-                SelectionIndex = Choices.Count - 1;
             }
         }
 
@@ -142,6 +206,16 @@ namespace wey.Console
             }
 
             OnViewing();
+        }
+
+        public SelectionChoice<T> Render()
+        {
+            while (true)
+            {
+                RenderNext();
+
+                if (Result != null) return Result;
+            }
         }
 
         public void Reset()

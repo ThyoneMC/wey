@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="RestSharp" Version="110.2.0" />
     <PackageReference Include="SharpHook" Version="5.1.2" />
   </ItemGroup>
 

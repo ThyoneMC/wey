@@ -21,7 +21,7 @@ namespace wey.Global
         protected ManualResetEvent PauseEvent = new(true);
         protected Thread Worker;
 
-        private ThreadStart Starter;
+        private readonly ThreadStart Starter;
 
         public TaskWorker(Action action)
         {
@@ -33,7 +33,7 @@ namespace wey.Global
 
                     if (ShutdownEvent.WaitOne(0)) break;
 
-                    action();
+                    action.Invoke();
                 }
             };
 

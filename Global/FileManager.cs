@@ -118,7 +118,7 @@ namespace wey.Global
 
             try
             {
-                string temporaryPath = Path.Combine(StaticFolderController.TemporaryPath, $"{Path.GetFileName(path)}_{DateTime.UtcNow.ToFileTime()}".ToLower());
+                string temporaryPath = Path.Combine(TemporaryPath, $"{Path.GetFileName(path)}_{DateTime.UtcNow.ToFileTime()}".ToLower());
                 Directory.Move(path, temporaryPath);
             }
             catch (Exception exception)
@@ -126,7 +126,7 @@ namespace wey.Global
                 Logger.Warn(exception);
             }
 
-            StaticFolderController.Delete(path);
+            Delete(path);
         }
 
         public static void Delete(string path)
@@ -139,7 +139,10 @@ namespace wey.Global
 
     class FileControllerReadException : Exception
     {
+        public FileControllerReadException(string? message = null) : base(message)
+        {
 
+        }
     }
 
     class FileController<T>

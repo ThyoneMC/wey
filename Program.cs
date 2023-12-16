@@ -12,7 +12,7 @@ namespace wey
     {
         private static readonly Stack<IPageBase> PageList = new();
 
-        private static IPageBase CurrentPage = new Main();
+        private static IPageBase CurrentPage = new Home();
 
         private static void AddPage(IPageBase page)
         {
@@ -34,38 +34,59 @@ namespace wey
                 );
         }
 
+        private static void ReturnPage()
+        {
+            PageList.Pop();
+
+            ChangePage();
+        }
+
         public static void Main(string[] args)
         {
-            AddPage(new Main());
+            Argument.Import(args);
 
+            AddPage(new Home());
             new TaskWorker(() =>
             {
                 if (PageList.Count > 1 && KeyReader.Get() == KeyCode.VcLeft)
                 {
-                    PageList.Pop();
-
-                    ChangePage();
+                    ReturnPage();
                     return;
                 }
 
-                if (CurrentPage.GetPageType() == PageType.Group)
+                switch (CurrentPage.GetPageType())
                 {
-                    IPageGroup Group = (IPageGroup)CurrentPage;
+                    case PageType.Group:
+                        {
+                            IPageGroup Group = (IPageGroup)CurrentPage;
 
-                    Group.RenderNext();
+                            Group.RenderNext();
 
-                    if (Group.Selection != null)
-                    {
-                        AddPage(Group.Selection);
+                            if (Group.Selection != null)
+                            {
+                                AddPage(Group.Selection);
 
-                        Group.Reset();
+                                Group.Reset();
 
-                        return;
-                    }
-                }
-                else
-                {
-                    CurrentPage.RenderNext();
+                                return;
+                            }
+
+                            break;
+                        }
+                    case PageType.Command:
+                        {
+                            IPageCommand Command = (IPageCommand)CurrentPage;
+
+                            Command.RenderNext();
+
+                            ReturnPage();
+                            break;
+                        }
+                    case PageType.Page:
+                        {
+                            CurrentPage.RenderNext();
+                            break;
+                        }
                 }
             }).Start();
         }

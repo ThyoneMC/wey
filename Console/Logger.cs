@@ -7,8 +7,58 @@ using wey.Global;
 
 namespace wey.Console
 {
+    class Logs
+    {
+        protected static readonly List<string> Data = new();
+
+        protected static readonly StreamWriter File;
+
+        static Logs()
+        {
+            string FilePath = Path.Join(StaticFolderController.AppdataPath, "logs", $"{DateTime.UtcNow.ToLocalTime().ToFileTime()}.log");
+
+            StaticFileController.Build(FilePath, string.Empty);
+
+            File = new(FilePath)
+            {
+                AutoFlush = true
+            };
+        }
+
+        public static void Add(string data)
+        {
+            File.WriteLine(data);
+        }
+
+        public static void Stop()
+        {
+            File.Close();
+        }
+    }
+
     class Logger
     {
+        public static void ClearLine(int line)
+        {
+            System.Console.SetCursorPosition(0, line - 1);
+            System.Console.Write(new String(' ', System.Console.WindowWidth));
+            System.Console.SetCursorPosition(0, line - 1);
+        }
+
+        public static void ClearFromLine(int line)
+        {
+            int numClear = (System.Console.CursorTop + 1) - line;
+
+            System.Console.SetCursorPosition(0, line - 1);
+            while (numClear != 0)
+            {
+                System.Console.Write(new String(' ', System.Console.WindowWidth));
+
+                numClear--;
+            }
+            System.Console.SetCursorPosition(0, line - 1);
+        }
+
         private static string Bracket(params string[] message)
         {
             return $"[{string.Join("] [", message)}]";

@@ -7,7 +7,7 @@ using wey.Interface;
 
 namespace wey.Pages
 {
-    class Main : IPageGroup
+    class Home : IPageGroup
     {
         public override string GetName()
         {

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using wey.Console;
 
 namespace wey.Global
@@ -25,6 +26,14 @@ namespace wey.Global
         //class
 
         public List<TaskQueueInfo> Queues = new();
+
+        public int[] Add(Action action)
+        {
+            return Add(new TaskQueueInfo()
+            {
+                Action = action,
+            });
+        }
 
         public int[] Add(params TaskQueueInfo[] queues)
         {
@@ -88,6 +97,16 @@ namespace wey.Global
             }
 
             this.Remove(queue => queue.Times == 0);
+        }
+
+        public void Next(int times)
+        {
+            while (times != 0)
+            {
+                Next();
+
+                times--;
+            }
         }
 
         //global
