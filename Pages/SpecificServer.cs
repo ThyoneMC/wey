@@ -4,19 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wey.Interface;
+using wey.Host;
+using wey.Console;
+using System.Text.Json;
 
 namespace wey.Pages
 {
     class SpecificServer : IPageGroup
     {
-        public SpecificServer(string name) : base(name)
-        {
+        private readonly HostData Host;
 
+        public SpecificServer(HostData host) : base(host.Name)
+        {
+            Host = host;
         }
 
         public override string GetName()
         {
-            return arguments[0];
+            return Host.Name;
         }
 
         public override string GetDescription()
@@ -24,12 +29,12 @@ namespace wey.Pages
             return "server management";
         }
 
-        public override IPageBase[] GetPages()
+        public override IEnumerable<IPageBase> GetPages()
         {
             return new IPageBase[] {
-                    new SpecificServerStart(arguments[0]),
-                    new SpecificServerStop(arguments[0]),
-                    new SpecificServerDelete(arguments[0]),
+                    new SpecificServerStart(Host),
+                    new SpecificServerStop(Host),
+                    new SpecificServerDelete(Host),
             };
         }
     }

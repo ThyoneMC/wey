@@ -9,7 +9,7 @@ namespace wey.Interface
 {
     public class VersionNotFoundException : Exception
     {
-        public VersionNotFoundException(string? message = null) : base(message)
+        public VersionNotFoundException(string? message = null) : base($"version not found: {message}")
         {
 
         }
@@ -17,7 +17,7 @@ namespace wey.Interface
 
     public class IProviderBuild
     {
-        public string Version { get; set; }
+        public string Version { get; set; } = string.Empty;
 
         public IProviderBuild(string version)
         {
@@ -25,9 +25,9 @@ namespace wey.Interface
         }
     }
 
-    public class IProviderDownload<T> where T : IProviderBuild
+    public class IProviderDownload
     {
-        public T Build { get; set; } = FileController<T>.CreateTypeInstance();
+        public string Build { get; set; } = string.Empty;
         public byte[] ServerJar { get; set; } = Array.Empty<byte>();
     }
 
@@ -35,9 +35,9 @@ namespace wey.Interface
     {
         public abstract bool IsMod();
 
-        public abstract IProviderDownload<T> GetServerJar(T build);
+        public abstract IProviderDownload GetServerJar(T build);
 
-        public abstract IProviderDownload<T> GetServerJar(string gameVersion);
+        public abstract IProviderDownload GetServerJar(string gameVersion);
     }
 
 }

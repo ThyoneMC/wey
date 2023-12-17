@@ -112,25 +112,26 @@ namespace wey.Console
             }
 
             //selector
-
             switch (KeyReader.Get())
             {
                 case KeyCode.VcUp:
                     {
+                        if (Choices.Count == 1) break;
                         SelectionIndex--;
 
                         if (SelectionIndex < 0)
                         {
                             SelectionIndex = Choices.Count - 1;
 
+                            EndIndex = Choices.Count - 1;
                             if (Choices.Count > 10)
                             {
                                 StartIndex = (int)(Choices.Count / 10) * 10;
-                                EndIndex = Choices.Count - 1;
-                            }
-                            else
-                            {
-                                EndIndex = Choices.Count - 1;
+
+                                if (StartIndex == Choices.Count)
+                                {
+                                    StartIndex = EndIndex - 9;
+                                }
                             }
 
                             Logger.ClearFromLine(StartingCursorPosition + 1);
@@ -147,6 +148,7 @@ namespace wey.Console
                     }
                 case KeyCode.VcDown:
                     {
+                        if (Choices.Count == 1) break;
                         SelectionIndex++;
 
                         if (SelectionIndex > Choices.Count - 1)
@@ -154,14 +156,7 @@ namespace wey.Console
                             SelectionIndex = 0;
 
                             StartIndex = 0;
-                            if (Choices.Count > 10)
-                            {
-                                EndIndex = 9;
-                            }
-                            else
-                            {
-                                EndIndex = Choices.Count - 1;
-                            }
+                            EndIndex = (Choices.Count) > 10 ? 9 : Choices.Count - 1;
 
                             Logger.ClearFromLine(StartingCursorPosition + 1);
                         }
@@ -169,16 +164,8 @@ namespace wey.Console
                         {
                             int IndexLeft = (Choices.Count - 1) - EndIndex;
 
-                            if (IndexLeft > 10)
-                            {
-                                StartIndex = EndIndex + 1;
-                                EndIndex = EndIndex + 10;
-                            }
-                            else
-                            {
-                                StartIndex = EndIndex + 1;
-                                EndIndex = Choices.Count - 1;
-                            }
+                            StartIndex = EndIndex + 1;
+                            EndIndex = (IndexLeft > 10) ? EndIndex + 10 : Choices.Count - 1;
 
                             Logger.ClearFromLine(StartingCursorPosition + 1);
                         }

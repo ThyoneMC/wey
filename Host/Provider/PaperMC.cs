@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using wey.Global;
@@ -11,8 +12,8 @@ namespace wey.Host.Provider
 {
     class PaperMCBuild : IProviderBuild
     {
-        public string Build { get; set; }
-        public string Download { get; set; }
+        public string Build { get; set; } = string.Empty;
+        public string Download { get; set; } = string.Empty;
 
         public PaperMCBuild(string version, string build, string download) : base(version)
         {
@@ -31,6 +32,7 @@ namespace wey.Host.Provider
 
         public class Project
         {
+            [JsonPropertyName("versions")]
             public string[] Versions { get; set; } = Array.Empty<string>();
         }
 
@@ -43,24 +45,34 @@ namespace wey.Host.Provider
 
         public class BuildDownloadApplicationData
         {
+            [JsonPropertyName("name")]
             public string Name { get; set; } = string.Empty;
         }
 
         public class BuildDownloadData
         {
+            [JsonPropertyName("application")]
             public BuildDownloadApplicationData Application { get; set; } = new();
         }
 
         public class BuildData
         {
+            [JsonPropertyName("build")]
             public int ID { get; set; } = -1;
+
+            [JsonPropertyName("time")]
             public DateTime ReleaseDate { get; set; } = new();
+
+            [JsonPropertyName("channel")]
             public string Type { get; set; } = string.Empty;
+
+            [JsonPropertyName("downloads")]
             public BuildDownloadData Download { get; set; } = new();
         }
 
         public class Build
         {
+            [JsonPropertyName("builds")]
             public BuildData[] Builds { get; set; } = Array.Empty<BuildData>();
         }
 
@@ -83,7 +95,7 @@ namespace wey.Host.Provider
             return false;
         }
 
-        public override IProviderDownload<PaperMCBuild> GetServerJar(string TargetGameVersion)
+        public override IProviderDownload GetServerJar(string TargetGameVersion)
         {
             //version
             PaperMC.Project GameVersions = PaperMC.GetProject();
@@ -110,11 +122,11 @@ namespace wey.Host.Provider
             return GetServerJar(new PaperMCBuild(TargetGameVersion, TargetBuild, TargetDownload));
         }
 
-        public override IProviderDownload<PaperMCBuild> GetServerJar(PaperMCBuild build)
+        public override IProviderDownload GetServerJar(PaperMCBuild build)
         {
             return new()
             {
-                Build = build,
+                Build = JsonEncryption<PaperMCBuild>.Encrypt(build),
                 ServerJar = PaperMC.Download(build.Version, build.Build,build.Download)
             };
         }

@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wey.Console;
+using wey.Host;
 using wey.Interface;
 
 namespace wey.Pages
 {
     class SpecificServerDelete : IPage
     {
-        public SpecificServerDelete(string name) : base(name)
+        public SpecificServerDelete(HostData host) : base(host.Name)
         {
 
         }

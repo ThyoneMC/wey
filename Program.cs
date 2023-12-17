@@ -43,7 +43,7 @@ namespace wey
 
         public static void Main(string[] args)
         {
-            Argument.Import(args);
+            ExecutableArgument.Import(args);
 
             AddPage(new Home());
             new TaskWorker(() =>

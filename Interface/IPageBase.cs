@@ -16,11 +16,11 @@ namespace wey.Interface
 
     abstract class IPageBase
     {
-        protected string[] arguments;
+        protected object[] arguments;
 
         public bool IsLoaded { get; protected set; }
 
-        public IPageBase(params string[] args)
+        public IPageBase(params object[] args)
         {
             arguments = args;
         }

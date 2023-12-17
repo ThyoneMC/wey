@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using wey.Console;
+using wey.Host;
+using wey.Host.Provider;
 using wey.Interface;
 
 namespace wey.Pages
@@ -19,18 +23,11 @@ namespace wey.Pages
             return "servers list";
         }
 
-        public override IPageBase[] GetPages()
+        public override IEnumerable<IPageBase> GetPages()
         {
-            List<IPageBase> list = new();
+            HostData[] hostList = HostFinder.Find();
 
-            string[] fakeServerList = new string[] { "pete", "is", "my", "friends" };
-
-            foreach (string fakeServer in fakeServerList)
-            {
-                list.Add(new SpecificServer(fakeServer));
-            }
-
-            return list.ToArray();
+            return hostList.Select(host => new SpecificServer(host));
         }
     }
 }

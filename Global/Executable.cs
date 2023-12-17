@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic.FileIO;
+using SharpHook.Native;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,6 +12,45 @@ using wey.Console;
 
 namespace wey.Global
 {
+    public class ExecutableArgument
+    {
+        public static List<string> Arguments { get; protected set; } = new();
+
+        public static Dictionary<string, string?> Flags { get; protected set; } = new();
+
+        public static void Import(params string[] args)
+        {
+            foreach (string text in args)
+            {
+                // args
+                if (!text.StartsWith("--"))
+                {
+                    Arguments.Add(text);
+                    continue;
+                }
+
+                // flag
+                int indexOfEqualSign = text.IndexOf("=");
+                if (indexOfEqualSign == -1)
+                {
+                    Flags.Add(text, string.Empty);
+                    continue;
+                }
+
+                // flag=
+                string content = text[(indexOfEqualSign + "=".Length)..];
+                if (string.IsNullOrWhiteSpace(content))
+                {
+                    Flags.Add(text[..indexOfEqualSign], string.Empty);
+                    continue;
+                }
+
+                // flag=content
+                Flags.Add(text[..indexOfEqualSign], content);
+            }
+        }
+    }
+
     public class ExecutablePlatformNotFoundException : Exception
     {
         public ExecutablePlatformNotFoundException(string? message = null) : base(message)
@@ -29,7 +69,7 @@ namespace wey.Global
             IsOsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             IsOsLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
-            throw new ExecutablePlatformNotFoundException();
+            if(!IsOsWindows && !IsOsLinux) throw new ExecutablePlatformNotFoundException();
         }
 
         public static string Get(string windows, string linux)
@@ -63,6 +103,8 @@ namespace wey.Global
 
         public readonly bool IsStarted = false;
 
+        private string? OnceOutput = null;
+
         public Executable(ExecutableOption option)
         {
             StartInfo = new ProcessStartInfo()
@@ -81,6 +123,8 @@ namespace wey.Global
             {
                 if (string.IsNullOrEmpty(thisEvent.Data)) return;
 
+                OnceOutput = thisEvent.Data;
+
                 Output.Enqueue(thisEvent.Data);
                 while (Output.Count > option.OutputSaved) Output.Dequeue();
             });
@@ -90,9 +134,11 @@ namespace wey.Global
 
         protected static Dictionary<int, Executable> ExecutableList = new();
 
-        public void Export()
+        public int Export()
         {
             ExecutableList.Add(Id, this);
+
+            return Id;
         }
 
         public static Executable Import(int pid)
@@ -103,6 +149,30 @@ namespace wey.Global
             }
 
             return ExecutableList[pid];
+        }
+
+        private static readonly string PathSplitter = ExecutablePlatform.Get(windows: ";", linux: ":");
+        public static string? Where(string fileName, string variable = "PATH")
+        {
+            string? AllPath = Environment.GetEnvironmentVariable(variable);
+
+            if (AllPath == null) return null;
+
+            foreach (string folderPath in AllPath.Split(PathSplitter))
+            {
+                if (!Directory.Exists(folderPath)) continue;
+                string[] folderFiles = StaticFolderController.Read(folderPath).Files;
+
+                foreach (string filePath in folderFiles)
+                {
+                    if (Path.GetFileName(filePath).StartsWith(fileName))
+                    {
+                        return Path.GetFullPath(filePath);
+                    }
+                }
+            }
+
+            return null;
         }
 
         public bool IsExists()
@@ -139,6 +209,19 @@ namespace wey.Global
         public string[] GetOutput()
         {
             return Output.ToArray();
+        }
+
+        public string? GetOnceOutput()
+        {
+            if (OnceOutput != null)
+            {
+                string tempOnceOutput = OnceOutput;
+                OnceOutput = null;
+
+                return tempOnceOutput;
+            }
+
+            return null;
         }
     }
 }

@@ -9,7 +9,7 @@ namespace wey.Interface
 {
     abstract class IPage : IPageBase
     {
-        public IPage(params string[] args) : base(args)
+        public IPage(params object[] args) : base(args)
         {
             
         }

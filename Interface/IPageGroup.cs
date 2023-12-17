@@ -9,7 +9,7 @@ namespace wey.Interface
 {
     abstract class IPageGroup : IPageBase
     {
-        private readonly Selection<string> Selector;
+        private Selection<string> Selector = Selection<string>.Create();
 
         public IPageBase? Selection
         {
@@ -18,24 +18,33 @@ namespace wey.Interface
                 if (Selector.Result == null) return null;
                 if (Selector.Result.Index == -1) return null;
 
-                return GetPages()[Selector.Result.Index];
+                return GetPages().ElementAt(Selector.Result.Index);
             }
         }
 
-        public IPageGroup(params string[] args) : base(args)
+        public IPageGroup(params object[] args) : base(args)
         {
-            Selector = Selection<string>.Create(
-                            GetPages().Select(page => page.GetName())
-                        );
+
         }
 
         public void Reset()
         {
+            IsLoaded = false;
+
             Selector.Reset();
         }
 
         public override void RenderNext()
         {
+            if (!IsLoaded)
+            {
+                IsLoaded = true;
+
+                Selector = Selection<string>.Create(
+                            GetPages().Select(page => page.GetName())
+                        );
+            }
+
             Selector.RenderNext();
         }
 
@@ -44,6 +53,6 @@ namespace wey.Interface
             return PageType.Group;
         }
 
-        public abstract IPageBase[] GetPages();
+        public abstract IEnumerable<IPageBase> GetPages();
     }
 }

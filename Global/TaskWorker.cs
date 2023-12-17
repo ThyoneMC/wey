@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using wey.Console;
 
 namespace wey.Global
 {
@@ -33,7 +34,19 @@ namespace wey.Global
 
                     if (ShutdownEvent.WaitOne(0)) break;
 
-                    action.Invoke();
+                    int StartingCursorTop = System.Console.CursorTop + 1;
+                    try
+                    {
+                        action.Invoke();
+                    }
+                    catch (Exception exception)
+                    {
+                        Logger.Error(exception);
+
+                        Thread.Sleep(5 * 1000);
+                        
+                        Logger.ClearFromLine(StartingCursorTop);
+                    }
                 }
             };
 

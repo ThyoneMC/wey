@@ -8,19 +8,30 @@ namespace wey.Console
 {
     class Input
     {
-        public static string ReadString(string? message = null)
+        public static string ReadString(string? message = null, bool required = false, bool clear = false)
         {
             if (!string.IsNullOrEmpty(message)) System.Console.Write($"{message}: ");
 
+            (int StartingCursorLeft, int StartingCursorTop) = System.Console.GetCursorPosition();
+
             while (true)
             {
+                System.Console.SetCursorPosition(StartingCursorLeft, StartingCursorTop);
+
                 string? read = KeyReader.ReadLine();
 
-                if (read != null) return read;
+                if (read != null)
+                {
+                    if (required && string.IsNullOrWhiteSpace(read)) continue;
+
+                    if (clear) Logger.ClearLine(System.Console.CursorTop);
+
+                    return read;
+                }
             }
         }
 
-        public static string SelectionString(string[] choices, string? message = null)
+        public static SelectionChoice<string> SelectionString(IEnumerable<string> choices, string? message = null)
         {
             int StartingCursorTop = System.Console.CursorTop + 1;
 
@@ -41,23 +52,23 @@ namespace wey.Console
 
             if (!string.IsNullOrEmpty(message)) System.Console.WriteLine($"{message}: {Selector.Result.Value}");
 
-            return Selector.Result.Value;
+            return Selector.Result;
         }
 
         public static bool ReadBoolean(string? message = null, bool defaultOption = true)
         {
             if (!string.IsNullOrEmpty(message)) System.Console.Write($"{message} (default: {defaultOption}): ");
 
-            string read = ReadString().ToLower();
+            string read = ReadString(required: false).ToLower();
 
             // contains "no"
-            if (defaultOption == true && read.Contains('n'))
+            if (defaultOption == true && (read.Contains('n') || read.ToLower() == "false"))
             {
                 return false;
             }
 
             // contains "yes"
-            if (defaultOption == false && read.Contains('y'))
+            if (defaultOption == false && (read.Contains('y') || read.ToLower() == "true"))
             {
                 return true;
             }

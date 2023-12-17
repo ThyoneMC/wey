@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using wey.Global;
@@ -11,7 +12,7 @@ namespace wey.Host.Provider
 {
     class VanillaBuild : IProviderBuild
     {
-        public string DownloadURL { get;set; }
+        public string DownloadURL { get; set; } = string.Empty;
 
         public VanillaBuild(string version, string downloadURL) : base(version)
         {
@@ -46,21 +47,34 @@ namespace wey.Host.Provider
 
         public class VersionLatest
         {
+            [JsonPropertyName("release")]
             public string Release { get; set; } = string.Empty;
+
+            [JsonPropertyName("snapshot")]
             public string Snapshot { get; set; } = string.Empty;
         }
 
         public class VersionData
         {
+            [JsonPropertyName("id")]
             public string ID { get; set; } = string.Empty;
+
+            [JsonPropertyName("type")]
             public string Type { get; set; } = string.Empty;
+
+            [JsonPropertyName("url")]
             public string URL { get; set; } = string.Empty;
+
+            [JsonPropertyName("releaseTime")]
             public DateTime ReleaseDate { get; set; } = new();
         }
 
         public class Version
         {
+            [JsonPropertyName("latest")]
             public VersionLatest LatestVersion { get; set; } = new();
+
+            [JsonPropertyName("versions")]
             public VersionData[] Versions { get; set; } = Array.Empty<VersionData>();
         }
 
@@ -73,16 +87,19 @@ namespace wey.Host.Provider
 
         public class VersionMetaDownloadData
         {
+            [JsonPropertyName("url")]
             public string URL { get; set; } = string.Empty;
         }
 
         public class VersionMetaDownload
         {
+            [JsonPropertyName("server")]
             public VersionMetaDownloadData Server { get; set; } = new();
         }
 
         public class VersionMeta
         {
+            [JsonPropertyName("downloads")]
             public VersionMetaDownload Downloads { get; set; } = new();
         }
 
@@ -93,20 +110,10 @@ namespace wey.Host.Provider
             return false;
         }
 
-        public override IProviderDownload<VanillaBuild> GetServerJar(string TargetGameVersion)
+        public override IProviderDownload GetServerJar(string TargetGameVersion)
         {
             //version
             Vanilla.Version GameVersions = Vanilla.GetVersions();
-
-            TargetGameVersion = Vanilla.VersionType.FromString(TargetGameVersion);
-            if (TargetGameVersion == Vanilla.VersionType.Release)
-            {
-                TargetGameVersion = GameVersions.LatestVersion.Release;
-            }
-            else if (TargetGameVersion == Vanilla.VersionType.Snapshot)
-            {
-                TargetGameVersion = GameVersions.LatestVersion.Snapshot;
-            }
 
             //server
             string URL = string.Empty;
@@ -126,11 +133,11 @@ namespace wey.Host.Provider
             return GetServerJar(new VanillaBuild(TargetGameVersion, VersionMeta.Downloads.Server.URL));
         }
 
-        public override IProviderDownload<VanillaBuild> GetServerJar(VanillaBuild build)
+        public override IProviderDownload GetServerJar(VanillaBuild build)
         {
             return new()
             {
-                Build = build,
+                Build = JsonEncryption<IProviderBuild>.Encrypt(build),
                 ServerJar = Rest.StaticDownload(build.DownloadURL),
             };
         }

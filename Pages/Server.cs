@@ -19,11 +19,11 @@ namespace wey.Pages
             return "server";
         }
 
-        public override IPageBase[] GetPages()
+        public override IEnumerable<IPageBase> GetPages()
         {
             return new IPageBase[] {
-                    new ServerCreate(),
-                    new ServerList()
+                    new ServerList(),
+                    new ServerCreate()
             };
         }
     }

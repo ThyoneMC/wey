@@ -4,15 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wey.Console;
+using wey.Host;
 using wey.Interface;
 
 namespace wey.Pages
 {
-    class SpecificServerStop : IPage
+    class SpecificServerStop : IPageCommand
     {
-        public SpecificServerStop(string name) : base(name)
-        {
+        private HostData Host;
 
+        public SpecificServerStop(HostData host) : base(host.Name)
+        {
+            Host = host;
         }
 
         public override string GetName()
@@ -25,14 +28,11 @@ namespace wey.Pages
             return "stop the server";
         }
 
-        public override void OnLoad()
+        public override void OnCommand()
         {
-            Logger.WriteSingle("START --> Stp");
-        }
+            HostManager host = new(Host);
 
-        public override void OnViewing()
-        {
-            Logger.WriteSingle("VIEW --> Stp");
+            host.Start();
         }
     }
 }

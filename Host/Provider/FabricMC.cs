@@ -11,8 +11,8 @@ namespace wey.Host.Provider
 {
     class FabricMCBuild : IProviderBuild
     {
-        public string Loader { get; set; }
-        public string Installer { get; set; }
+        public string Loader { get; set; } = string.Empty;
+        public string Installer { get; set; } = string.Empty;
 
         public FabricMCBuild(string version, string loader, string installer) : base(version)
         {
@@ -29,7 +29,10 @@ namespace wey.Host.Provider
 
         public class GameVersions
         {
+            [JsonPropertyName("version")]
             public string Version { get; set; } = string.Empty;
+
+            [JsonPropertyName("stable")]
             public bool IsStable { get; set; } = true;
         }
 
@@ -42,14 +45,22 @@ namespace wey.Host.Provider
 
         public class LoadersData
         {
+            [JsonPropertyName("separator")]
             public string Separator { get; set; } = string.Empty;
+
+            [JsonPropertyName("build")]
             public int BuildID { get; set; } = -1;
+
+            [JsonPropertyName("version")]
             public string Version { get; set; } = string.Empty;
+
+            [JsonPropertyName("stable")]
             public bool IsStable { get; set; } = true;
         }
 
         public class Loaders
         {
+            [JsonPropertyName("loader")]
             public LoadersData Loader { get; set; } = new();
         }
 
@@ -62,8 +73,13 @@ namespace wey.Host.Provider
 
         public class Installer
         {
+            [JsonPropertyName("url")]
             public string URL { get; set; } = string.Empty;
+
+            [JsonPropertyName("version")]
             public string Version { get; set; } = string.Empty;
+
+            [JsonPropertyName("stable")]
             public bool IsStable { get; set; } = true;
         }
 
@@ -86,7 +102,7 @@ namespace wey.Host.Provider
             return true;
         }
 
-        public override IProviderDownload<FabricMCBuild> GetServerJar(string TargetGameVersion)
+        public override IProviderDownload GetServerJar(string TargetGameVersion)
         {
             //version
             FabricMC.GameVersions[] GameVersions = FabricMC.GetGameVersions();
@@ -129,11 +145,11 @@ namespace wey.Host.Provider
             return GetServerJar(new FabricMCBuild(TargetGameVersion, TargetLoader, TargetInstaller));
         }
 
-        public override IProviderDownload<FabricMCBuild> GetServerJar(FabricMCBuild build)
+        public override IProviderDownload GetServerJar(FabricMCBuild build)
         {
             return new()
             {
-                Build = build,
+                Build = JsonEncryption<FabricMCBuild>.Encrypt(build),
                 ServerJar = FabricMC.Download(build.Version, build.Loader, build.Installer)
             };
         }

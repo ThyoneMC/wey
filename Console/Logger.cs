@@ -116,6 +116,11 @@ namespace wey.Console
             }
         }
 
+        public static void WriteLine()
+        {
+            System.Console.WriteLine(new String('-', System.Console.WindowWidth));
+        }
+
         public static string Log(params string[] message)
         {
             string text = Combine(message);
