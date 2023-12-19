@@ -21,7 +21,8 @@ namespace wey.Console
         public static long LatestReleasedTimestamp { get; private set; }
 
         private static readonly List<KeyboardEventData> HoverKeys = new();
-    
+
+        private static KeyboardEventData? _OncePressed = null;
         private static KeyboardEventData? OncePressed = null;
 
         public static void Reset()
@@ -80,10 +81,10 @@ namespace wey.Console
         {
             if (OncePressed != null)
             {
-                KeyboardEventData tempOncePressed = OncePressed.Value;
+                _OncePressed = OncePressed.Value;
                 OncePressed = null;
 
-                return tempOncePressed;
+                return _OncePressed;
             }
 
             return null;
@@ -120,6 +121,17 @@ namespace wey.Console
 
             return raw.Value.KeyCode;
         }
+    }
+
+    class ConsoleReaderKeybaordData
+    {
+        public KeyCode Key { get; set; }
+        public string? Character { get; set; }
+    }
+
+    class ConsoleReader
+    {
+        // static
 
         private static string? Translate(KeyCode key)
         {
@@ -171,7 +183,7 @@ namespace wey.Console
                 _ => null,
             };
 
-            if (translate != null && GetHoverOnce(KeyCode.VcLeftShift, KeyCode.VcRightShift))
+            if (translate != null && KeyReader.GetHoverOnce(KeyCode.VcLeftShift, KeyCode.VcRightShift))
             {
                 translate = translate.ToUpper();
             }
@@ -179,39 +191,87 @@ namespace wey.Console
             return translate;
         }
 
+        public static ConsoleReaderKeybaordData? ReadChar()
+        {
+            KeyboardEventData? raw = KeyReader.GetOnce();
+            if (raw == null) return null;
+
+            return new()
+            {
+                Key = raw.Value.KeyCode,
+                Character = Translate(raw.Value.KeyCode),
+            };
+        }
+
         public static string ReadLine()
         {
+            KeyReader.GetOnce(); //debug
+
+            int _top = System.Console.CursorTop;
             List<string> builder = new();
 
-            OncePressed = null;
             while (true)
             {
-                KeyboardEventData? raw = GetOnce();
+                ConsoleReaderKeybaordData? raw = ReadChar();
                 if (raw == null) continue;
 
-                if (raw.Value.KeyCode == KeyCode.VcEnter) break;
+                if (raw.Key == KeyCode.VcEnter) break;
 
-                if ((raw.Value.KeyCode == KeyCode.VcBackspace || raw.Value.KeyCode == KeyCode.VcDelete) && builder.Count > 0)
+                if ((raw.Key == KeyCode.VcBackspace || raw.Key == KeyCode.VcDelete) && builder.Count > 0)
                 {
                     builder.RemoveAt(builder.Count - 1);
 
                     System.Console.CursorLeft--;
                     System.Console.Write(" ");
                     System.Console.CursorLeft--;
+
                     continue;
                 }
 
-                string? translate = Translate(raw.Value.KeyCode);
-                if (translate == null) continue;
+                if (raw.Character == null) continue;
 
-                builder.Add(translate);
-                System.Console.Write(translate);
+                builder.Add(raw.Character);
+                System.Console.Write(raw.Character);
             }
 
             System.Console.WriteLine();
             KeyReader.Reset();
 
             return string.Join("", builder);
+        }
+
+        // class
+
+        private bool IsLoaded = false;
+
+        private int StartingCursorLeft = -1;
+        private int StartingCursorTop = -1;
+
+        private void OnLoad()
+        {
+            (StartingCursorLeft, StartingCursorTop) = System.Console.GetCursorPosition();
+
+            StartingCursorLeft++;
+            StartingCursorTop++;
+        }
+
+        private void OnRead()
+        {
+            System.Console.CursorTop = System.Console.WindowHeight - 1;
+
+            System.Console.Write("LMAO");
+        }
+
+        public void RenderNext()
+        {
+            if (!IsLoaded)
+            {
+                IsLoaded = true;
+
+                OnLoad();
+            }
+
+            OnRead();
         }
     }
 }

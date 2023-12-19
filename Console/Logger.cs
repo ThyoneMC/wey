@@ -38,25 +38,48 @@ namespace wey.Console
 
     class Logger
     {
-        public static void ClearLine(int line)
+        private static (int Left, int Top)? CursorReturnPosition = null;
+
+        public static void SetCursorReturnPoint()
         {
-            System.Console.SetCursorPosition(0, line - 1);
-            System.Console.Write(new String(' ', System.Console.WindowWidth));
-            System.Console.SetCursorPosition(0, line - 1);
+            CursorReturnPosition = System.Console.GetCursorPosition();
         }
 
-        public static void ClearFromLine(int line)
+        public static void CursorReturnPoint(bool reset = true)
         {
-            int numClear = (System.Console.CursorTop + 1) - line;
+            if (CursorReturnPosition == null) return;
 
-            System.Console.SetCursorPosition(0, line - 1);
-            while (numClear != 0)
+            System.Console.SetCursorPosition(CursorReturnPosition.Value.Left, CursorReturnPosition.Value.Top);
+
+            if (reset) CursorReturnPosition = null;
+        }
+
+        public static void ClearLine(int line)
+        {
+            SetCursorReturnPoint();
+
+            System.Console.SetCursorPosition(0, line);
+            System.Console.Write(new String(' ', System.Console.WindowWidth));
+
+            CursorReturnPoint();
+        }
+
+        public static void ClearFromLine(int line, int end = -1)
+        {
+            if (end < 0) end = System.Console.CursorTop;
+
+            SetCursorReturnPoint();
+
+            int clearLines = (end + 1) - line;
+            System.Console.SetCursorPosition(0, line);
+            while (clearLines != 0)
             {
                 System.Console.Write(new String(' ', System.Console.WindowWidth));
 
-                numClear--;
+                clearLines--;
             }
-            System.Console.SetCursorPosition(0, line - 1);
+
+            CursorReturnPoint();
         }
 
         private static string Bracket(params string[] message)
@@ -69,9 +92,20 @@ namespace wey.Console
             return string.Join(' ', message);
         }
 
-        public static void CreateWriteLine(string mode, ConsoleColor color, string[] message)
+        public static int CreateWriteLine(ConsoleColor color, string message)
         {
-            CreateWriteLine(
+            System.Console.ForegroundColor = color;
+
+            int CursorTop = WriteSingle(message);
+
+            System.Console.ResetColor();
+
+            return CursorTop;
+        }
+
+        public static int CreateWriteLine(string mode, ConsoleColor color, string[] message)
+        {
+            return CreateWriteLine(
                     color: color,
                     message: Combine(
                             Bracket(
@@ -83,42 +117,40 @@ namespace wey.Console
                 );
         }
 
-        public static void CreateWriteLine(ConsoleColor color, string message)
-        {
-            System.Console.ForegroundColor = color;
-
-            WriteSingle(message);
-
-            System.Console.ResetColor();
-        }
-
-        public static void WriteSingle(object? message)
+        public static int WriteSingle(object? message)
         {
             if (message == null)
             {
-                WriteSingle("null");
-                return;
-            };
+                System.Console.WriteLine("null");
+            }
+            else
+            {
+                if (typeof(object) == typeof(IEnumerable<string>))
+                {
+                    message = Combine((string[])message);
+                }
 
-            WriteSingle(message.ToString() ?? $"{message}");
+                System.Console.WriteLine(message.ToString() ?? $"{message}");
+            }
+
+            return System.Console.CursorTop - 1;
         }
 
-        public static void WriteSingle(params string[] message)
+        public static (int StartLine, int EndLine) WriteMultiple(params string[] message)
         {
-            System.Console.WriteLine(Combine(message));
-        }
+            List<int> CursorTop = new();
 
-        public static void WriteMultiple(params string[] message)
-        {
             foreach (string text in message)
             {
-                System.Console.WriteLine(text);
+                CursorTop.Add(WriteSingle(text));
             }
+
+            return (CursorTop.Min(), CursorTop.Max());
         }
 
-        public static void WriteLine()
+        public static int WriteLine()
         {
-            System.Console.WriteLine(new String('-', System.Console.WindowWidth));
+            return WriteSingle(new String('-', System.Console.WindowWidth));
         }
 
         public static string Log(params string[] message)
@@ -130,37 +162,41 @@ namespace wey.Console
             return text;
         }
 
-        public static void Info(params string[] message)
+        public static int Info(params string[] message)
         {
-            CreateWriteLine("INFO", ConsoleColor.White, message);
+            return CreateWriteLine("INFO", ConsoleColor.White, message);
         }
 
-        public static void Help(params string[] message)
+        public static int Help(params string[] message)
         {
-            CreateWriteLine("HELP", ConsoleColor.Cyan, message);
+            return CreateWriteLine("HELP", ConsoleColor.Cyan, message);
         }
 
-        public static void Warn(params string[] message)
+        public static int Warn(params string[] message)
         {
-            CreateWriteLine("WARN", ConsoleColor.Yellow, message);
+            return CreateWriteLine("WARN", ConsoleColor.Yellow, message);
         }
 
-        public static void Warn(Exception exception)
+        public static (int StartLine, int EndLine) Warn(Exception exception)
         {
             Warn(exception.Message);
             if (exception.StackTrace != null) CreateWriteLine(ConsoleColor.Yellow, exception.StackTrace);
+
+            return (System.Console.CursorTop - 1, System.Console.CursorTop);
         }
 
-        public static void Error(params string[] message)
+        public static int Error(params string[] message)
         {
 
-            CreateWriteLine("ERROR", ConsoleColor.Red, message);
+            return CreateWriteLine("ERROR", ConsoleColor.Red, message);
         }
 
-        public static void Error(Exception exception)
+        public static (int StartLine, int EndLine) Error(Exception exception)
         {
             Error(exception.Message);
             if (exception.StackTrace != null) CreateWriteLine(ConsoleColor.Red, exception.StackTrace);
+
+            return (System.Console.CursorTop - 1, System.Console.CursorTop);
         }
     }
 }

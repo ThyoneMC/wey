@@ -190,8 +190,6 @@ namespace wey.Global
 
             base.Start();
 
-            Logger.WriteSingle($"STARTING -->");
-
             BeginOutputReadLine();
             StandardInput.AutoFlush = true;
         }

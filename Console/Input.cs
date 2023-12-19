@@ -18,7 +18,7 @@ namespace wey.Console
             {
                 System.Console.SetCursorPosition(StartingCursorLeft, StartingCursorTop);
 
-                string? read = KeyReader.ReadLine();
+                string? read = ConsoleReader.ReadLine();
 
                 if (read != null)
                 {

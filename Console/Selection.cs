@@ -67,8 +67,6 @@ namespace wey.Console
 
         private void OnLoad()
         {
-            System.Console.CursorVisible = false;
-
             StartingCursorPosition = System.Console.GetCursorPosition().Top;
 
             KeyReader.TimestampRange = 4250;

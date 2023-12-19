@@ -43,6 +43,30 @@ namespace wey
 
         public static void Main(string[] args)
         {
+            System.Console.CursorVisible = false;
+
+            Panel.SetStatus();
+
+            Panel.InputDisable = true;
+            Panel.SetInput();
+
+            Panel.RenderCanvas();
+
+            Thread.Sleep(-1);
+
+            return;
+
+            var c = new ConsoleReader();
+
+            while (true)
+            {
+                c.RenderNext();
+
+                Logger.WriteSingle("aiusdh918");
+            }
+
+            return;
+
             ExecutableArgument.Import(args);
 
             AddPage(new Home());

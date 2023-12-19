@@ -35,16 +35,13 @@ namespace wey.Pages
             Host = new(HostData);
 
             Host.Start();
+
+            //string read = KeyReader.ReadLine();
         }
 
         public override void OnViewing()
         {
-            if (Host == null || Host.Process == null) return;
-
-            string? output = Host.Process.GetOnceOutput();
-            if (output == null) return;
-
-            Logger.Log(output);
+            
         }
     }
 }
