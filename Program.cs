@@ -45,14 +45,7 @@ namespace wey
         {
             System.Console.CursorVisible = false;
 
-            Panel.SetStatus();
-
-            Panel.InputDisable = true;
-            Panel.SetInput();
-
-            Panel.RenderCanvas();
-
-            Thread.Sleep(-1);
+            new Panel();
 
             return;
 

@@ -12,12 +12,55 @@ namespace wey.Console
 {
     class Panel
     {
+        protected static void Reset()
+        {
+            Status = "wey";
+
+            StatusCursorEnd = -1;
+            StatusCursor = -1;
+
+            Input = ">";
+
+            InputCursorBegin = -1;
+            InputCursor = -1;
+
+            InputDisable = false;
+        }
+
+        protected static void Render()
+        {
+            RenderStatus();
+            RenderInput();
+            RenderCanvas();
+        }
+
+        static Panel()
+        {
+            System.Console.Clear();
+
+            Reset();
+            Render();
+
+            new TaskWorker(() =>
+            {
+                RenderInputBuilder();
+
+                string? InputBuilder = GetInput();
+                if (InputBuilder != null)
+                {
+                    CanvasLines.Add(InputBuilder);
+
+                    RenderCanvas();
+                }
+            }).Start();
+        }
+
         //status
 
-        private static string Status = "wey";
+        private static string Status = string.Empty;
 
-        private static int StatusCursorEnd = -1;
-        private static int StatusCursor = -1;
+        private static int StatusCursorEnd;
+        private static int StatusCursor;
 
         public static void SetStatus(string? text = null)
         {
@@ -36,6 +79,7 @@ namespace wey.Console
                 System.Console.CursorTop = 0;
 
                 (StatusCursor, StatusCursorEnd) = Logger.WriteMultiple(
+                    string.Empty,
                     Status,
                     string.Empty,
                     new string('-', System.Console.WindowWidth),
@@ -53,12 +97,12 @@ namespace wey.Console
 
         //input
 
-        private static string Input = ">";
+        private static string Input = string.Empty;
 
-        private static int InputCursorBegin = -1;
-        private static int InputCursor = -1;
+        private static int InputCursorBegin;
+        private static int InputCursor;
 
-        public static bool InputDisable = false;
+        public static bool InputDisable;
         public static string InputDisableMessage = "https://github.com/ThyoneMC/wey";
 
         public static void SetInput(string? text = null)
@@ -97,15 +141,62 @@ namespace wey.Console
             Logger.WriteSingle(_Input);
         }
 
+        // input - builder
+
+        public static List<string> InputList = new();
+        private static StringBuilder InputBuilder = new();
+        
+        private static bool InputBuilderNext()
+        {
+            ConsoleReaderKeybaordData? raw = ConsoleReader.ReadChar();
+
+            if (raw == null) return false;
+
+            if (raw.Key == KeyCode.VcEnter)
+            {
+                InputList.Add(InputBuilder.ToString());
+                InputBuilder = new();
+
+                return true;
+            }
+
+            if ((raw.Key == KeyCode.VcBackspace || raw.Key == KeyCode.VcDelete) && InputBuilder.Length > 0)
+            {
+                InputBuilder.Remove(InputBuilder.Length - 1, 1);
+
+                return true;
+            }
+
+            if (raw.Character == null) return false;
+
+            InputBuilder.Append(raw.Character);
+            return true;
+        }
+
+        protected static void RenderInputBuilder()
+        {
+            if (InputBuilderNext()) //IsInputChange
+            {
+                SetInput(InputBuilder.ToString());
+            }
+        }
+
+        public static string? GetInput(bool remove = true)
+        {
+            if (InputList.Count == 0) return null;
+
+            string _Input = InputList.Last();
+
+            if (remove) InputList.RemoveAt(InputList.Count - 1);
+
+            return _Input;
+        }
+
         //canvas
 
-        private static List<string> CanvasLines = new()
-        {
-            "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2", "3", "4", "5", "6"
-        };
+        private static List<string> CanvasLines = new();
 
-        //<-- protected
-        public static void RenderCanvas()
+        protected static void RenderCanvas()
         {
             int CanvasCursorBegin = StatusCursorEnd + 1;
             int CanvasCursorEnd = InputCursorBegin - 1;
