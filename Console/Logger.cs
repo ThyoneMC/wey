@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using wey.Global;
 
@@ -38,6 +39,8 @@ namespace wey.Console
 
     class Logger
     {
+        // CursorReturn
+
         private static (int Left, int Top)? CursorReturnPosition = null;
 
         public static void SetCursorReturnPoint()
@@ -53,6 +56,8 @@ namespace wey.Console
 
             if (reset) CursorReturnPosition = null;
         }
+
+        // ClearLine
 
         public static void ClearLine(int line)
         {
@@ -82,6 +87,8 @@ namespace wey.Console
             CursorReturnPoint();
         }
 
+        // utils
+
         private static string Bracket(params string[] message)
         {
             return $"[{string.Join("] [", message)}]";
@@ -92,46 +99,26 @@ namespace wey.Console
             return string.Join(' ', message);
         }
 
-        public static int CreateWriteLine(ConsoleColor color, string message)
-        {
-            System.Console.ForegroundColor = color;
-
-            int CursorTop = WriteSingle(message);
-
-            System.Console.ResetColor();
-
-            return CursorTop;
-        }
-
-        public static int CreateWriteLine(string mode, ConsoleColor color, string[] message)
-        {
-            return CreateWriteLine(
-                    color: color,
-                    message: Combine(
-                            Bracket(
-                                DateTime.UtcNow.ToLocalTime().ToLongTimeString(),
-                                mode
-                            ),
-                            Log(message)
-                        )
-                );
-        }
-
-        public static int WriteSingle(object? message)
+        private static string Convert(object? message)
         {
             if (message == null)
             {
-                System.Console.WriteLine("null");
+                return "null";
             }
-            else
-            {
-                if (typeof(object) == typeof(IEnumerable<string>))
-                {
-                    message = Combine((string[])message);
-                }
 
-                System.Console.WriteLine(message.ToString() ?? $"{message}");
+            if (message.GetType() == typeof(string))
+            {
+                return (string)message;
             }
+
+            return JsonSerializer.Serialize(message);
+        }
+
+        // writer
+
+        public static int WriteSingle(object? message)
+        {
+            System.Console.WriteLine(Convert(message));
 
             return System.Console.CursorTop - 1;
         }
@@ -146,6 +133,31 @@ namespace wey.Console
             }
 
             return (CursorTop.Min(), CursorTop.Max());
+        }
+
+        protected static int CreateWriteLine(ConsoleColor color, string message)
+        {
+            System.Console.ForegroundColor = color;
+
+            int CursorTop = WriteSingle(message);
+
+            System.Console.ResetColor();
+
+            return CursorTop;
+        }
+
+        protected static int CreateWriteLine(string mode, ConsoleColor color, string[] message)
+        {
+            return CreateWriteLine(
+                    color: color,
+                    message: Combine(
+                            Bracket(
+                                DateTime.UtcNow.ToLocalTime().ToLongTimeString(),
+                                mode
+                            ),
+                            Log(message)
+                        )
+                );
         }
 
         public static int WriteLine()

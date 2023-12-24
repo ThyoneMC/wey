@@ -42,24 +42,7 @@ namespace wey
         }
 
         public static void Main(string[] args)
-        {
-            System.Console.CursorVisible = false;
-
-            new Panel();
-
-            return;
-
-            var c = new ConsoleReader();
-
-            while (true)
-            {
-                c.RenderNext();
-
-                Logger.WriteSingle("aiusdh918");
-            }
-
-            return;
-
+        {            
             ExecutableArgument.Import(args);
 
             AddPage(new Home());
@@ -101,7 +84,11 @@ namespace wey
                         }
                     case PageType.Page:
                         {
-                            CurrentPage.RenderNext();
+                            IPage Page = (IPage)CurrentPage;
+
+                            Page.RenderNext();
+
+                            if (Page.IsExit) ReturnPage();
                             break;
                         }
                 }

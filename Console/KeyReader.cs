@@ -164,7 +164,6 @@ namespace wey.Console
                 KeyCode.VcY => "y",
                 KeyCode.VcZ => "z",
 
-                KeyCode.Vc0 or KeyCode.VcNumPad0 => "0",
                 KeyCode.Vc1 or KeyCode.VcNumPad1 => "1",
                 KeyCode.Vc2 or KeyCode.VcNumPad2 => "2",
                 KeyCode.Vc3 or KeyCode.VcNumPad3 => "3",
@@ -174,18 +173,41 @@ namespace wey.Console
                 KeyCode.Vc7 or KeyCode.VcNumPad7 => "7",
                 KeyCode.Vc8 or KeyCode.VcNumPad8 => "8",
                 KeyCode.Vc9 or KeyCode.VcNumPad9 => "9",
+                KeyCode.Vc0 or KeyCode.VcNumPad0 => "0",
 
                 KeyCode.VcPeriod or KeyCode.VcNumPadDecimal => ".",
                 KeyCode.VcMinus or KeyCode.VcNumPadSubtract => "-",
+                KeyCode.VcSlash => "/",
 
                 KeyCode.VcSpace => " ",
 
                 _ => null,
             };
 
-            if (translate != null && KeyReader.GetHoverOnce(KeyCode.VcLeftShift, KeyCode.VcRightShift))
+            if (translate == null) return null;
+
+            if (KeyReader.GetHoverOnce(KeyCode.VcLeftShift, KeyCode.VcRightShift))
             {
-                translate = translate.ToUpper();
+                string upper = translate.ToUpper();
+                if (!translate.Equals(upper)) return upper;
+
+                string? shift = translate switch
+                {
+                    "1" => "!",
+                    "2" => "@",
+                    "3" => "#",
+                    "4" => "$",
+                    "5" => "%",
+                    "6" => "^",
+                    "7" => "&",
+                    "8" => "*",
+
+                    "-" => "_",
+                    "/" => "?",
+
+                    _ => null,
+                };
+                return shift ?? translate;
             }
 
             return translate;

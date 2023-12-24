@@ -19,40 +19,64 @@ namespace wey.Console
             StatusCursorEnd = -1;
             StatusCursor = -1;
 
+            IsStatusChange = true;
+
             Input = ">";
 
             InputCursorBegin = -1;
             InputCursor = -1;
 
             InputDisable = false;
+
+            IsInputChange = true;
+
+            IsCanvasChange = true;
+
+            ClearCanvas();
         }
 
-        protected static void Render()
+        private static readonly TaskWorker Worker = new(() =>
         {
-            RenderStatus();
-            RenderInput();
-            RenderCanvas();
-        }
+            if (IsStatusChange)
+            {
+                IsStatusChange = false;
 
-        static Panel()
+                RenderStatus();
+            }
+
+            if (IsInputChange)
+            {
+                IsInputChange = false;
+
+                RenderInput();
+            }
+
+            if (IsCanvasChange) 
+            {
+                IsCanvasChange = false;
+
+                RenderCanvas();
+            }
+
+            RenderInputBuilder();
+        });
+
+        public static void Start()
         {
+            System.Console.CursorVisible = false;
             System.Console.Clear();
 
             Reset();
-            Render();
 
-            new TaskWorker(() =>
-            {
-                RenderInputBuilder();
+            Worker.Start();
+        }
 
-                string? InputBuilder = GetInput();
-                if (InputBuilder != null)
-                {
-                    CanvasLines.Add(InputBuilder);
+        public static void Stop()
+        {
+            Worker.Stop();
 
-                    RenderCanvas();
-                }
-            }).Start();
+            System.Console.CursorVisible = true;
+            System.Console.Clear();
         }
 
         //status
@@ -62,6 +86,8 @@ namespace wey.Console
         private static int StatusCursorEnd;
         private static int StatusCursor;
 
+        private static bool IsStatusChange;
+
         public static void SetStatus(string? text = null)
         {
             if (text != null)
@@ -69,7 +95,7 @@ namespace wey.Console
                 Status = text;
             }
 
-            RenderStatus();
+            IsStatusChange = true;
         }
 
         protected static void RenderStatus()
@@ -78,13 +104,15 @@ namespace wey.Console
             {
                 System.Console.CursorTop = 0;
 
-                (StatusCursor, StatusCursorEnd) = Logger.WriteMultiple(
+                (int StartLine, StatusCursorEnd) = Logger.WriteMultiple(
                     string.Empty,
                     Status,
                     string.Empty,
                     new string('-', System.Console.WindowWidth),
                     string.Empty
                 );
+
+                StatusCursor = StartLine + 1;
 
                 return;
             }
@@ -105,6 +133,8 @@ namespace wey.Console
         public static bool InputDisable;
         public static string InputDisableMessage = "https://github.com/ThyoneMC/wey";
 
+        private static bool IsInputChange;
+
         public static void SetInput(string? text = null)
         {
             if (text != null)
@@ -112,7 +142,7 @@ namespace wey.Console
                 Input = $"> {text}";
             }
 
-            RenderInput();
+            IsInputChange = true;
         }
 
         protected static void RenderInput()
@@ -192,9 +222,14 @@ namespace wey.Console
             return _Input;
         }
 
-        //canvas
+        public static string GetCurrentInput()
+        {
+            return InputBuilder.ToString();
+        }
 
-        private static List<string> CanvasLines = new();
+        // canvas
+
+        private static readonly List<string> CanvasLines = new();
 
         protected static void RenderCanvas()
         {
@@ -204,7 +239,7 @@ namespace wey.Console
             Logger.ClearFromLine(CanvasCursorBegin, CanvasCursorEnd);
 
             int Size = CanvasCursorEnd - CanvasCursorBegin;
-            double StartIndexPercent = 28;
+            double StartIndexPercent = 100;
             int StartIndex = (int)Math.Floor(StartIndexPercent / 100.0 * CanvasLines.Count);
             int EndIndex = -1;
             if (CanvasLines.Count - StartIndex <= Size)
@@ -224,6 +259,22 @@ namespace wey.Console
 
                 StartIndex++;
             }
+        }
+
+        private static bool IsCanvasChange;
+
+        public static void AddCanvas(params string[] lines)
+        {
+            CanvasLines.AddRange(lines);
+
+            IsCanvasChange = true;
+        }
+
+        public static void ClearCanvas()
+        {
+            CanvasLines.Clear();
+
+            IsCanvasChange = true;
         }
     }
 }

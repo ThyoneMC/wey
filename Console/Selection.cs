@@ -41,20 +41,17 @@ namespace wey.Console
 
         public static Selection<T> Create(IEnumerable<T> choices)
         {
-            return new Selection<T>(choices);
+            return new (choices);
         }
 
         public static Selection<T> Create(params T[] choices)
         {
-            return new Selection<T>(choices);
+            return new (choices);
         }
 
         public static Selection<T> Create(SelectionChoice<T>[] choices)
         {
-            return new(Array.Empty<T>())
-            {
-                Choices = choices.ToList()
-            };
+            return new (choices.OrderBy(choice => choice.Index).Select(choice => choice.Value));
         }
 
         public SelectionChoice<T>? Result = null;

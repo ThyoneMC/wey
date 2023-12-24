@@ -36,12 +36,28 @@ namespace wey.Pages
 
             Host.Start();
 
-            //string read = KeyReader.ReadLine();
+            Panel.Start();
+            Panel.SetStatus($"[{Host.Data.Provider}] {Host.Data.Name}");
         }
 
         public override void OnViewing()
         {
-            
+            if (Host == null || Host.Process == null) return;
+
+            if (Host.Process.IsStarted && !Host.Process.IsExists())
+            {
+                IsExit = true;
+
+                Panel.Stop();
+
+                return;
+            }
+
+            string? output = Host.Process.GetOnceOutput();
+            if (output != null) Panel.AddCanvas(output);
+
+            string? input = Panel.GetInput();
+            if (input != null) Host.Process.Input(input);
         }
     }
 }

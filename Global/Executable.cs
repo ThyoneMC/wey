@@ -101,7 +101,7 @@ namespace wey.Global
     {
         public readonly Queue<string> Output = new();
 
-        public readonly bool IsStarted = false;
+        public bool IsStarted = false;
 
         private string? OnceOutput = null;
 
@@ -125,7 +125,7 @@ namespace wey.Global
 
                 OnceOutput = thisEvent.Data;
 
-                Output.Enqueue(thisEvent.Data);
+                Array.ForEach(thisEvent.Data.Split('\n'), output => Output.Enqueue(output));
                 while (Output.Count > option.OutputSaved) Output.Dequeue();
             });
 
@@ -189,6 +189,7 @@ namespace wey.Global
             if (IsStarted) return;
 
             base.Start();
+            IsStarted = true;
 
             BeginOutputReadLine();
             StandardInput.AutoFlush = true;
@@ -220,6 +221,11 @@ namespace wey.Global
             }
 
             return null;
+        }
+
+        public void Input(string input)
+        {
+            StandardInput.WriteLine(input);
         }
     }
 }
