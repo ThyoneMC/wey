@@ -7,11 +7,11 @@ using wey.Console;
 
 namespace wey.Interface
 {
-    abstract class IPageGroup : IPageBase
+    abstract class IPageGroup : IPage
     {
         private Selection<string> Selector = Selection<string>.Create();
 
-        public IPageBase? Selection
+        public IPage? Selection
         {
             get
             {
@@ -53,6 +53,6 @@ namespace wey.Interface
             return PageType.Group;
         }
 
-        public abstract IEnumerable<IPageBase> GetPages();
+        public abstract IEnumerable<IPage> GetPages();
     }
 }

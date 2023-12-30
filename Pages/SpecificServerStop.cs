@@ -11,11 +11,11 @@ namespace wey.Pages
 {
     class SpecificServerStop : IPageCommand
     {
-        private HostData Host;
+        private readonly HostData HostData;
 
         public SpecificServerStop(HostData host) : base(host.Name)
         {
-            Host = host;
+            HostData = host;
         }
 
         public override string GetName()
@@ -30,9 +30,7 @@ namespace wey.Pages
 
         public override void OnCommand()
         {
-            HostManager host = new(Host);
-
-            host.Start();
+            new HostManager(HostData).Stop();
         }
     }
 }

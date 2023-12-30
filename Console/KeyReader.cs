@@ -175,9 +175,18 @@ namespace wey.Console
                 KeyCode.Vc9 or KeyCode.VcNumPad9 => "9",
                 KeyCode.Vc0 or KeyCode.VcNumPad0 => "0",
 
-                KeyCode.VcPeriod or KeyCode.VcNumPadDecimal => ".",
                 KeyCode.VcMinus or KeyCode.VcNumPadSubtract => "-",
-                KeyCode.VcSlash => "/",
+                KeyCode.VcEquals or KeyCode.VcNumPadEquals => "=",
+
+                KeyCode.VcOpenBracket => "[",
+                KeyCode.VcCloseBracket => "]",
+
+                KeyCode.VcSemicolon => ";",
+                KeyCode.VcQuote => "'",
+
+                KeyCode.VcComma => ",",
+                KeyCode.VcPeriod or KeyCode.VcNumPadDecimal => ".",
+                KeyCode.VcSlash or KeyCode.VcNumPadDivide => "/",
 
                 KeyCode.VcSpace => " ",
 
@@ -201,9 +210,21 @@ namespace wey.Console
                     "6" => "^",
                     "7" => "&",
                     "8" => "*",
+                    "9" => "(",
+                    "0" => ")",
 
                     "-" => "_",
-                    "/" => "?",
+                    "=" => "+",
+
+                    "[" => "{",
+                    "]" => "}",
+
+                    ";" => ":",
+                    "'" => "\"",
+
+                    "," => "<",
+                    "." => ">",
+                    "?" => "?",
 
                     _ => null,
                 };
@@ -280,8 +301,6 @@ namespace wey.Console
         private void OnRead()
         {
             System.Console.CursorTop = System.Console.WindowHeight - 1;
-
-            System.Console.Write("LMAO");
         }
 
         public void RenderNext()

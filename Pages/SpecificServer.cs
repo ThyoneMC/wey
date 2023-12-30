@@ -29,12 +29,12 @@ namespace wey.Pages
             return "server management";
         }
 
-        public override IEnumerable<IPageBase> GetPages()
+        public override IEnumerable<IPage> GetPages()
         {
-            return new IPageBase[] {
+            return new IPage[] {
+                    new SpecificServerConsole(Host),
                     new SpecificServerStart(Host),
                     new SpecificServerStop(Host),
-                    new SpecificServerDelete(Host),
             };
         }
     }

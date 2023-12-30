@@ -10,11 +10,11 @@ namespace wey
 {
     class Program
     {
-        private static readonly Stack<IPageBase> PageList = new();
+        private static readonly Stack<IPage> PageList = new();
 
-        private static IPageBase CurrentPage = new Home();
+        private static IPage CurrentPage = new Home();
 
-        private static void AddPage(IPageBase page)
+        private static void AddPage(IPage page)
         {
             PageList.Push(page);
 
@@ -28,8 +28,10 @@ namespace wey
             CurrentPage = PageList.First();
 
             Logger.WriteMultiple(
+                    string.Empty,
                     string.Join(" / ", PageList.Reverse().Select(p => p.GetName())),
-                    new String('-', 10),
+                    string.Empty,
+                    new string('-', System.Console.WindowWidth),
                     string.Empty
                 );
         }
@@ -78,13 +80,14 @@ namespace wey
                             IPageCommand Command = (IPageCommand)CurrentPage;
 
                             Command.RenderNext();
+                            Thread.Sleep(1000);
 
                             ReturnPage();
                             break;
                         }
-                    case PageType.Page:
+                    case PageType.View:
                         {
-                            IPage Page = (IPage)CurrentPage;
+                            IPageView Page = (IPageView)CurrentPage;
 
                             Page.RenderNext();
 

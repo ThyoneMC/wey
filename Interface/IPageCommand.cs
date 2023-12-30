@@ -7,7 +7,7 @@ using wey.Console;
 
 namespace wey.Interface
 {
-    abstract class IPageCommand : IPageBase
+    abstract class IPageCommand : IPage
     {
         public IPageCommand(params object[] args) : base(args)
         {

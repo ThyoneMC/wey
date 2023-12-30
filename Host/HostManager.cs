@@ -33,6 +33,9 @@ namespace wey.Host
         [JsonPropertyName("timestamp")]
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 
+        [JsonPropertyName("pid")]
+        public int ProcessID { get; set; } = -1;
+
         public HostData(string name, string provider, string folderPath)
         {
             Name = name;
@@ -67,10 +70,23 @@ namespace wey.Host
         public HostData Data;
         public string DataPath;
 
+        public Executable? Process = null;
+
         public HostManager(HostData data)
         {
             Data = data;
             DataPath = Path.Join(data.FolderPath, ".wey");
+
+            if (Data.ProcessID != -1)
+            {
+                Executable? ImportProcess = Executable.Import(Data.ProcessID);
+
+                if (ImportProcess != null)
+                {
+                    Process = ImportProcess;
+                    return;
+                }
+            }
         }
 
         public void Create()
@@ -113,11 +129,9 @@ namespace wey.Host
             AddServerFile(downloadData.ServerJar);
         }
 
-        public Executable? Process = null;
-
         public void Start()
         {
-            if (Process != null && Process.IsExists()) Stop();
+            if (Process != null && Process.IsExists()) return;
 
             Logger.Info($"Starting Server: {Data.Name} ({Data.Provider} {Data.GetVersion()})");
 
@@ -136,14 +150,16 @@ namespace wey.Host
             });
 
             Process.Start();
-            Process.Export();
+            Data.ProcessID = Process.Export();
         }
 
         public void Stop()
         {
+            if (Process == null) return;
+
             Logger.Info($"Stoping Server: {Data.Name}");
 
-            Process?.Kill();
+            Process.Input("stop");
         }
     }
 }

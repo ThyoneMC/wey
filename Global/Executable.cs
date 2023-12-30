@@ -134,6 +134,8 @@ namespace wey.Global
 
         protected static Dictionary<int, Executable> ExecutableList = new();
 
+        public static int Count => ExecutableList.Count;
+
         public int Export()
         {
             ExecutableList.Add(Id, this);
@@ -141,13 +143,8 @@ namespace wey.Global
             return Id;
         }
 
-        public static Executable Import(int pid)
+        public static Executable? Import(int pid)
         {
-            if (ExecutableList[pid] == null)
-            {
-                throw new ExecutableNotFoundException();
-            }
-
             return ExecutableList[pid];
         }
 

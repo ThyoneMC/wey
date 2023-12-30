@@ -190,6 +190,16 @@ namespace wey.Console
                 return true;
             }
 
+            if (KeyReader.GetHoverOnce(KeyCode.VcLeftControl, KeyCode.VcRightControl) && raw.Key == KeyCode.VcV)
+            {
+                string? Clipboard = ClipboardService.GetText();
+                if (Clipboard == null) return false;
+
+                InputBuilder.Append(Clipboard);
+
+                return true;
+            }
+
             if ((raw.Key == KeyCode.VcBackspace || raw.Key == KeyCode.VcDelete) && InputBuilder.Length > 0)
             {
                 InputBuilder.Remove(InputBuilder.Length - 1, 1);

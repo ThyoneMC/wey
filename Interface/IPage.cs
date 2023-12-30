@@ -7,35 +7,30 @@ using wey.Console;
 
 namespace wey.Interface
 {
-    abstract class IPage : IPageBase
+    enum PageType
     {
-        public IPage(params object[] args) : base(args)
+        View,
+        Command,
+        Group
+    }
+
+    abstract class IPage
+    {
+        protected object[] arguments;
+
+        public bool IsLoaded { get; protected set; }
+
+        public IPage(params object[] args)
         {
-            
+            arguments = args;
         }
 
-        public override void RenderNext()
-        {
-            if (!IsLoaded)
-            {
-                IsLoaded = true;
-                KeyReader.TimestampRange = 17500;
+        public abstract void RenderNext();
 
-                OnLoad();
-            }
+        public abstract PageType GetPageType();
 
-            OnViewing();
-        }
+        public abstract string GetName();
 
-        public override PageType GetPageType()
-        {
-            return PageType.Page;
-        }
-
-        public bool IsExit = false;
-
-        public abstract void OnViewing();
-
-        public abstract void OnLoad();
+        public abstract string GetDescription();
     }
 }

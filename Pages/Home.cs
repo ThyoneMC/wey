@@ -19,9 +19,9 @@ namespace wey.Pages
             return "wey";
         }
 
-        public override IEnumerable<IPageBase> GetPages()
+        public override IEnumerable<IPage> GetPages()
         {
-            return new IPageBase[] {
+            return new IPage[] {
                     new Server()
             };
         }

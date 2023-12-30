@@ -23,7 +23,7 @@ namespace wey.Pages
             return "servers list";
         }
 
-        public override IEnumerable<IPageBase> GetPages()
+        public override IEnumerable<IPage> GetPages()
         {
             HostData[] hostList = HostFinder.Find();
 
