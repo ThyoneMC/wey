@@ -123,10 +123,10 @@ namespace wey.Global
             {
                 if (string.IsNullOrEmpty(thisEvent.Data)) return;
 
-                OnceOutput = thisEvent.Data;
-
                 Array.ForEach(thisEvent.Data.Split('\n'), output => Output.Enqueue(output));
                 while (Output.Count > option.OutputSaved) Output.Dequeue();
+
+                OnceOutput = Output.Last();
             });
 
             IsStarted = IsExists();

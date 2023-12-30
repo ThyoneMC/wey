@@ -49,7 +49,7 @@ namespace wey.Host
                 {
                     if (host == null) continue;
 
-                    if (host.Name == name || host.SpecificName == name)
+                    if (host.Name.Equals(name) || host.SpecificName.Equals(name))
                     {
                         servers.Add(host);
                     }

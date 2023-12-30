@@ -12,10 +12,10 @@ namespace wey.Host.Provider
 {
     class PaperMCBuild : IProviderBuild
     {
-        public string Build { get; set; } = string.Empty;
+        public int Build { get; set; } = -1;
         public string Download { get; set; } = string.Empty;
 
-        public PaperMCBuild(string version, string build, string download) : base(version)
+        public PaperMCBuild(string version, int build, string download) : base(version)
         {
             Build = build;
             Download = download;
@@ -83,7 +83,7 @@ namespace wey.Host.Provider
 
         // download
 
-        public static byte[] Download(string version, string build, string download)
+        public static byte[] Download(string version, int build, string download)
         {
             return Client.Download($"projects/{TargetProject}/versions/{version}/builds/{build}/downloads/{download}");
         }
@@ -115,7 +115,7 @@ namespace wey.Host.Provider
             if (ServerBuild.Builds == null) throw new VersionNotFoundException();
 
             PaperMC.BuildData LastestBuild = ServerBuild.Builds[ServerBuild.Builds.Length - 1];
-            string TargetBuild = LastestBuild.ID.ToString();
+            int TargetBuild = LastestBuild.ID;
             string TargetDownload = LastestBuild.Download.Application.Name;
 
             //download

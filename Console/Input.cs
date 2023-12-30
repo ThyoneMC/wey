@@ -24,7 +24,11 @@ namespace wey.Console
                 {
                     if (required && string.IsNullOrWhiteSpace(read)) continue;
 
-                    if (clear) Logger.ClearLine(System.Console.CursorTop);
+                    if (clear)
+                    {
+                        Logger.ClearLine(StartingCursorTop);
+                        System.Console.CursorTop = StartingCursorTop;
+                    }
 
                     return read;
                 }
@@ -33,7 +37,7 @@ namespace wey.Console
 
         public static SelectionChoice<string> SelectionString(IEnumerable<string> choices, string? message = null)
         {
-            int StartingCursorTop = System.Console.CursorTop + 1;
+            int StartingCursorTop = System.Console.CursorTop;
 
             if (!string.IsNullOrEmpty(message)) System.Console.WriteLine($"{message}: ");
 
@@ -50,7 +54,11 @@ namespace wey.Console
 
             Logger.ClearFromLine(StartingCursorTop);
 
-            if (!string.IsNullOrEmpty(message)) System.Console.WriteLine($"{message}: {Selector.Result.Value}");
+            if (!string.IsNullOrEmpty(message))
+            {
+                System.Console.CursorTop = StartingCursorTop;
+                System.Console.WriteLine($"{message}: {Selector.Result.Value}");
+            }
 
             return Selector.Result;
         }
@@ -81,12 +89,13 @@ namespace wey.Console
             while (true)
             {
                 if (!string.IsNullOrEmpty(message)) System.Console.Write($"{message}: ");
-                string read = ReadString();
+                string read = ReadString(clear: true);
 
                 if (int.TryParse(read, out int number))
                 {
                     if (number < min || number > max) continue;
 
+                    System.Console.WriteLine($"{message}: {number}");
                     return number;
                 }
 
@@ -99,12 +108,13 @@ namespace wey.Console
             while (true)
             {
                 if (!string.IsNullOrEmpty(message)) System.Console.Write($"{message}: ");
-                string read = ReadString();
+                string read = ReadString(clear: true);
 
                 if (float.TryParse(read, out float number))
                 {
                     if (number < min || number > max) continue;
 
+                    System.Console.WriteLine($"{message}: {number}");
                     return number;
                 }
 

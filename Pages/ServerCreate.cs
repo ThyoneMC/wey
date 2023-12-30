@@ -9,6 +9,7 @@ using wey.Global;
 using wey.Host;
 using wey.Host.Provider;
 using wey.Interface;
+using static wey.Host.Provider.PaperMC;
 using static wey.Host.Provider.Vanilla;
 
 namespace wey.Pages
@@ -69,11 +70,44 @@ namespace wey.Pages
                     {
                         PaperMC provider = new();
 
+                        PaperMC.Project project = PaperMC.GetProject();
+
+                        if (versionFilter == Vanilla.VersionType.Release) versionFilter = project.Versions.Last();
+                        else if (versionFilter == Vanilla.VersionType.Snapshot)
+                        {
+                            throw new VersionNotFoundException("snapshot not support");
+                        }
+
+                        IEnumerable<string> versionList = project.Versions.Where(v => v.Contains(versionFilter));
+                        if (!versionList.Any())
+                        {
+                            throw new VersionNotFoundException(versionFilter);
+                        }
+
+                        string version = Input.SelectionString(versionList, "version").Value;
+
+                        download = provider.GetServerJar(version);
+
                         break;
                     }
                 case "fabric":
                     {
                         FabricMC provider = new();
+
+                        FabricMC.GameVersions[] versions = FabricMC.GetGameVersions();
+
+                        if (versionFilter == Vanilla.VersionType.Release) versionFilter = versions.First(v => v.IsStable).Version;
+                        else if (versionFilter == Vanilla.VersionType.Snapshot) versionFilter = versions.First(v => !v.IsStable).Version;
+
+                        IEnumerable<string> versionList = versions.Where(v => v.Version.Contains(versionFilter)).Select(v => v.Version);
+                        if (!versionList.Any())
+                        {
+                            throw new VersionNotFoundException(versionFilter);
+                        }
+
+                        string version = Input.SelectionString(versionList, "version").Value;
+
+                        download = provider.GetServerJar(version);
 
                         break;
                     }

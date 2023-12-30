@@ -25,6 +25,8 @@ namespace wey.Interface
             arguments = args;
         }
 
+        public bool IsExit = false;
+
         public abstract void RenderNext();
 
         public abstract PageType GetPageType();

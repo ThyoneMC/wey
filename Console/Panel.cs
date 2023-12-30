@@ -182,6 +182,14 @@ namespace wey.Console
 
             if (raw == null) return false;
 
+            if (raw.Key == KeyCode.VcUp && InputList.Count > 0)
+            {
+                InputBuilder.Clear();
+                InputBuilder.Append(InputList.Last());
+
+                return true;
+            }
+
             if (raw.Key == KeyCode.VcEnter)
             {
                 InputList.Add(InputBuilder.ToString());
@@ -265,9 +273,23 @@ namespace wey.Console
             System.Console.CursorTop = CanvasCursorBegin;
             while (StartIndex <= EndIndex && StartIndex < CanvasLines.Count)
             {
-                Logger.WriteSingle(CanvasLines[StartIndex]);
+                string Content = CanvasLines[StartIndex];
 
-                StartIndex++;
+                if (Content.Length > System.Console.WindowWidth)
+                {
+                    for (var i = 0; i < Content.Length; i += System.Console.WindowWidth)
+                    {
+                        Logger.WriteSingle(Content.Substring(i, Math.Min(System.Console.WindowWidth, Content.Length - i)));
+
+                        StartIndex++;
+                    }
+                }
+                else
+                {
+                    Logger.WriteSingle(CanvasLines[StartIndex]);
+
+                    StartIndex++;
+                }
             }
         }
 

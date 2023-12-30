@@ -63,5 +63,10 @@ namespace wey.Pages
             string? input = Panel.GetInput();
             if (input != null) Host.Process.Input(input);
         }
+
+        public override void OnForceExit()
+        {
+            Panel.Stop();
+        }
     }
 }

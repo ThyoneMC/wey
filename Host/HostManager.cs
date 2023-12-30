@@ -19,7 +19,7 @@ namespace wey.Host
         public string Name { get; set; } = "default";
 
         [JsonPropertyName("specific_name")]
-        public string SpecificName { get; set; } = $"default-{DateTime.UtcNow.ToFileTime()}";
+        public string SpecificName { get; set; } = $"default{DateTime.UtcNow.ToFileTime()}";
 
         [JsonPropertyName("provider")]
         public string Provider { get; set; } = string.Empty;
@@ -39,7 +39,7 @@ namespace wey.Host
         public HostData(string name, string provider, string folderPath)
         {
             Name = name;
-            SpecificName = $"{name.Replace(" ", "")}-{new Random().Next(9999999)}"; //random from 0 - 9,999,999
+            SpecificName = $"{name.Replace(" ", "")}{new Random().Next(9999999)}"; //random from 0 - 9,999,999
             Provider = provider;
             FolderPath = Path.GetFullPath(folderPath);
         }
@@ -99,7 +99,7 @@ namespace wey.Host
             HostList.Add(Data.FolderPath);
         }
 
-        public void Delete(bool temporary)
+        public void Delete(bool temporary = true)
         {
             Logger.Info($"Deleting: {Data.Name}");
 

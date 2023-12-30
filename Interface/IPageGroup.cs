@@ -40,8 +40,16 @@ namespace wey.Interface
             {
                 IsLoaded = true;
 
+                IEnumerable<IPage> Pages = GetPages();
+
+                if (!Pages.Any())
+                {
+                    IsExit = true;
+                    return;
+                }
+
                 Selector = Selection<string>.Create(
-                            GetPages().Select(page => page.GetName())
+                            Pages.Select(page => page.GetName())
                         );
             }
 

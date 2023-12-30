@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using wey.Console;
 using wey.Global;
+using wey.Host.Provider;
 using wey.Interface;
 using wey.Pages;
 
@@ -50,13 +51,21 @@ namespace wey
             AddPage(new Home());
             new TaskWorker(() =>
             {
-                if (PageList.Count > 1 && KeyReader.Get() == KeyCode.VcLeft)
+                PageType CurrentType = CurrentPage.GetPageType();
+
+                if 
+                (
+                    (CurrentPage.IsExit) ||
+                    (PageList.Count > 1 && KeyReader.Get() == KeyCode.VcLeft)
+                )
                 {
+                    if (CurrentType == PageType.View) ((IPageView)CurrentPage).OnForceExit();
+
                     ReturnPage();
                     return;
                 }
 
-                switch (CurrentPage.GetPageType())
+                switch (CurrentType)
                 {
                     case PageType.Group:
                         {
@@ -91,7 +100,6 @@ namespace wey
 
                             Page.RenderNext();
 
-                            if (Page.IsExit) ReturnPage();
                             break;
                         }
                 }
