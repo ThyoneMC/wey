@@ -33,8 +33,8 @@ namespace wey.Host
         [JsonPropertyName("timestamp")]
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 
-        [JsonPropertyName("pid")]
-        public int ProcessID { get; set; } = -1;
+        [JsonPropertyName("jar_flags")]
+        public string ServerJarFlags { get; set; } = "--nogui";
 
         public HostData(string name, string provider, string folderPath)
         {
@@ -68,7 +68,10 @@ namespace wey.Host
     class HostManager
     {
         public HostData Data;
-        public string DataPath;
+        public readonly string DataPath;
+
+        public readonly string ProcessDataPath;
+        private readonly JsonFileController<int> ProcessID;
 
         public Executable? Process = null;
 
@@ -77,14 +80,21 @@ namespace wey.Host
             Data = data;
             DataPath = Path.Join(data.FolderPath, ".wey");
 
-            if (Data.ProcessID != -1)
+            ProcessDataPath = Path.Join(DataPath, "process");
+            ProcessID = new(ProcessDataPath, "pid");
+
+            int ReadPID = ProcessID.Read();
+            if (ReadPID > 0)
             {
-                Executable? ImportProcess = Executable.Import(Data.ProcessID);
+                Executable? ImportProcess = Executable.Import(ReadPID);
 
                 if (ImportProcess != null)
                 {
                     Process = ImportProcess;
-                    return;
+                }
+                else
+                {
+                    StaticFolderController.Delete(ProcessDataPath);
                 }
             }
         }
@@ -142,15 +152,17 @@ namespace wey.Host
             string? javaExecute = Executable.Where(javaExecuteName);
             if (javaExecute == null) throw new FileNotFoundException($"{javaExecuteName} not found");
 
+            string? port = null;
+
             Process = new(new ExecutableOption()
             {
                 FileName = javaExecute,
-                Arguments = "-jar server.jar --nogui",
+                Arguments = $"-jar server.jar --port={port ?? "25565"} {Data.ServerJarFlags}",
                 WorkDirectory = Data.FolderPath
             });
 
             Process.Start();
-            Data.ProcessID = Process.Export();
+            ProcessID.Edit(Process.Export());
         }
 
         public void Stop()
@@ -160,6 +172,7 @@ namespace wey.Host
             Logger.Info($"Stoping Server: {Data.Name}");
 
             Process.Input("stop");
+            ProcessID.Delete();
         }
     }
 }

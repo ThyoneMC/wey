@@ -12,7 +12,7 @@ namespace wey.Console
     class SelectionChoice<T>
     {
         public int Index { get; set; } = -1;
-        public T Value { get; set; } = FileController<T>.CreateTypeInstance();
+        public T Value { get; set; } = JsonFileController<T>.CreateTypeInstance();
     }
 
     class Selection<T>

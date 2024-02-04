@@ -73,6 +73,8 @@ namespace wey.Console
 
         public static void Stop()
         {
+            ClearInput();
+
             Worker.Stop();
 
             System.Console.CursorVisible = true;
@@ -243,6 +245,14 @@ namespace wey.Console
         public static string GetCurrentInput()
         {
             return InputBuilder.ToString();
+        }
+
+        public static void ClearInput()
+        {
+            InputBuilder.Clear();
+            InputList.Clear();
+
+            SetInput(null);
         }
 
         // canvas

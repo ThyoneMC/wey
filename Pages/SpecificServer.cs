@@ -37,7 +37,7 @@ namespace wey.Pages
                     new SpecificServerConsole(Host),
                     new SpecificServerStart(Host),
                     new SpecificServerStop(Host),
-                    new SpecificServerDelete(Host),
+                    new SpecificServerDelete(Host)
             };
         }
     }

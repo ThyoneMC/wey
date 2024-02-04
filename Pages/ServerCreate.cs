@@ -78,7 +78,7 @@ namespace wey.Pages
                             throw new VersionNotFoundException("snapshot not support");
                         }
 
-                        IEnumerable<string> versionList = project.Versions.Where(v => v.Contains(versionFilter));
+                        IEnumerable<string> versionList = project.Versions.Where(v => v.Contains(versionFilter)).Reverse();
                         if (!versionList.Any())
                         {
                             throw new VersionNotFoundException(versionFilter);

@@ -145,7 +145,17 @@ namespace wey.Global
 
         public static Executable? Import(int pid)
         {
-            return ExecutableList[pid];
+            ExecutableList.TryGetValue(pid, out Executable? Execute);
+
+            if (Execute == null) return null;
+
+            if (!Execute.IsExists())
+            {
+                ExecutableList.Remove(pid);
+                return null;
+            }
+
+            return Execute;
         }
 
         private static readonly string PathSplitter = ExecutablePlatform.Get(windows: ";", linux: ":");

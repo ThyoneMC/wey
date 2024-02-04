@@ -112,20 +112,30 @@ namespace wey.Global
             }
         }
 
+        public static void Copy(string sourcePath, string destinationPath)
+        {
+            StaticFolderControllerRead read = Read(sourcePath);
+
+            Build(destinationPath);
+
+            foreach (string file in read.Files)
+            {
+                File.Copy(file, Path.Join(destinationPath, Path.GetFileName(file)));
+            }
+
+            foreach (string folder in read.Folders)
+            {
+                string folderName = Path.GetFileName(folder);
+
+                StaticFolderController.Copy(Path.Join(sourcePath, folderName), Path.Join(destinationPath, folderName));
+            }
+        }
+
         public static void Temporary(string path)
         {
             if (!Directory.Exists(path)) return;
 
-            try
-            {
-                string temporaryPath = Path.Combine(TemporaryPath, $"{Path.GetFileName(path)}_{DateTime.UtcNow.ToFileTime()}".ToLower());
-                Directory.Move(path, temporaryPath);
-            }
-            catch (Exception exception)
-            {
-                Logger.Warn(exception);
-            }
-
+            StaticFolderController.Copy(path, Path.Combine(TemporaryPath, $"{Path.GetFileName(path)}_{DateTime.UtcNow.ToFileTime()}".ToLower()));
             Delete(path);
         }
 
@@ -145,7 +155,73 @@ namespace wey.Global
         }
     }
 
-    class FileController<T>
+    class FileController
+    {
+        protected readonly string FilePath;
+
+        public FileController(string name)
+        {
+            FilePath = Path.Combine(StaticFolderController.AppdataPath, name);
+        }
+
+        public FileController(string path, string name)
+        {
+            this.FilePath = Path.Combine(path, name);
+        }
+
+        public bool Exists()
+        {
+            return File.Exists(FilePath);
+        }
+
+        public void Build(string data)
+        {
+            StaticFileController.Build(FilePath, data);
+        }
+
+        public void Edit(string data)
+        {
+            if (!Exists())
+            {
+                Build(data);
+            }
+            else
+            {
+                StaticFileController.Edit(FilePath, data);
+            }
+        }
+
+        public void Edit(Func<string, string> callback)
+        {
+            Edit(callback(ReadRequired()));
+        }
+
+        public string? Read()
+        {
+            if (!Exists())
+            {
+                Build(string.Empty);
+                return string.Empty;
+            }
+
+            return StaticFileController.Read(FilePath);
+        }
+
+        public string ReadRequired()
+        {
+            string? read = Read();
+            if (read == null) throw new FileControllerReadException();
+
+            return read;
+        }
+
+        public void Delete()
+        {
+            StaticFileController.Delete(FilePath);
+        }
+    }
+
+    class JsonFileController<T> : FileController
     {
         public static T CreateTypeInstance()
         {
@@ -167,30 +243,33 @@ namespace wey.Global
             return $"{Path.GetFileNameWithoutExtension(name)}.json";
         }
 
-        // class
+        //class
 
-        private readonly string FilePath;
-
-        public FileController(string name)
+        public JsonFileController(string name) : base(Rename(name))
         {
-            FilePath = Path.Combine(StaticFolderController.AppdataPath, Rename(name));
+
         }
 
-        public FileController(string path, string name)
+        public JsonFileController(string path, string name) : base(path, Rename(name))
         {
-            this.FilePath = Path.Combine(path, Rename(name));
+
         }
 
         public void Build()
         {
-            StaticFileController.Build(FilePath, JsonSerializer.Serialize(CreateTypeInstance()));
+            Build(CreateTypeInstance());
+        }
+
+        public void Build(T data)
+        {
+            StaticFileController.Build(FilePath, JsonSerializer.Serialize(data));
         }
 
         public void Edit(T data)
         {
-            if (!File.Exists(FilePath))
+            if (!Exists())
             {
-                StaticFileController.Build(FilePath, JsonSerializer.Serialize(data));
+                Build();
             }
             else
             {
@@ -203,28 +282,24 @@ namespace wey.Global
             Edit(callback(ReadRequired()));
         }
 
-        public T? Read()
+        public new T? Read()
         {
-            if (!File.Exists(FilePath))
+            if (!Exists())
             {
                 Build();
+
                 return CreateTypeInstance();
             }
 
             return JsonSerializer.Deserialize<T>(StaticFileController.Read(FilePath));
         }
 
-        public T ReadRequired()
+        public new T ReadRequired()
         {
             T? read = Read();
             if (read == null) throw new FileControllerReadException();
 
             return read;
-        }
-
-        public void Delete()
-        {
-            StaticFileController.Delete(FilePath);
         }
     }
 }

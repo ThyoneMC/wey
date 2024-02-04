@@ -7,6 +7,7 @@ using wey.Console;
 using wey.Global;
 using wey.Host;
 using wey.Interface;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace wey.Pages
 {
@@ -30,6 +31,7 @@ namespace wey.Pages
         }
 
         private HostManager? Host = null;
+        public JsonFileController<string[]>? ProcessOutput = null;
 
         public override void OnLoad()
         {
@@ -40,19 +42,29 @@ namespace wey.Pages
 
             if (Host.Process == null) return;
 
+            ProcessOutput = new(Host.ProcessDataPath, "output");
+            if (ProcessOutput.Exists())
+            {
+                Panel.AddCanvas(ProcessOutput.ReadRequired());
+            }
+            else
+            {
+                ProcessOutput.Build(Array.Empty<string>());
+            }
+
             Panel.AddCanvas(Host.Process.GetOutput());
             Host.Process.GetOnceOutput(); //remove latest print
         }
 
         public override void OnViewing()
         {
-            if (Host == null || Host.Process == null) return;
-
-            if (Host.Process.IsStarted && !Host.Process.IsExists())
-            {
+            if (
+                (Host == null || Host.Process == null) ||
+                (Host.Process.IsStarted && !Host.Process.IsExists())
+            ) {
                 IsExit = true;
 
-                Panel.Stop();
+                OnForceExit();
 
                 return;
             }
@@ -67,6 +79,10 @@ namespace wey.Pages
         public override void OnForceExit()
         {
             Panel.Stop();
+
+            if (ProcessOutput == null || Host == null || Host.Process == null) return;
+
+            ProcessOutput.Edit(output => output.Concat(Host.Process.GetOutput()).ToArray());
         }
     }
 }
