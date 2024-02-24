@@ -3,7 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TextCopy;
 using wey.Global;
@@ -59,6 +61,7 @@ namespace wey.Console
             }
 
             RenderInputBuilder();
+            RenderCanvasScroller();
         });
 
         public static void Start()
@@ -259,6 +262,36 @@ namespace wey.Console
 
         private static readonly List<string> CanvasLines = new();
 
+        protected static string[] ParseCanvasLines(string[] lines)
+        {
+            List<string> ParsedLines = new();
+
+            foreach (string line in lines)
+            {
+                if (line.Contains('\n'))
+                {
+                    ParsedLines.AddRange(ParseCanvasLines(line.Split('\n')));
+                    continue;
+                }
+
+                if (line.Length > System.Console.WindowWidth)
+                {
+                    for (var i = 0; i < line.Length; i += System.Console.WindowWidth)
+                    {
+                        ParsedLines.Add(line.Substring(i, Math.Min(System.Console.WindowWidth, line.Length - i)));
+                    }
+                }
+                else
+                {
+                    ParsedLines.Add(line);
+                }
+            }
+
+            return ParsedLines.ToArray();
+        }
+
+        protected static double StartIndexPercent = 100;
+
         protected static void RenderCanvas()
         {
             int CanvasCursorBegin = StatusCursorEnd + 1;
@@ -266,13 +299,14 @@ namespace wey.Console
 
             Logger.ClearFromLine(CanvasCursorBegin, CanvasCursorEnd);
 
+            string[] ParsedLines = ParseCanvasLines(CanvasLines.ToArray());
+
             int Size = CanvasCursorEnd - CanvasCursorBegin;
-            double StartIndexPercent = 100;
-            int StartIndex = (int)Math.Floor(StartIndexPercent / 100.0 * CanvasLines.Count);
-            int EndIndex = -1;
-            if (CanvasLines.Count - StartIndex <= Size)
+            int StartIndex = (int)Math.Floor(StartIndexPercent / 100.0 * ParsedLines.Length);
+            int EndIndex;
+            if (ParsedLines.Length - StartIndex <= Size)
             {
-                EndIndex = CanvasLines.Count - 1;
+                EndIndex = ParsedLines.Length - 1;
                 StartIndex = EndIndex > Size ? EndIndex - Size : 0;
             }
             else
@@ -281,25 +315,11 @@ namespace wey.Console
             }
 
             System.Console.CursorTop = CanvasCursorBegin;
-            while (StartIndex <= EndIndex && StartIndex < CanvasLines.Count)
+            while (StartIndex <= EndIndex && StartIndex < ParsedLines.Length)
             {
-                string Content = CanvasLines[StartIndex];
+                Logger.WriteSingle(ParsedLines[StartIndex]);
 
-                if (Content.Length > System.Console.WindowWidth)
-                {
-                    for (var i = 0; i < Content.Length; i += System.Console.WindowWidth)
-                    {
-                        Logger.WriteSingle(Content.Substring(i, Math.Min(System.Console.WindowWidth, Content.Length - i)));
-
-                        StartIndex++;
-                    }
-                }
-                else
-                {
-                    Logger.WriteSingle(CanvasLines[StartIndex]);
-
-                    StartIndex++;
-                }
+                StartIndex++;
             }
         }
 
@@ -317,6 +337,31 @@ namespace wey.Console
             CanvasLines.Clear();
 
             IsCanvasChange = true;
+        }
+
+        protected static void RenderCanvasScroller()
+        {
+            if (KeyReader.GetHoverOnce(KeyCode.VcUp))
+            {
+                if (StartIndexPercent != 0)
+                {
+                    StartIndexPercent--;
+                }
+
+                IsCanvasChange = true;
+                return;
+            }
+
+            if (KeyReader.GetHoverOnce(KeyCode.VcDown))
+            {
+                if (StartIndexPercent != 100)
+                {
+                    StartIndexPercent++;
+                }
+
+                IsCanvasChange = true;
+                return;
+            }
         }
     }
 }

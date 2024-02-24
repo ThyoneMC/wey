@@ -233,24 +233,14 @@ namespace wey.Global
             return Activator.CreateInstance<T>();
         }
 
-        public static string Rename(string name)
-        {
-            if (Path.GetExtension(name) == "json")
-            {
-                return name;
-            }
-
-            return $"{Path.GetFileNameWithoutExtension(name)}.json";
-        }
-
         //class
 
-        public JsonFileController(string name) : base(Rename(name))
+        public JsonFileController(string name) : base(name)
         {
 
         }
 
-        public JsonFileController(string path, string name) : base(path, Rename(name))
+        public JsonFileController(string path, string name) : base(path, name)
         {
 
         }

@@ -16,16 +16,16 @@ namespace wey.Global
         }
     }
 
-    class JsonEncryption<T>
+    class JsonEncryption
     {
-        public static string Encrypt(T json)
+        public static string Encrypt<T>(T json)
         {
             string str = JsonSerializer.Serialize(json);
 
             return Convert.ToBase64String(Encoding.UTF8.GetBytes(str));
         }
 
-        public static T Decrypt(string json)
+        public static T Decrypt<T>(string json)
         {
             string decrypt = Encoding.UTF8.GetString(Convert.FromBase64String(json));
 

@@ -51,7 +51,7 @@ namespace wey.Host
 
         public string GetVersion()
         {
-            IProviderBuild build = JsonEncryption<IProviderBuild>.Decrypt(Build);
+            IProviderBuild build = JsonEncryption.Decrypt<IProviderBuild>(Build);
 
             return build.Version;
         }
@@ -70,7 +70,6 @@ namespace wey.Host
         public HostData Data;
         public readonly string DataPath;
 
-        public readonly string ProcessDataPath;
         private readonly JsonFileController<int> ProcessID;
 
         public Executable? Process = null;
@@ -80,8 +79,7 @@ namespace wey.Host
             Data = data;
             DataPath = Path.Join(data.FolderPath, ".wey");
 
-            ProcessDataPath = Path.Join(DataPath, "process");
-            ProcessID = new(ProcessDataPath, "pid");
+            ProcessID = new(DataPath, "pid");
 
             int ReadPID = ProcessID.Read();
             if (ReadPID > 0)
@@ -94,7 +92,7 @@ namespace wey.Host
                 }
                 else
                 {
-                    StaticFolderController.Delete(ProcessDataPath);
+                    ProcessID.Delete();
                 }
             }
         }

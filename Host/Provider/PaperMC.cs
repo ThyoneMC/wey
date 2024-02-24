@@ -126,7 +126,7 @@ namespace wey.Host.Provider
         {
             return new()
             {
-                Build = JsonEncryption<PaperMCBuild>.Encrypt(build),
+                Build = JsonEncryption.Encrypt(build),
                 ServerJar = PaperMC.Download(build.Version, build.Build,build.Download)
             };
         }

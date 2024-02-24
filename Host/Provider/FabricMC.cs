@@ -149,7 +149,7 @@ namespace wey.Host.Provider
         {
             return new()
             {
-                Build = JsonEncryption<FabricMCBuild>.Encrypt(build),
+                Build = JsonEncryption.Encrypt(build),
                 ServerJar = FabricMC.Download(build.Version, build.Loader, build.Installer)
             };
         }

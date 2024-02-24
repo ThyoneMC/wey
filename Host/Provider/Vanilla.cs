@@ -137,7 +137,7 @@ namespace wey.Host.Provider
         {
             return new()
             {
-                Build = JsonEncryption<IProviderBuild>.Encrypt(build),
+                Build = JsonEncryption.Encrypt(build),
                 ServerJar = Rest.StaticDownload(build.DownloadURL),
             };
         }

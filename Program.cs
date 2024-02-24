@@ -45,7 +45,7 @@ namespace wey
         }
 
         public static void Main(string[] args)
-        {            
+        {
             ExecutableArgument.Import(args);
 
             AddPage(new Home());

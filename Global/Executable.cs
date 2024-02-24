@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using wey.Console;
 
@@ -86,7 +87,7 @@ namespace wey.Global
         public string FileName { get; set; } = string.Empty;
         public string Arguments { get; set; } = string.Empty;
         public string WorkDirectory { get; set; } = Directory.GetCurrentDirectory();
-        public int OutputSaved { get; set; } = 25;
+        public int OutputSaved { get; set; } = 200;
     }
 
     public class ExecutableNotFoundException : Exception
@@ -99,7 +100,7 @@ namespace wey.Global
 
     class Executable : Process
     {
-        public readonly Queue<string> Output = new();
+        public Queue<string> Output { get; private set; } = new();
 
         public bool IsStarted = false;
 
@@ -123,7 +124,7 @@ namespace wey.Global
             {
                 if (string.IsNullOrEmpty(thisEvent.Data)) return;
 
-                Array.ForEach(thisEvent.Data.Split('\n'), output => Output.Enqueue(output));
+                Output.Enqueue(thisEvent.Data);
                 while (Output.Count > option.OutputSaved) Output.Dequeue();
 
                 OnceOutput = Output.Last();
@@ -138,9 +139,18 @@ namespace wey.Global
 
         public int Export()
         {
-            ExecutableList.Add(Id, this);
+            ExecutableList[Id] = this;
+
+            StaticFileController.Edit(Path.Join(StaticFolderController.TemporaryPath, $"process_{Id}"), JsonEncryption.Encrypt(Output));
 
             return Id;
+        }
+
+        public static void RemoveExport(int pid)
+        {
+            ExecutableList.Remove(pid);
+
+            StaticFileController.Delete(Path.Join(StaticFolderController.TemporaryPath, $"process_{pid}"));
         }
 
         public static Executable? Import(int pid)
@@ -151,8 +161,14 @@ namespace wey.Global
 
             if (!Execute.IsExists())
             {
-                ExecutableList.Remove(pid);
+                RemoveExport(pid);
                 return null;
+            }
+
+            string ProcessOutput = StaticFileController.Read(Path.Join(StaticFolderController.TemporaryPath, $"process_{pid}"));
+            if (!string.IsNullOrEmpty(ProcessOutput))
+            {
+                Execute.Output = JsonEncryption.Decrypt<Queue<string>>(ProcessOutput);
             }
 
             return Execute;
@@ -209,7 +225,7 @@ namespace wey.Global
             Kill(true);
             WaitForExit();
 
-            ExecutableList.Remove(Id);
+            RemoveExport(Id);
         }
 
         public string[] GetOutput()

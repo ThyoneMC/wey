@@ -71,7 +71,7 @@ namespace wey.Host
 
     class HostList
     {
-        private static readonly JsonFileController<List<string>> File = new("servers");
+        private static readonly JsonFileController<List<string>> File = new("servers.json");
 
         public static List<string> Get()
         {

@@ -31,7 +31,6 @@ namespace wey.Pages
         }
 
         private HostManager? Host = null;
-        public JsonFileController<string[]>? ProcessOutput = null;
 
         public override void OnLoad()
         {
@@ -41,16 +40,6 @@ namespace wey.Pages
             Panel.SetStatus($"[{Host.Data.Provider}] {Host.Data.Name}");
 
             if (Host.Process == null) return;
-
-            ProcessOutput = new(Host.ProcessDataPath, "output");
-            if (ProcessOutput.Exists())
-            {
-                Panel.AddCanvas(ProcessOutput.ReadRequired());
-            }
-            else
-            {
-                ProcessOutput.Build(Array.Empty<string>());
-            }
 
             Panel.AddCanvas(Host.Process.GetOutput());
             Host.Process.GetOnceOutput(); //remove latest print
@@ -80,9 +69,9 @@ namespace wey.Pages
         {
             Panel.Stop();
 
-            if (ProcessOutput == null || Host == null || Host.Process == null) return;
+            if (Host == null || Host.Process == null) return;
 
-            ProcessOutput.Edit(output => output.Concat(Host.Process.GetOutput()).ToArray());
+            Host.Process.Export();
         }
     }
 }
