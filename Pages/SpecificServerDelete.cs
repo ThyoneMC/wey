@@ -13,7 +13,7 @@ namespace wey.Pages
     {
         private readonly HostData HostData;
 
-        public SpecificServerDelete(HostData host) : base(host.Name)
+        public SpecificServerDelete(HostData host)
         {
             HostData = host;
         }

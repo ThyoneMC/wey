@@ -34,14 +34,13 @@ namespace wey.Global
 
                     if (ShutdownEvent.WaitOne(0)) break;
 
-                    int StartingCursorTop = System.Console.CursorTop + 1;
                     try
                     {
                         action.Invoke();
                     }
                     catch (Exception exception)
                     {
-                        Logger.Error(exception);
+                        int StartingCursorTop = Logger.Error(exception).StartLine + 1;
 
                         Thread.Sleep(5 * 1000);
                         

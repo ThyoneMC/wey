@@ -12,16 +12,16 @@ namespace wey.Pages
 {
     class SpecificServer : IPageGroup
     {
-        private readonly HostData Host;
+        private readonly HostData HostData;
 
-        public SpecificServer(HostData host) : base(host.Name)
+        public SpecificServer(HostData host)
         {
-            Host = host;
+            HostData = host;
         }
 
         public override string GetName()
         {
-            return Host.Name;
+            return HostData.Name;
         }
 
         public override string GetDescription()
@@ -31,14 +31,15 @@ namespace wey.Pages
 
         public override IEnumerable<IPage> GetPages()
         {
-            if (HostFinder.Find(Host.Name).Length == 0) return Array.Empty<IPage>();
+            if (HostFinder.Find(HostData.Name).Length == 0) return Array.Empty<IPage>(); //deleted server
 
             return new IPage[] {
-                    new SpecificServerInfo(Host),
-                    new SpecificServerConsole(Host),
-                    new SpecificServerStart(Host),
-                    new SpecificServerStop(Host),
-                    new SpecificServerDelete(Host)
+                    new SpecificServerInfo(HostData),
+                    new SpecificServerConsole(HostData),
+                    new SpecificServerStart(HostData),
+                    new SpecificServerStop(HostData),
+                    new SpecificServerUpdate(HostData),
+                    new SpecificServerDelete(HostData)
             };
         }
     }

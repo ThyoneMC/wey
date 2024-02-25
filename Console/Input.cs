@@ -219,22 +219,28 @@ namespace wey.Console
             return Selector.Result;
         }
 
-        public static bool ReadBoolean(string? message = null, bool defaultOption = true)
+        public static bool ReadBoolean(string? message = null, bool defaultOption = true, bool clear = false)
         {
             if (!string.IsNullOrEmpty(message)) System.Console.Write($"{message} (default: {defaultOption}): ");
 
             string read = ReadString(required: false).ToLower();
 
             // contains "no"
-            if (defaultOption == true && (read.Contains('n') || read.ToLower() == "false"))
+            if (defaultOption == true && (read.Contains('n') || read == "false"))
             {
                 return false;
             }
 
             // contains "yes"
-            if (defaultOption == false && (read.Contains('y') || read.ToLower() == "true"))
+            if (defaultOption == false && (read.Contains('y') || read == "true"))
             {
                 return true;
+            }
+
+            if (clear)
+            {
+                Logger.ClearLine(System.Console.CursorTop - 1);
+                System.Console.CursorTop -= 1;
             }
 
             return defaultOption;

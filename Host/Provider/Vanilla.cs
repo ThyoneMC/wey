@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using wey.Console;
 using wey.Global;
 using wey.Interface;
 
@@ -32,7 +33,7 @@ namespace wey.Host.Provider
             public static string FromString(string version)
             {
                 version = version.ToLower();
-                if (version == VersionType.Release || version.StartsWith("last"))
+                if (version == VersionType.Release)
                 {
                     return VersionType.Release;
                 }
@@ -104,6 +105,28 @@ namespace wey.Host.Provider
         }
 
         //#class
+
+        public override string[] GetServerVersions(string filter = "")
+        {
+            filter = Vanilla.VersionType.FromString(filter);
+
+            Vanilla.VersionData[] versionList = Vanilla.GetVersions().Versions;
+
+            if (filter == Vanilla.VersionType.Release)
+            {
+                versionList = Array.FindAll(versionList, v => v.Type.Equals(Vanilla.VersionType.Release));
+            }
+            else if (filter == Vanilla.VersionType.Snapshot)
+            {
+                versionList = Array.FindAll(versionList, v => v.Type.Equals(Vanilla.VersionType.Snapshot));
+            }
+            else
+            {
+                versionList = Array.FindAll(versionList, v => v.ID.Contains(filter));
+            }
+
+            return versionList.Select(v => v.ID).ToArray();
+        }
 
         public override IProviderDownload GetServerJar(string TargetGameVersion)
         {

@@ -13,7 +13,7 @@ namespace wey.Pages
     {
         private readonly HostData HostData;
 
-        public SpecificServerStart(HostData host) : base(host.Name)
+        public SpecificServerStart(HostData host)
         {
             HostData = host;
         }

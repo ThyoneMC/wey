@@ -49,6 +49,7 @@ namespace wey
             ExecutableArgument.Import(args);
 
             AddPage(new Home());
+
             new TaskWorker(() =>
             {
                 PageType CurrentType = CurrentPage.GetPageType();
@@ -71,7 +72,7 @@ namespace wey
                         {
                             IPageGroup Group = (IPageGroup)CurrentPage;
 
-                            Group.RenderNext();
+                            Group.Render();
 
                             if (Group.Selection != null)
                             {
@@ -88,7 +89,7 @@ namespace wey
                         {
                             IPageCommand Command = (IPageCommand)CurrentPage;
 
-                            Command.RenderNext();
+                            Command.Render();
                             Thread.Sleep(1000);
 
                             ReturnPage();
@@ -98,7 +99,7 @@ namespace wey
                         {
                             IPageView Page = (IPageView)CurrentPage;
 
-                            Page.RenderNext();
+                            Page.Render();
 
                             break;
                         }

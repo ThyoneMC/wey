@@ -37,6 +37,8 @@ namespace wey.Interface
 
     public abstract class IProvider<T> where T : IProviderBuild
     {
+        public abstract string[] GetServerVersions(string filter = "");
+
         public abstract IProviderDownload GetServerJar(T build);
 
         public abstract IProviderDownload GetServerJar(string gameVersion);

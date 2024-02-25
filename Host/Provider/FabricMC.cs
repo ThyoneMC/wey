@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using wey.Console;
 using wey.Global;
 using wey.Interface;
 
@@ -99,36 +100,30 @@ namespace wey.Host.Provider
 
         //#class
 
+        public override string[] GetServerVersions(string filter = "")
+        {
+            filter = Vanilla.VersionType.FromString(filter);
+
+            FabricMC.GameVersions[] versionList = FabricMC.GetGameVersions();
+
+            if (filter == Vanilla.VersionType.Release)
+            {
+                versionList = Array.FindAll(versionList, v => v.IsStable);
+            }
+            else if (filter == Vanilla.VersionType.Snapshot)
+            {
+                versionList = Array.FindAll(versionList, v => !v.IsStable);
+            }
+            else
+            {
+                versionList = Array.FindAll(versionList, v => v.Version.Contains(filter));
+            }
+
+            return versionList.Select(v => v.Version).ToArray();
+        }
+
         public override IProviderDownload GetServerJar(string TargetGameVersion)
         {
-            //version
-            FabricMC.GameVersions[] GameVersions = FabricMC.GetGameVersions();
-
-            TargetGameVersion = Vanilla.VersionType.FromString(TargetGameVersion);
-            if (TargetGameVersion == Vanilla.VersionType.Release)
-            {
-                foreach (FabricMC.GameVersions Version in GameVersions)
-                {
-                    // first that are stable
-                    if (Version.IsStable)
-                    {
-                        TargetGameVersion = Version.Version;
-                        break;
-                    }
-                }
-            }
-            else if (TargetGameVersion == Vanilla.VersionType.Snapshot)
-            {
-                foreach (FabricMC.GameVersions Version in GameVersions)
-                {
-                    if (!Version.IsStable)
-                    {
-                        TargetGameVersion = Version.Version;
-                        break;
-                    }
-                }
-            }
-
             //server
             FabricMC.Loaders[] ServerLoader = FabricMC.GetLoaders(TargetGameVersion);
             if (ServerLoader.Length == 0) throw new VersionNotFoundException();

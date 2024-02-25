@@ -9,21 +9,16 @@ namespace wey.Interface
 {
     abstract class IPageCommand : IPage
     {
-        public IPageCommand(params object[] args) : base(args)
+        public override PageType GetPageType()
         {
-
+            return PageType.Command;
         }
 
-        public override void RenderNext()
+        public override void Render()
         {
             IsLoaded = true;
 
             OnCommand();
-        }
-
-        public override PageType GetPageType()
-        {
-            return PageType.Command;
         }
 
         public abstract void OnCommand();

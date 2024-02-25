@@ -111,7 +111,7 @@ namespace wey.Host
         {
             Logger.Info($"Deleting: {Data.Name}");
 
-            if (temporary) StaticFolderController.Copy(Data.FolderPath, Path.Combine(StaticFolderController.TemporaryPath, "servers", $"{Path.GetFileName(Data.FolderPath)}_{DateTime.UtcNow.ToFileTime()}"));
+            if (temporary) StaticFolderController.Copy(Data.FolderPath, Path.Combine(StaticFolderController.TemporaryPath, "servers", Data.SpecificName));
             StaticFolderController.Delete(Data.FolderPath);
 
             HostList.Remove(Data.FolderPath);
@@ -144,7 +144,7 @@ namespace wey.Host
             string? javaExecute = Executable.Where(javaExecuteName);
             if (javaExecute == null) throw new FileNotFoundException($"{javaExecuteName} not found");
 
-            string? port = null;
+            string? port = new HostProperties(Data).Get("server-port");
 
             Process = new(new ExecutableOption()
             {

@@ -9,12 +9,12 @@ namespace wey.Interface
 {
     abstract class IPageView : IPage
     {
-        public IPageView(params object[] args) : base(args)
+        public override PageType GetPageType()
         {
-            
+            return PageType.View;
         }
 
-        public override void RenderNext()
+        public override void Render()
         {
             if (!IsLoaded)
             {
@@ -25,11 +25,6 @@ namespace wey.Interface
             }
 
             OnViewing();
-        }
-
-        public override PageType GetPageType()
-        {
-            return PageType.View;
         }
 
         public abstract void OnLoad();

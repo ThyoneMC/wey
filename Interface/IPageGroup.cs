@@ -22,11 +22,6 @@ namespace wey.Interface
             }
         }
 
-        public IPageGroup(params object[] args) : base(args)
-        {
-
-        }
-
         public void Reset()
         {
             IsLoaded = false;
@@ -34,7 +29,12 @@ namespace wey.Interface
             Selector.Reset();
         }
 
-        public override void RenderNext()
+        public override PageType GetPageType()
+        {
+            return PageType.Group;
+        }
+
+        public override void Render()
         {
             if (!IsLoaded)
             {
@@ -54,11 +54,6 @@ namespace wey.Interface
             }
 
             Selector.RenderNext();
-        }
-
-        public override PageType GetPageType()
-        {
-            return PageType.Group;
         }
 
         public abstract IEnumerable<IPage> GetPages();

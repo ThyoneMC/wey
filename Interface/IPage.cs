@@ -16,23 +16,16 @@ namespace wey.Interface
 
     abstract class IPage
     {
-        protected object[] arguments;
-
         public bool IsLoaded { get; protected set; }
 
-        public IPage(params object[] args)
-        {
-            arguments = args;
-        }
-
         public bool IsExit = false;
-
-        public abstract void RenderNext();
 
         public abstract PageType GetPageType();
 
         public abstract string GetName();
 
         public abstract string GetDescription();
+
+        public abstract void Render();
     }
 }

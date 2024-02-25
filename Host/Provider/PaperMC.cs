@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using wey.Console;
 using wey.Global;
 using wey.Interface;
 
@@ -92,21 +93,28 @@ namespace wey.Host.Provider
 
         //#class
 
+        public override string[] GetServerVersions(string filter = "")
+        {
+            filter = Vanilla.VersionType.FromString(filter);
+
+            IEnumerable<string> versionList = PaperMC.GetProject().Versions.Reverse();
+
+            if (filter == Vanilla.VersionType.Release)
+            {
+                return versionList.ToArray();
+            }
+            else if (filter == Vanilla.VersionType.Snapshot)
+            {
+                return Array.Empty<string>();
+            }
+            else
+            {
+                return versionList.Where(v => v.Contains(filter)).ToArray();
+            }
+        }
+
         public override IProviderDownload GetServerJar(string TargetGameVersion)
         {
-            //version
-            PaperMC.Project GameVersions = PaperMC.GetProject();
-
-            TargetGameVersion = Vanilla.VersionType.FromString(TargetGameVersion);
-            if (TargetGameVersion == Vanilla.VersionType.Release)
-            {
-                TargetGameVersion = GameVersions.Versions[GameVersions.Versions.Length - 1];
-            }
-            else if (TargetGameVersion == Vanilla.VersionType.Snapshot)
-            {
-                throw new VersionNotFoundException("paper did not have a snapshot version");
-            }
-
             //build
             PaperMC.Build ServerBuild = PaperMC.GetBuilds(TargetGameVersion);
             if (ServerBuild.Builds == null) throw new VersionNotFoundException();
