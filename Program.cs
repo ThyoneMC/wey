@@ -59,7 +59,7 @@ namespace wey
                     (PageList.Count > 1 && KeyReader.Get() == KeyCode.VcLeft)
                 )
                 {
-                    if (CurrentType == PageType.View) ((IPageView)CurrentPage).OnForceExit();
+                    if (CurrentType == PageType.View) ((IPageView)CurrentPage).OnExit();
 
                     ReturnPage();
                     return;

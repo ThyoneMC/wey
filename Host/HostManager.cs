@@ -171,6 +171,9 @@ namespace wey.Host
 
             Process.Input("stop");
             ProcessID.Delete();
+
+            Process.WaitForExit();
+            Executable.RemoveExport(Process.Id);
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TextCopy;
 using wey.Global;
@@ -18,27 +19,41 @@ namespace wey.Console
         {
             Status = "wey";
 
-            StatusCursorEnd = -1;
-            StatusCursor = -1;
-
-            IsStatusChange = true;
-
             Input = ">";
 
-            InputCursorBegin = -1;
-            InputCursor = -1;
+            StartIndexPercent = 100;
 
             InputDisable = false;
 
-            IsInputChange = true;
-
-            IsCanvasChange = true;
+            Reload();
 
             ClearCanvas();
         }
 
+        protected static void Reload()
+        {
+            System.Console.Clear();
+
+            StatusCursorEnd = -1;
+            StatusCursor = -1;
+
+            InputCursorBegin = -1;
+            InputCursor = -1;
+
+            IsStatusChange = true;
+            IsInputChange = true;
+            IsCanvasChange = true;
+        }
+
         private static readonly TaskWorker Worker = new(() =>
         {
+            if (DateTime.Now.Second % 30 == 0)
+            {
+                //refresh every 30 seconds
+
+                Reload();
+            }
+
             if (IsStatusChange)
             {
                 IsStatusChange = false;
@@ -67,7 +82,6 @@ namespace wey.Console
         public static void Start()
         {
             System.Console.CursorVisible = false;
-            System.Console.Clear();
 
             Reset();
 
@@ -142,9 +156,13 @@ namespace wey.Console
 
         public static void SetInput(string? text = null)
         {
-            if (text != null)
+            if (!string.IsNullOrEmpty(text))
             {
-                Input = $"> {text}";
+                Input = $"> {text}|";
+            }
+            else
+            {
+                Input = $">";
             }
 
             IsInputChange = true;
@@ -268,29 +286,33 @@ namespace wey.Console
 
             foreach (string line in lines)
             {
+                //Escape sequences
+
                 if (line.Contains('\n'))
                 {
                     ParsedLines.AddRange(ParseCanvasLines(line.Split('\n')));
                     continue;
                 }
 
-                if (line.Length > System.Console.WindowWidth)
+                string str = Regex.Unescape(line);
+
+                if (str.Length > System.Console.WindowWidth)
                 {
-                    for (var i = 0; i < line.Length; i += System.Console.WindowWidth)
+                    for (var i = 0; i < str.Length; i += System.Console.WindowWidth)
                     {
-                        ParsedLines.Add(line.Substring(i, Math.Min(System.Console.WindowWidth, line.Length - i)));
+                        ParsedLines.Add(str.Substring(i, Math.Min(System.Console.WindowWidth, str.Length - i)));
                     }
                 }
                 else
                 {
-                    ParsedLines.Add(line);
+                    ParsedLines.Add(str);
                 }
             }
 
             return ParsedLines.ToArray();
         }
 
-        protected static double StartIndexPercent = 100;
+        protected static double StartIndexPercent;
 
         protected static void RenderCanvas()
         {
@@ -346,10 +368,10 @@ namespace wey.Console
                 if (StartIndexPercent != 0)
                 {
                     StartIndexPercent--;
-                }
 
-                IsCanvasChange = true;
-                return;
+                    IsCanvasChange = true;
+                    return;
+                }
             }
 
             if (KeyReader.GetHoverOnce(KeyCode.VcDown))
@@ -357,10 +379,10 @@ namespace wey.Console
                 if (StartIndexPercent != 100)
                 {
                     StartIndexPercent++;
-                }
 
-                IsCanvasChange = true;
-                return;
+                    IsCanvasChange = true;
+                    return;
+                }
             }
         }
     }

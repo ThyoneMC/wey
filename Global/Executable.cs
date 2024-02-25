@@ -104,7 +104,7 @@ namespace wey.Global
 
         public bool IsStarted = false;
 
-        private string? OnceOutput = null;
+        private List<Action<string>> OutputListener = new();
 
         public Executable(ExecutableOption option)
         {
@@ -124,10 +124,13 @@ namespace wey.Global
             {
                 if (string.IsNullOrEmpty(thisEvent.Data)) return;
 
+                foreach (Action<string> action in OutputListener)
+                {
+                    action.Invoke(thisEvent.Data);
+                }
+
                 Output.Enqueue(thisEvent.Data);
                 while (Output.Count > option.OutputSaved) Output.Dequeue();
-
-                OnceOutput = Output.Last();
             });
 
             IsStarted = IsExists();
@@ -139,6 +142,8 @@ namespace wey.Global
 
         public int Export()
         {
+            OutputListener.Clear();
+
             ExecutableList[Id] = this;
 
             StaticFileController.Edit(Path.Join(StaticFolderController.TemporaryPath, $"process_{Id}"), JsonEncryption.Encrypt(Output));
@@ -233,17 +238,9 @@ namespace wey.Global
             return Output.ToArray();
         }
 
-        public string? GetOnceOutput()
+        public void ListenOutput(Action<string> listener)
         {
-            if (OnceOutput != null)
-            {
-                string tempOnceOutput = OnceOutput;
-                OnceOutput = null;
-
-                return tempOnceOutput;
-            }
-
-            return null;
+            OutputListener.Add(listener);
         }
 
         public void Input(string input)

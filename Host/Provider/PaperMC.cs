@@ -17,6 +17,8 @@ namespace wey.Host.Provider
 
         public PaperMCBuild(string version, int build, string download) : base(version)
         {
+            HasPlugin = true;
+
             Build = build;
             Download = download;
         }
@@ -89,11 +91,6 @@ namespace wey.Host.Provider
         }
 
         //#class
-
-        public override bool IsMod()
-        {
-            return false;
-        }
 
         public override IProviderDownload GetServerJar(string TargetGameVersion)
         {

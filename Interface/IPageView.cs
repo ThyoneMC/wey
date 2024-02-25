@@ -32,10 +32,10 @@ namespace wey.Interface
             return PageType.View;
         }
 
-        public abstract void OnViewing();
-
         public abstract void OnLoad();
 
-        public abstract void OnForceExit();
+        public abstract void OnViewing();
+
+        public abstract void OnExit();
     }
 }

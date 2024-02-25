@@ -17,6 +17,10 @@ namespace wey.Interface
 
     public class IProviderBuild
     {
+        public bool HasMod { get; set; } = false;
+
+        public bool HasPlugin { get; set; } = false;
+
         public string Version { get; set; } = string.Empty;
 
         public IProviderBuild(string version)
@@ -33,8 +37,6 @@ namespace wey.Interface
 
     public abstract class IProvider<T> where T : IProviderBuild
     {
-        public abstract bool IsMod();
-
         public abstract IProviderDownload GetServerJar(T build);
 
         public abstract IProviderDownload GetServerJar(string gameVersion);

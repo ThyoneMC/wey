@@ -92,7 +92,14 @@ namespace wey.Console
 
         public static bool GetHoverOnce(params KeyCode[] keys)
         {
-            return HoverKeys.Any(hover => keys.Contains(hover.KeyCode));
+            try
+            {
+                return HoverKeys.Any(hover => keys.Contains(hover.KeyCode));
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public static bool GetHoverAll(params KeyCode[] keys)

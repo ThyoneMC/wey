@@ -34,6 +34,7 @@ namespace wey.Pages
             if (HostFinder.Find(Host.Name).Length == 0) return Array.Empty<IPage>();
 
             return new IPage[] {
+                    new SpecificServerInfo(Host),
                     new SpecificServerConsole(Host),
                     new SpecificServerStart(Host),
                     new SpecificServerStop(Host),

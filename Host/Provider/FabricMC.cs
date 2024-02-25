@@ -16,6 +16,8 @@ namespace wey.Host.Provider
 
         public FabricMCBuild(string version, string loader, string installer) : base(version)
         {
+            HasMod = true;
+
             Loader = loader;
             Installer = installer;
         }
@@ -96,11 +98,6 @@ namespace wey.Host.Provider
         }
 
         //#class
-
-        public override bool IsMod()
-        {
-            return true;
-        }
 
         public override IProviderDownload GetServerJar(string TargetGameVersion)
         {

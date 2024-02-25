@@ -105,11 +105,6 @@ namespace wey.Host.Provider
 
         //#class
 
-        public override bool IsMod()
-        {
-            return false;
-        }
-
         public override IProviderDownload GetServerJar(string TargetGameVersion)
         {
             //version
