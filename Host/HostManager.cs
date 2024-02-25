@@ -111,14 +111,8 @@ namespace wey.Host
         {
             Logger.Info($"Deleting: {Data.Name}");
 
-            if (temporary)
-            {
-                StaticFolderController.Temporary(Data.FolderPath);
-            }
-            else
-            {
-                StaticFolderController.Delete(Data.FolderPath);
-            }
+            if (temporary) StaticFolderController.Copy(Data.FolderPath, Path.Combine(StaticFolderController.TemporaryPath, "servers", $"{Path.GetFileName(Data.FolderPath)}_{DateTime.UtcNow.ToFileTime()}"));
+            StaticFolderController.Delete(Data.FolderPath);
 
             HostList.Remove(Data.FolderPath);
         }

@@ -104,7 +104,7 @@ namespace wey.Global
 
         public bool IsStarted = false;
 
-        private List<Action<string>> OutputListener = new();
+        private readonly List<Action<string>> OutputListener = new();
 
         public Executable(ExecutableOption option)
         {
@@ -146,7 +146,7 @@ namespace wey.Global
 
             ExecutableList[Id] = this;
 
-            StaticFileController.Edit(Path.Join(StaticFolderController.TemporaryPath, $"process_{Id}"), JsonEncryption.Encrypt(Output));
+            StaticFileController.Edit(Path.Join(StaticFolderController.TemporaryPath, "process", Id.ToString()), JsonEncryption.Encrypt(Output));
 
             return Id;
         }
@@ -155,7 +155,7 @@ namespace wey.Global
         {
             ExecutableList.Remove(pid);
 
-            StaticFileController.Delete(Path.Join(StaticFolderController.TemporaryPath, $"process_{pid}"));
+            StaticFileController.Delete(Path.Join(StaticFolderController.TemporaryPath, "process", pid.ToString()));
         }
 
         public static Executable? Import(int pid)
@@ -170,7 +170,7 @@ namespace wey.Global
                 return null;
             }
 
-            string ProcessOutput = StaticFileController.Read(Path.Join(StaticFolderController.TemporaryPath, $"process_{pid}"));
+            string ProcessOutput = StaticFileController.Read(Path.Join(StaticFolderController.TemporaryPath, "process", pid.ToString()));
             if (!string.IsNullOrEmpty(ProcessOutput))
             {
                 Execute.Output = JsonEncryption.Decrypt<Queue<string>>(ProcessOutput);

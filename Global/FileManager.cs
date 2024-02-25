@@ -65,6 +65,12 @@ namespace wey.Global
         }
     }
 
+    public class StaticFolderControllerRead
+    {
+        public string[] Folders { get; set; } = Array.Empty<string>();
+        public string[] Files { get; set; } = Array.Empty<string>();
+    }
+
     class StaticFolderController
     {
         public static string AppdataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ".thyonemc", "wey");
@@ -85,12 +91,6 @@ namespace wey.Global
             if (Directory.Exists(path)) return;
 
             Directory.CreateDirectory(path);
-        }
-
-        public class StaticFolderControllerRead
-        {
-            public string[] Folders { get; set; } = Array.Empty<string>();
-            public string[] Files { get; set; } = Array.Empty<string>();
         }
 
         public static StaticFolderControllerRead Read(string path)
@@ -114,6 +114,8 @@ namespace wey.Global
 
         public static void Copy(string sourcePath, string destinationPath)
         {
+            if (!Directory.Exists(sourcePath)) return;
+
             StaticFolderControllerRead read = Read(sourcePath);
 
             Build(destinationPath);
@@ -129,14 +131,6 @@ namespace wey.Global
 
                 StaticFolderController.Copy(Path.Join(sourcePath, folderName), Path.Join(destinationPath, folderName));
             }
-        }
-
-        public static void Temporary(string path)
-        {
-            if (!Directory.Exists(path)) return;
-
-            StaticFolderController.Copy(path, Path.Combine(TemporaryPath, $"{Path.GetFileName(path)}_{DateTime.UtcNow.ToFileTime()}".ToLower()));
-            Delete(path);
         }
 
         public static void Delete(string path)

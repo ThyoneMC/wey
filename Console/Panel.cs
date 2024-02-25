@@ -201,7 +201,7 @@ namespace wey.Console
         
         private static bool InputBuilderNext()
         {
-            ConsoleReaderKeybaordData? raw = ConsoleReader.ReadChar();
+            InputReadCharData? raw = Console.Input.ReadChar();
 
             if (raw == null) return false;
 

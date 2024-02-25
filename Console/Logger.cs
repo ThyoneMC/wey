@@ -16,7 +16,7 @@ namespace wey.Console
 
         static Logs()
         {
-            string FilePath = Path.Join(StaticFolderController.AppdataPath, "logs", $"{DateTime.UtcNow.ToLocalTime().ToFileTime()}.log");
+            string FilePath = Path.Join(StaticFolderController.TemporaryPath, "logs", $"{DateTime.UtcNow.ToLocalTime().ToFileTime()}.log");
 
             StaticFileController.Build(FilePath, string.Empty);
 
