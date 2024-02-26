@@ -10,11 +10,11 @@ using wey.Interface;
 
 namespace wey.Pages
 {
-    class SpecificServerUpdateBuild : IPageCommand
+    class ServerUpdateBuild : IPageCommand
     {
         private readonly HostData HostData;
 
-        public SpecificServerUpdateBuild(HostData host)
+        public ServerUpdateBuild(HostData host)
         {
             HostData = host;
         }

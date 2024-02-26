@@ -2,32 +2,35 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using wey.Console;
 using wey.Host;
-using wey.Host.Provider;
 using wey.Interface;
 
 namespace wey.Pages
 {
-    class ServerList : IPageGroup
+    class ServerStart : IPageCommand
     {
+        private readonly HostData HostData;
+
+        public ServerStart(HostData host)
+        {
+            HostData = host;
+        }
+
         public override string GetName()
         {
-            return "list";
+            return "start";
         }
 
         public override string GetDescription()
         {
-            return "servers list";
+            return "start the server";
         }
 
-        public override IEnumerable<IPage> GetPages()
+        public override void OnCommand()
         {
-            HostData[] hostList = HostFinder.Find();
-
-            return hostList.Select(host => new SpecificServer(host));
+            new HostManager(HostData).Start();
         }
     }
 }

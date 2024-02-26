@@ -9,11 +9,11 @@ using wey.Interface;
 
 namespace wey.Pages
 {
-    class SpecificServerUpdate : IPageGroup
+    class ServerUpdate : IPageGroup
     {
         private readonly HostData HostData;
 
-        public SpecificServerUpdate(HostData host)
+        public ServerUpdate(HostData host)
         {
             HostData = host;
         }
@@ -33,8 +33,8 @@ namespace wey.Pages
             if (!Input.ReadBoolean($"Are you sure to update {HostData.Name}?", clear: true)) return Array.Empty<IPage>();
 
             return new IPage[] {
-                    new SpecificServerUpdateBuild(HostData),
-                    new SpecificServerUpdateVersion(HostData),
+                    new ServerUpdateBuild(HostData),
+                    new ServerUpdateVersion(HostData),
             };
         }
     }

@@ -17,7 +17,7 @@ namespace wey.Host
 
             string local = Path.Join(Directory.GetCurrentDirectory(), ".wey", "config.json"); //current folder
 
-            string[] localList = StaticFolderController.Read(Directory.GetCurrentDirectory()).Folders; //in folder (depth=1)
+            string[] localList = Directory.GetDirectories(Directory.GetCurrentDirectory()); //in folder (depth=1)
             string[] serverLists = HostList.Get().ToArray(); //server list
 
             foreach (string itemPath in localList.Concat(serverLists).Append(local))

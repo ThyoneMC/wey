@@ -1,44 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using wey.Console;
-using wey.Global;
 using wey.Host;
 using wey.Host.Provider;
 using wey.Interface;
-using static wey.Host.Provider.PaperMC;
-using static wey.Host.Provider.Vanilla;
 
 namespace wey.Pages
 {
-    class ServerCreate : IPageCommand
+    class ServerUpdateVersion : IPageCommand
     {
+        private readonly HostData HostData;
+
+        public ServerUpdateVersion(HostData host)
+        {
+            HostData = host;
+        }
+
         public override string GetName()
         {
-            return "create";
+            return "version";
         }
 
         public override string GetDescription()
         {
-            return "create the server";
+            return "update server version";
         }
 
         public override void OnCommand()
         {
-            if(!Input.ReadBoolean("Do you accept to Minecraft End User License Agreement?")) return;
-
-            string name = Input.ReadString("server name", true);
-            string path = Path.Join(Directory.GetCurrentDirectory(), name);
-
-            string providerName = Input.SelectionString(new string[] { "vanilla", "paper", "fabric" }, "provider name").Value;
-
             string versionFilter = Vanilla.VersionType.FromString(Input.ReadString("version (filter)", clear: true));
 
             IProviderDownload download;
-            switch (providerName)
+            switch (HostData.Provider)
             {
                 case "vanilla":
                     {
@@ -85,8 +83,7 @@ namespace wey.Pages
                     }
             }
 
-            HostManager host = new(new HostData(name, providerName, path));
-            host.Create();
+            HostManager host = new(HostData);
             host.AddServerFile(download);
         }
     }

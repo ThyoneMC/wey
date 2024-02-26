@@ -10,11 +10,16 @@ namespace wey.Global
 {
     class StaticFileController
     {
+        public static string GetDirectory(string path)
+        {
+            return Path.GetDirectoryName(path) ?? string.Empty;
+        }
+
         public static void Build(string path, string data)
         {
             if (File.Exists(path)) return;
 
-            StaticFolderController.Build(Path.GetDirectoryName(path));
+            StaticFolderController.Build(StaticFileController.GetDirectory(path));
 
             using StreamWriter writer = File.CreateText(path);
             writer.Write(data);
@@ -24,7 +29,7 @@ namespace wey.Global
         {
             if (File.Exists(path)) return;
 
-            StaticFolderController.Build(Path.GetDirectoryName(path));
+            StaticFolderController.Build(StaticFileController.GetDirectory(path));
 
             File.WriteAllBytes(path, data);
         }
@@ -65,12 +70,6 @@ namespace wey.Global
         }
     }
 
-    public class StaticFolderControllerRead
-    {
-        public string[] Folders { get; set; } = Array.Empty<string>();
-        public string[] Files { get; set; } = Array.Empty<string>();
-    }
-
     class StaticFolderController
     {
         public static string AppdataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ".thyonemc", "wey");
@@ -93,15 +92,6 @@ namespace wey.Global
             Directory.CreateDirectory(path);
         }
 
-        public static StaticFolderControllerRead Read(string path)
-        {
-            return new StaticFolderControllerRead()
-            {
-                Folders = Directory.GetDirectories(path),
-                Files = Directory.GetFiles(path)
-            };
-        }
-
         public static void Wait(string path)
         {
             Logger.Info($"Waiting for {path}");
@@ -116,16 +106,14 @@ namespace wey.Global
         {
             if (!Directory.Exists(sourcePath)) return;
 
-            StaticFolderControllerRead read = Read(sourcePath);
-
             Build(destinationPath);
 
-            foreach (string file in read.Files)
+            foreach (string file in Directory.GetFiles(sourcePath))
             {
                 File.Copy(file, Path.Join(destinationPath, Path.GetFileName(file)));
             }
 
-            foreach (string folder in read.Folders)
+            foreach (string folder in Directory.GetDirectories(sourcePath))
             {
                 string folderName = Path.GetFileName(folder);
 

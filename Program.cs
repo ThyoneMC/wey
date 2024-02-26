@@ -90,7 +90,7 @@ namespace wey
                             IPageCommand Command = (IPageCommand)CurrentPage;
 
                             Command.Render();
-                            Thread.Sleep(1000);
+                            Thread.Sleep(Command.ExitDelay);
 
                             ReturnPage();
                             break;

@@ -9,6 +9,8 @@ namespace wey.Interface
 {
     abstract class IPageCommand : IPage
     {
+        public int ExitDelay = 2 * 1000;
+
         public override PageType GetPageType()
         {
             return PageType.Command;

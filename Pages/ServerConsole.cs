@@ -10,11 +10,11 @@ using wey.Interface;
 
 namespace wey.Pages
 {
-    class SpecificServerConsole : IPageView
+    class ServerConsole : IPageView
     {
         private readonly HostData HostData;
 
-        public SpecificServerConsole(HostData host)
+        public ServerConsole(HostData host)
         {
             HostData = host;
         }
@@ -51,9 +51,10 @@ namespace wey.Pages
         public override void OnViewing()
         {
             if (
-                (Host == null || Host.Process == null) ||
-                (Host.Process.IsStarted && !Host.Process.IsExists())
-            ) {
+                Host == null || Host.Process == null ||
+                Host.Process.IsStarted && !Host.Process.IsExists()
+            )
+            {
                 IsExit = true;
 
                 OnExit();

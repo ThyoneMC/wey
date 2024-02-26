@@ -2,6 +2,7 @@
 using SharpHook.Native;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -67,10 +68,12 @@ namespace wey.Global
 
         static ExecutablePlatform()
         {
+            if (RuntimeInformation.ProcessArchitecture != Architecture.X64 && RuntimeInformation.ProcessArchitecture != Architecture.Arm64) throw new ExecutablePlatformNotFoundException("Wey only support on x64 architecture");
+
             IsOsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             IsOsLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
-            if(!IsOsWindows && !IsOsLinux) throw new ExecutablePlatformNotFoundException();
+            if(!IsOsWindows && !IsOsLinux) throw new ExecutablePlatformNotFoundException("Wey only support on windows or linux");
         }
 
         public static string Get(string windows, string linux)
@@ -189,7 +192,7 @@ namespace wey.Global
             foreach (string folderPath in AllPath.Split(PathSplitter))
             {
                 if (!Directory.Exists(folderPath)) continue;
-                string[] folderFiles = StaticFolderController.Read(folderPath).Files;
+                string[] folderFiles = Directory.GetFiles(folderPath);
 
                 foreach (string filePath in folderFiles)
                 {
@@ -246,6 +249,47 @@ namespace wey.Global
         public void Input(string input)
         {
             StandardInput.WriteLine(input);
+        }
+    }
+
+    class ExecutableInstanceOption
+    {
+        public string FileName { get; set; } = string.Empty;
+        public string BaseArguments { get; set; } = string.Empty;
+        public bool CreateWindow { get; set; } = false;
+    }
+
+    class ExecutableInstance
+    {
+        public ProcessStartInfo startInfo;
+
+        public string baseArguments;
+
+        public ExecutableInstance(ExecutableInstanceOption option)
+        {
+            startInfo = new()
+            {
+                CreateNoWindow = !option.CreateWindow,
+                UseShellExecute = false,
+
+                FileName = option.FileName
+            };
+
+            baseArguments = option.BaseArguments;
+        }
+
+        public bool Execute(params string[] args)
+        {
+            if (string.IsNullOrEmpty(startInfo.FileName)) return false;
+
+            startInfo.Arguments = $"{baseArguments} {string.Join(' ', args)}";
+
+            Process? process = Process.Start(startInfo);
+            if (process == null) return false;
+
+            process.WaitForExit();
+            Thread.Sleep(500); //busy delay
+            return true;
         }
     }
 }

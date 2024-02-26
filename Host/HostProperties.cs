@@ -37,8 +37,6 @@ namespace wey.Host
                 }
             }
 
-            Logger.WriteSingle(data);
-
             return data;
         }
 

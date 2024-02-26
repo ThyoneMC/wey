@@ -9,28 +9,33 @@ using wey.Interface;
 
 namespace wey.Pages
 {
-    class SpecificServerStop : IPageCommand
+    class ServerDelete : IPageCommand
     {
         private readonly HostData HostData;
 
-        public SpecificServerStop(HostData host)
+        public ServerDelete(HostData host)
         {
             HostData = host;
         }
 
         public override string GetName()
         {
-            return "stop";
+            return "delete";
         }
 
         public override string GetDescription()
         {
-            return "stop the server";
+            return "delete server";
         }
 
         public override void OnCommand()
         {
-            new HostManager(HostData).Stop();
+            if (!Input.ReadBoolean($"Are you sure to delete {HostData.Name}?")) return;
+
+            HostManager Host = new(HostData);
+
+            if (Host.Process != null) Host.Process.Kill();
+            Host.Delete();
         }
     }
 }

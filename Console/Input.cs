@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextCopy;
 
 namespace wey.Console
 {
@@ -152,7 +153,20 @@ namespace wey.Console
                     continue;
                 }
 
-                if (raw.Character == null) continue;
+                if (KeyReader.GetHoverOnce(KeyCode.VcLeftControl, KeyCode.VcRightControl) && KeyReader.GetHoverAll(KeyCode.VcV))
+                {
+                    string? clipboard = new Clipboard().GetText();
+
+                    if (!string.IsNullOrWhiteSpace(clipboard))
+                    {
+                        builder.AddRange(clipboard.ToCharArray().Select(c => c.ToString()));
+                        System.Console.Write(clipboard);
+                    }
+
+                    continue;
+                }
+
+                if (string.IsNullOrEmpty(raw.Character)) continue;
 
                 builder.Add(raw.Character);
                 System.Console.Write(raw.Character);

@@ -9,28 +9,28 @@ using wey.Interface;
 
 namespace wey.Pages
 {
-    class SpecificServerStart : IPageCommand
+    class ServerStop : IPageCommand
     {
         private readonly HostData HostData;
 
-        public SpecificServerStart(HostData host)
+        public ServerStop(HostData host)
         {
             HostData = host;
         }
 
         public override string GetName()
         {
-            return "start";
+            return "stop";
         }
 
         public override string GetDescription()
         {
-            return "start the server";
+            return "stop the server";
         }
 
         public override void OnCommand()
         {
-            new HostManager(HostData).Start();
+            new HostManager(HostData).Stop();
         }
     }
 }

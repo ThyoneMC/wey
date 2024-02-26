@@ -106,7 +106,14 @@ namespace wey.Console
         {
             var hover = HoverKeys.Select(hover => hover.KeyCode);
 
-            return keys.All(key => hover.Contains(key));
+            try
+            {
+                return keys.All(key => hover.Contains(key));
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public static long TimestampRange = 500;

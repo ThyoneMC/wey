@@ -12,11 +12,11 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace wey.Pages
 {
-    class SpecificServerInfo : IPageView
+    class ServerInfo : IPageView
     {
         private readonly HostData HostData;
 
-        public SpecificServerInfo(HostData host)
+        public ServerInfo(HostData host)
         {
             HostData = host;
         }
