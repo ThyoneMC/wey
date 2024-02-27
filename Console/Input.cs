@@ -211,26 +211,17 @@ namespace wey.Console
 
             if (!string.IsNullOrEmpty(message)) System.Console.WriteLine($"{message}: ");
 
-            Selection<string> Selector = Selection<string>.Create(choices);
-            while (true)
-            {
-                Selector.RenderNext();
-
-                if (Selector.Result != null)
-                {
-                    break;
-                }
-            }
+            SelectionChoice<string> Selection = Selection<string>.Create(choices).Get();
 
             Logger.ClearFromLine(StartingCursorTop);
 
             if (!string.IsNullOrEmpty(message))
             {
                 System.Console.CursorTop = StartingCursorTop;
-                System.Console.WriteLine($"{message}: {Selector.Result.Value}");
+                System.Console.WriteLine($"{message}: {Selection.Value}");
             }
 
-            return Selector.Result;
+            return Selection;
         }
 
         public static bool ReadBoolean(string? message = null, bool defaultOption = true, bool clear = false)

@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TextCopy;
 using wey.Console;
 using wey.Forwarding;
 using wey.Global;
@@ -86,7 +88,7 @@ namespace wey.Pages
 
             //command
 
-            if (Hamachi.State == ForwardingState.Running)
+            if (Hamachi.State == HamachiState.Running)
             {
                 Logger.WriteSingle($"Current State: Running");
             }
@@ -97,20 +99,42 @@ namespace wey.Pages
 
             HamachiData read = host.hamachi.ReadRequired();
 
+            string[] commands = new string[] { "exit", "create" };
+
+            StringBuilder info = new();
             if (read.Total > 0)
             {
-                Logger.WriteSingle($"Name:");
+                commands = new string[] { "exit", "copy", "create", "delete" };
+
+                info.AppendLine($"Name:");
                 for (int i = 1; i <= read.Total; i++)
                 {
-                    Logger.WriteSingle($"\t- {read.Name}-{i}");
+                    info.AppendLine($"\t> {read.Name}-{i}");
                 }
 
-                Logger.WriteSingle($"Password: {read.Password}");
+                info.Append($"Password: {read.Password}");
+
+                Logger.WriteSingle(info.ToString());
             }
 
-            while (!KeyReader.GetHoverAll(KeyCode.VcLeft))
+            Logger.WriteSingle(string.Empty);
+            switch (Selection<string>.Create(commands).Get().Value)
             {
-
+                case "copy":
+                    {
+                        new Clipboard().SetText(info.ToString());
+                        break;
+                    }
+                case "create":
+                    {
+                        host.Create();
+                        break;
+                    }
+                case "delete":
+                    {
+                        host.Delete();
+                        break;
+                    }
             }
         }
     }

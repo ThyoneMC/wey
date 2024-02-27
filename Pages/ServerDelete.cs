@@ -30,7 +30,7 @@ namespace wey.Pages
 
         public override void OnCommand()
         {
-            if (!Input.ReadBoolean($"Are you sure to delete {HostData.Name}?")) return;
+            if (!Input.ReadBoolean($"Are you sure to delete {HostData.Name}?", false)) return;
 
             HostManager Host = new(HostData);
 

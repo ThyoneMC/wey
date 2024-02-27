@@ -21,22 +21,39 @@ namespace wey.Forwarding
 
         protected static Executable? Process = null;
 
-        public void Start(int port)
+        public static int Port { get; private set; } = -1;
+
+        public static bool IsRunning()
         {
-            Logger.Info($"Opening Ngrok Tunnel [port: {port}]");
+            return Process != null && Process.IsExists();
+        }
+
+        public bool Start(int port)
+        {
+            if (IsRunning()) return false;
+
+            if (string.IsNullOrWhiteSpace(FilePath)) return false;
+
+            Port = port;
+
+            Logger.Info($"Opening Ngrok Tunnel: {Port}");
 
             Process = new(new ExecutableOption()
             {
                 FileName = FilePath,
-                Arguments = $"tcp {port}"
+                Arguments = $"tcp {Port}"
             });
 
             Process.Start();
+
+            return true;
         }
 
         public void Stop()
         {
             if (Process == null) return;
+
+            Logger.Info($"Closing Ngrok Tunnel");
 
             Process.Kill();
         }

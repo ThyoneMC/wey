@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,19 +23,28 @@ namespace wey.Forwarding
         public int Total { get; set; } = 0;
     }
 
+    public enum HamachiState
+    {
+        Running,
+        Stopped
+    }
+
     class Hamachi : IForwarding
     {
         private readonly HostData HostData;
 
-        public static ForwardingState State { get; private set; } = ForwardingState.Stopped;
+        public static HamachiState State { get; private set; } = HamachiState.Stopped;
 
         public JsonFileController<HamachiData> hamachi;
+
+        private ExecutableInstance Client = new(new ExecutableInstanceOption());
 
         public Hamachi(HostData host) : base("hamachi")
         {
             HostData = host;
 
             Client.baseArguments = "--cli";
+            Client.startInfo.FileName = FilePath;
 
             hamachi = new(Path.Join(HostData.FolderPath, ".wey", "forwarding"), "hamachi.json");
             if (!hamachi.Exists())
@@ -47,15 +57,30 @@ namespace wey.Forwarding
             }
         }
 
+        public new void Register(string path)
+        {
+            base.Register(path);
+
+            Client.startInfo.FileName = path;
+        }
+
+        public new void Unregister()
+        {
+            base.Unregister();
+
+            Client.startInfo.FileName = string.Empty;
+        }
+
         public void Create()
         {
             HamachiData read = hamachi.ReadRequired();
 
             string name = $"{read.Name}-{read.Total + 1}";
 
-            Logger.Info($"Create Hamachi Tunnel: {name}");
+            Logger.Log($"Create Hamachi Tunnel: {name}");
 
             Client.Execute("create", name, read.Password);
+            Client.Execute("go-offline", name);
 
             hamachi.Edit(data =>
             {
@@ -65,52 +90,62 @@ namespace wey.Forwarding
             });
         }
 
-        public void Delete()
+        public void Delete(int count = 1)
         {
             HamachiData read = hamachi.ReadRequired();
 
-            for (int i = 1; i <= read.Total; i++)
+            count = Math.Min(count, read.Total);
+            for (int i = 0; i < count; i++)
             {
-                Client.Execute("go-offline", $"{read.Name}-{i}");
+                string name = $"{read.Name}-{read.Total - i}";
+
+                Logger.Log($"Delete Hamachi Tunnel: {name}");
+
+                Client.Execute("delete", name);
             }
+
+            hamachi.Edit(data =>
+            {
+                data.Total -= count;
+
+                return data;
+            });
         }
 
         public void Start()
         {
-            if (State == ForwardingState.Running) return;
+            if (State == HamachiState.Running) return;
+
+            HamachiData read = hamachi.ReadRequired();
+            if (read.Total == 0) return;
 
             Logger.Info($"Opening Hamachi Tunnel");
 
-            HamachiData read = hamachi.ReadRequired();
-
             Client.Execute("login");
-
-            if (read.Total == 0)
-            {
-                Create();
-                read.Total += 1;
-            }
 
             for (int i = 1; i <= read.Total; i++)
             {
                 Client.Execute("go-online", $"{read.Name}-{i}");
             }
 
-            State = ForwardingState.Running;
+            State = HamachiState.Running;
         }
 
         public void Stop()
         {
-            if (State == ForwardingState.Stopped) return;
+            if (State == HamachiState.Stopped) return;
 
             HamachiData read = hamachi.ReadRequired();
+            if (read.Total == 0) return;
+
+            Logger.Info($"Closing Hamachi Tunnel");
 
             for (int i = 1; i <= read.Total; i++)
             {
                 Client.Execute("go-offline", $"{read.Name}-{i}");
             }
 
-            State = ForwardingState.Stopped;
+            State = HamachiState.Stopped;
         }
 
         public void Exit()

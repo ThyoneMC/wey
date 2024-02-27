@@ -53,7 +53,7 @@ namespace wey.Interface
                         );
             }
 
-            Selector.RenderNext();
+            Selector.Render();
         }
 
         public abstract IEnumerable<IPage> GetPages();

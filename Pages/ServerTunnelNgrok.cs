@@ -75,6 +75,24 @@ namespace wey.Pages
             }
 
             //command
+
+            string? port = new HostProperties(HostData).Get("server-port");
+
+            if (Ngrok.IsRunning())
+            {
+                if (!string.IsNullOrWhiteSpace(port) && Ngrok.Port == int.Parse(port))
+                {
+                    Logger.WriteSingle($"Current State: Running");
+                }
+                else
+                {
+                    Logger.WriteSingle($"Current State: Running (busy)");
+                }
+            }
+            else
+            {
+                Logger.WriteSingle($"Current State: Stop");
+            }
         }
     }
 }

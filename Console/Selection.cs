@@ -178,7 +178,7 @@ namespace wey.Console
 
         private bool IsLoaded = false;
 
-        public void RenderNext()
+        public void Render()
         {
             if (!IsLoaded)
             {
@@ -190,11 +190,11 @@ namespace wey.Console
             OnViewing();
         }
 
-        public SelectionChoice<T> Render()
+        public SelectionChoice<T> Get()
         {
             while (true)
             {
-                RenderNext();
+                Render();
 
                 if (Result != null) return Result;
             }

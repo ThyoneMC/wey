@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using wey.Console;
+using wey.Forwarding;
 using wey.Global;
 using wey.Interface;
 using wey.Pages;
@@ -144,17 +145,20 @@ namespace wey.Host
             string? javaExecute = Executable.Where(javaExecuteName);
             if (javaExecute == null) throw new FileNotFoundException($"{javaExecuteName} not found");
 
-            string? port = new HostProperties(Data).Get("server-port");
+            int port = int.Parse(new HostProperties(Data).Get("server-port") ?? "25565");
 
             Process = new(new ExecutableOption()
             {
                 FileName = javaExecute,
-                Arguments = $"-jar server.jar --port={port ?? "25565"} {Data.ServerJarFlags}",
+                Arguments = $"-jar server.jar --port={port} {Data.ServerJarFlags}",
                 WorkDirectory = Data.FolderPath
             });
 
             Process.Start();
             ProcessID.Edit(Process.Export());
+
+            new Ngrok().Start(port);
+            new Hamachi(Data).Start();
         }
 
         public void Stop()
@@ -162,6 +166,9 @@ namespace wey.Host
             if (Process == null) return;
 
             Logger.Info($"Stoping Server: {Data.Name}");
+
+            new Ngrok().Stop();
+            new Hamachi(Data).Stop();
 
             Process.Input("stop");
             ProcessID.Delete();

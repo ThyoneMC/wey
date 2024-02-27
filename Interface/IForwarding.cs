@@ -10,12 +10,7 @@ using wey.Global;
 
 namespace wey.Interface
 {
-    public enum ForwardingState
-    {
-        Running,
-        Stopped
-    }
-
+    
     abstract class IForwarding
     {
         private static readonly JsonFileController<Dictionary<string, string>> File = new("forwarding.json");
@@ -28,13 +23,13 @@ namespace wey.Interface
         private string Name = string.Empty;
         protected string FilePath = string.Empty;
 
-        protected ExecutableInstance Client = new (new ExecutableInstanceOption());
+        
 
         public IForwarding(string name)
         {
             Name = name;
 
-            Client.startInfo.FileName = Get();
+            FilePath = Get();
         }
 
         public string Get()
@@ -53,8 +48,6 @@ namespace wey.Interface
 
             FilePath = path;
 
-            Client.startInfo.FileName = path;
-
             IForwarding.File.Edit(data =>
             {
                 data[Name] = FilePath;
@@ -67,7 +60,7 @@ namespace wey.Interface
         {
             Logger.Log($"Unregister executable path of {Name}");
 
-            Client.startInfo.FileName = string.Empty;
+            FilePath = string.Empty;
 
             IForwarding.File.Edit(data =>
             {
