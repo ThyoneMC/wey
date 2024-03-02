@@ -8,7 +8,7 @@ using wey.Console;
 
 namespace wey.Global
 {
-    class StaticFileController
+    public class StaticFileController
     {
         public static string GetDirectory(string path)
         {
@@ -70,7 +70,7 @@ namespace wey.Global
         }
     }
 
-    class StaticFolderController
+    public class StaticFolderController
     {
         public static string AppdataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ".thyonemc", "wey");
 
@@ -129,7 +129,7 @@ namespace wey.Global
         }
     }
 
-    class FileControllerReadException : Exception
+    public class FileControllerReadException : Exception
     {
         public FileControllerReadException(string? message = null) : base(message)
         {
@@ -137,7 +137,7 @@ namespace wey.Global
         }
     }
 
-    class FileController
+    public class FileController
     {
         protected readonly string FilePath;
 
@@ -203,7 +203,7 @@ namespace wey.Global
         }
     }
 
-    class JsonFileController<T> : FileController
+    public class JsonFileController<T> : FileController
     {
         public static T CreateTypeInstance()
         {

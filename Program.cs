@@ -1,10 +1,12 @@
-﻿using SharpHook.Native;
+﻿using RestSharp;
+using SharpHook.Native;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using wey.Console;
 using wey.Global;
 using wey.Host.Provider;
 using wey.Interface;
+using wey.Mod;
 using wey.Pages;
 
 namespace wey

@@ -61,7 +61,7 @@ namespace wey.Host.Provider
         public class BuildData
         {
             [JsonPropertyName("build")]
-            public int ID { get; set; } = -1;
+            public int ID { get; set; }
 
             [JsonPropertyName("time")]
             public DateTime ReleaseDate { get; set; } = new();

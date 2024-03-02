@@ -40,6 +40,7 @@ namespace wey.Pages
                     new ServerStop(HostData),
                     new ServerUpdate(HostData),
                     new ServerTunnel(HostData),
+                    new ServerMod(HostData),
                     new ServerDelete(HostData)
             };
         }

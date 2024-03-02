@@ -88,7 +88,9 @@ namespace wey.Pages
 
             //command
 
-            if (Hamachi.State == HamachiState.Running)
+            HamachiData read = host.hamachi.ReadRequired();
+
+            if (read.IsRunning)
             {
                 Logger.WriteSingle($"Current State: Running");
             }
@@ -96,8 +98,6 @@ namespace wey.Pages
             {
                 Logger.WriteSingle($"Current State: Stop");
             }
-
-            HamachiData read = host.hamachi.ReadRequired();
 
             string[] commands = new string[] { "exit", "create" };
 

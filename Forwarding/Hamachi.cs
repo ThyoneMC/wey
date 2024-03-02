@@ -16,6 +16,8 @@ namespace wey.Forwarding
 {
     class HamachiData
     {
+        public bool IsRunning { get; set; } = false;
+
         public string Name { get; set; } = string.Empty;
 
         public string Password { get; set; } = string.Empty;
@@ -23,21 +25,13 @@ namespace wey.Forwarding
         public int Total { get; set; } = 0;
     }
 
-    public enum HamachiState
-    {
-        Running,
-        Stopped
-    }
-
     class Hamachi : IForwarding
     {
         private readonly HostData HostData;
 
-        public static HamachiState State { get; private set; } = HamachiState.Stopped;
-
         public JsonFileController<HamachiData> hamachi;
 
-        private ExecutableInstance Client = new(new ExecutableInstanceOption());
+        private readonly ExecutableInstance Client = new(new ExecutableInstanceOption());
 
         public Hamachi(HostData host) : base("hamachi")
         {
@@ -82,12 +76,8 @@ namespace wey.Forwarding
             Client.Execute("create", name, read.Password);
             Client.Execute("go-offline", name);
 
-            hamachi.Edit(data =>
-            {
-                data.Total += 1;
-
-                return data;
-            });
+            read.Total += 1;
+            hamachi.Edit(read);
         }
 
         public void Delete(int count = 1)
@@ -104,20 +94,14 @@ namespace wey.Forwarding
                 Client.Execute("delete", name);
             }
 
-            hamachi.Edit(data =>
-            {
-                data.Total -= count;
-
-                return data;
-            });
+            read.Total -= count;
+            hamachi.Edit(read);
         }
 
         public void Start()
         {
-            if (State == HamachiState.Running) return;
-
             HamachiData read = hamachi.ReadRequired();
-            if (read.Total == 0) return;
+            if (read.IsRunning || read.Total == 0) return;
 
             Logger.Info($"Opening Hamachi Tunnel");
 
@@ -128,15 +112,14 @@ namespace wey.Forwarding
                 Client.Execute("go-online", $"{read.Name}-{i}");
             }
 
-            State = HamachiState.Running;
+            read.IsRunning = true;
+            hamachi.Edit(read);
         }
 
         public void Stop()
         {
-            if (State == HamachiState.Stopped) return;
-
             HamachiData read = hamachi.ReadRequired();
-            if (read.Total == 0) return;
+            if (!read.IsRunning || read.Total == 0) return;
 
             Logger.Info($"Closing Hamachi Tunnel");
 
@@ -145,7 +128,8 @@ namespace wey.Forwarding
                 Client.Execute("go-offline", $"{read.Name}-{i}");
             }
 
-            State = HamachiState.Stopped;
+            read.IsRunning = false;
+            hamachi.Edit(read);
         }
 
         public void Exit()

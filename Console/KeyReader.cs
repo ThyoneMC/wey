@@ -66,7 +66,7 @@ namespace wey.Console
                 LatestReleased = keyboardEvent.Data;
                 LatestReleasedTimestamp = GetTimestamp();
 
-                HoverKeys.RemoveAll(key => key == keyboardEvent.Data);
+                HoverKeys.RemoveAll(key => key.KeyCode == keyboardEvent.Data.KeyCode);
             };
 
             Task.Run(GlobalHook.RunAsync, TokenSource.Token);

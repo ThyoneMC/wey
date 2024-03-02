@@ -36,7 +36,7 @@ namespace wey.Host.Provider
             public string Version { get; set; } = string.Empty;
 
             [JsonPropertyName("stable")]
-            public bool IsStable { get; set; } = true;
+            public bool IsStable { get; set; }
         }
 
         public static GameVersions[] GetGameVersions()
@@ -52,13 +52,13 @@ namespace wey.Host.Provider
             public string Separator { get; set; } = string.Empty;
 
             [JsonPropertyName("build")]
-            public int BuildID { get; set; } = -1;
+            public int BuildID { get; set; }
 
             [JsonPropertyName("version")]
             public string Version { get; set; } = string.Empty;
 
             [JsonPropertyName("stable")]
-            public bool IsStable { get; set; } = true;
+            public bool IsStable { get; set; }
         }
 
         public class Loaders
@@ -83,7 +83,7 @@ namespace wey.Host.Provider
             public string Version { get; set; } = string.Empty;
 
             [JsonPropertyName("stable")]
-            public bool IsStable { get; set; } = true;
+            public bool IsStable { get; set; }
         }
 
         public static Installer[] GetInstaller()

@@ -67,7 +67,7 @@ namespace wey.Host.Provider
             public string URL { get; set; } = string.Empty;
 
             [JsonPropertyName("releaseTime")]
-            public DateTime ReleaseDate { get; set; } = new();
+            public DateTime ReleaseDate { get; set; }
         }
 
         public class Version
