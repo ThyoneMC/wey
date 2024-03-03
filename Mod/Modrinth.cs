@@ -27,7 +27,10 @@ namespace wey.Mod
         Optional,
 
         [EnumMember(Value = "unsupported")]
-        Unsupported
+        Unsupported,
+
+        [EnumMember(Value = "unknown")]
+        Unknown
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]

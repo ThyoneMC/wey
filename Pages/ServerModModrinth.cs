@@ -10,6 +10,7 @@ using wey.Host;
 using wey.Host.Provider;
 using wey.Interface;
 using wey.Mod;
+using static wey.Host.Provider.PaperMC;
 using static wey.Host.Provider.Vanilla;
 
 namespace wey.Pages
@@ -17,10 +18,12 @@ namespace wey.Pages
     class ServerModModrinth : IPageCommand
     {
         private readonly HostData HostData;
+        private readonly HostMod HostMod;
 
         public ServerModModrinth(HostData host)
         {
             HostData = host;
+            HostMod = new HostMod(host);
         }
 
         public override string GetName()
@@ -33,10 +36,18 @@ namespace wey.Pages
             return "modrinth";
         }
 
-        public static void ProjectDownload(string path, string id, string gameVersion, string? loader = null)
+        private void ProjectDownload(HostModType type, string id, string gameVersion, string? loader = null)
         {
             ModrinthVersion project = Modrinth.GetProjectVersions(id, gameVersion, loader).First();
-            StaticFileController.Build(Path.Join(path, project.Files.First().FileName), Rest.StaticDownload(project.Files.First().URL));
+            HostMod.Add(new HostModData
+            {
+                Type = type,
+                Provider = "modrinth",
+                ID = project.VersionID,
+                HashSHA1 = project.Files.First().Hash.SHA1,
+                URL = project.Files.First().URL,
+                Name = project.Files.First().FileName
+            });
 
             foreach (ModrinthVersionDependency dependency in project.Dependencies)
             {
@@ -44,19 +55,27 @@ namespace wey.Pages
 
                 if (!string.IsNullOrEmpty(dependency.VersionID))
                 {
-                    VersionDownload(path, dependency.VersionID, gameVersion, loader);
+                    VersionDownload(type, dependency.VersionID, gameVersion, loader);
                 }
                 else
                 {
-                    ProjectDownload(path, dependency.ProjectID, gameVersion, loader);
+                    ProjectDownload(type, dependency.ProjectID, gameVersion, loader);
                 }
             }
         }
 
-        public static void VersionDownload(string path, string id, string gameVersion, string? loader = null)
+        private void VersionDownload(HostModType type, string id, string gameVersion, string? loader = null)
         {
             ModrinthVersion version = Modrinth.GetVersion(id);
-            StaticFileController.Build(Path.Join(path, version.Files.First().FileName), Rest.StaticDownload(version.Files.First().URL));
+            HostMod.Add(new HostModData
+            {
+                Type = type,
+                Provider = "modrinth",
+                ID = version.VersionID,
+                HashSHA1 = version.Files.First().Hash.SHA1,
+                URL = version.Files.First().URL,
+                Name = version.Files.First().FileName
+            });
 
             foreach (ModrinthVersionDependency dependency in version.Dependencies)
             {
@@ -64,11 +83,11 @@ namespace wey.Pages
 
                 if (!string.IsNullOrEmpty(dependency.VersionID))
                 {
-                    VersionDownload(path, dependency.VersionID, gameVersion, loader);
+                    VersionDownload(type, dependency.VersionID, gameVersion, loader);
                 }
                 else
                 {
-                    ProjectDownload(path, dependency.ProjectID, gameVersion, loader);
+                    ProjectDownload(type, dependency.ProjectID, gameVersion, loader);
                 }
             }
         }
@@ -94,17 +113,22 @@ namespace wey.Pages
                 return;
             }
 
-            HostProperties property = new(HostData);
-
             if (project.ProjectType == ModrinthProjectType.ResourcePack)
             {
-                if (!string.IsNullOrWhiteSpace(property.Get("resource-pack")))
+                if (!string.IsNullOrWhiteSpace(new HostProperties(HostData).Get("resource-pack")))
                 {
                     if (!Input.ReadBoolean("Do you want to replace resource pack?")) return;
                 }
 
-                property.Set("resource-pack", versions[0].Files[0].URL);
-                property.Set("resource-pack-sha1", versions[0].Files[0].Hash.SHA1);
+                HostMod.Add(new HostModData
+                {
+                    Type = HostModType.ResourcePack,
+                    Provider = "modrinth",
+                    ID = versions.First().VersionID,
+                    HashSHA1 = versions.First().Files.First().Hash.SHA1,
+                    URL = versions.First().Files.First().URL,
+                    Name = versions.First().Files.First().FileName
+                });
 
                 return;
             }
@@ -120,7 +144,7 @@ namespace wey.Pages
                             return;
                         }
 
-                        ProjectDownload(Path.Join(HostData.FolderPath, "mods"), project.Slug, provider.Version, HostData.Provider);
+                        ProjectDownload(HostModType.Mod, project.Slug, provider.Version, HostData.Provider);
 
                         break;
                     }
@@ -132,20 +156,13 @@ namespace wey.Pages
                             return;
                         }
 
-                        VersionDownload(Path.Join(HostData.FolderPath, "plugins"), versions.First().VersionID, provider.Version);
+                        VersionDownload(HostModType.Plugin, versions.First(v => v.GetProjectType() == ModrinthProjectType.Plugin).VersionID, provider.Version);
 
                         break;
                     }
                 case ModrinthProjectType.Datapack:
                     {
-                        string? levelName = property.Get("level-name");
-                        if (string.IsNullOrWhiteSpace(levelName))
-                        {
-                            Logger.Info("world not found");
-                            return;
-                        }
-
-                        VersionDownload(Path.Join(HostData.FolderPath, levelName, "datapack"), versions.First().VersionID, provider.Version);
+                        VersionDownload(HostModType.Datapack, versions.First(v => v.GetProjectType() == ModrinthProjectType.Datapack).VersionID, provider.Version);
 
                         break;
                     }

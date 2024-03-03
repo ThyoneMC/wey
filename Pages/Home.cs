@@ -23,7 +23,8 @@ namespace wey.Pages
         {
             return new IPage[] {
                     new HostList(),
-                    new HostCreate()
+                    new HostCreate(),
+                    new Exit()
             };
         }
     }
