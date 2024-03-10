@@ -20,6 +20,8 @@ namespace wey.Interface
         {
             IsLoaded = true;
 
+            IsExit = true;
+
             OnCommand();
         }
 

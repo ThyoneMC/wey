@@ -21,8 +21,6 @@ namespace wey.Pages
         public ServerTunnelHamachi(HostData host)
         {
             HostData = host;
-
-            ExitDelay = 0;
         }
 
         public override string GetName()
@@ -83,8 +81,10 @@ namespace wey.Pages
                     }
                 }
 
-                System.Console.Clear();
+                Logger.ClearFromLine(2);
             }
+
+            ExitDelay = 0;
 
             //command
 

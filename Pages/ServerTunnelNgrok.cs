@@ -71,7 +71,7 @@ namespace wey.Pages
                     }
                 }
 
-                System.Console.Clear();
+                Logger.ClearFromLine(2);
             }
 
             //command
