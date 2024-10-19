@@ -1,112 +1,43 @@
-﻿using RestSharp;
-using SharpHook.Native;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
-using wey.Console;
-using wey.Global;
-using wey.Host.Provider;
-using wey.Interface;
-using wey.Mod;
-using wey.Pages;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+using wey.API;
+using wey.API.Game;
+using wey.CLI;
+using wey.IO;
 
 namespace wey
 {
-    class Program
+    internal class Program
     {
-        private static readonly Stack<IPage> PageList = new();
-
-        private static IPage CurrentPage = new Home();
-
-        private static void AddPage(IPage page)
+        static void Main(string[] args)
         {
-            PageList.Push(page);
-
-            ChangePage();
-        }
-
-        private static void ChangePage()
-        {
-            System.Console.Clear();
-
-            CurrentPage = PageList.First();
-
-            Logger.WriteMultiple(
-                    string.Empty,
-                    string.Join(" / ", PageList.Reverse().Select(p => p.GetName())),
-                    string.Empty,
-                    new string('-', System.Console.WindowWidth),
-                    string.Empty
-                );
-        }
-
-        private static void ReturnPage()
-        {
-            PageList.Pop();
-
-            ChangePage();
-        }
-
-        public static void Main(string[] args)
-        {
-            ExecutableArgument.Import(args);
-
-            AddPage(new Home());
-
-            new TaskWorker(() =>
+            foreach (string text in args)
             {
-                PageType CurrentType = CurrentPage.GetPageType();
+                if (string.IsNullOrWhiteSpace(text)) continue;
 
-                if 
-                (
-                    (CurrentPage.IsExit) ||
-                    (PageList.Count > 1 && KeyReader.Get() == KeyCode.VcLeft)
-                )
+                if (Options.IsArgOptions(text))
                 {
-                    if (CurrentType == PageType.View) ((IPageView)CurrentPage).OnExit();
-
-                    ReturnPage();
-                    return;
+                    Options.Import(text);
                 }
-
-                switch (CurrentType)
+                else
                 {
-                    case PageType.Group:
-                        {
-                            IPageGroup Group = (IPageGroup)CurrentPage;
-
-                            Group.Render();
-
-                            if (Group.Selection != null)
-                            {
-                                AddPage(Group.Selection);
-
-                                Group.Reset();
-
-                                return;
-                            }
-
-                            break;
-                        }
-                    case PageType.Command:
-                        {
-                            IPageCommand Command = (IPageCommand)CurrentPage;
-
-                            Command.Render();
-                            Thread.Sleep(Command.ExitDelay);
-
-                            ReturnPage();
-                            break;
-                        }
-                    case PageType.View:
-                        {
-                            IPageView Page = (IPageView)CurrentPage;
-
-                            Page.Render();
-
-                            break;
-                        }
+                    Arguments.Import(text);
                 }
-            }).Start();
+            }
+
+            string gameVersionID = new FabricClientHelper("1.20.6").Download();
+
+            Launcher.AddProfile(new Launcher.ProfileOptions()
+            {
+                Name = "KiewCraft",
+                MinecraftPath = Launcher.MinecraftPath,
+                GameVersionID = gameVersionID,
+                IconPath = ""
+            });
         }
     }
 }
