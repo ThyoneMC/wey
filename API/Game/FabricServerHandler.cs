@@ -8,14 +8,14 @@ using wey.IO;
 
 namespace wey.API.Game
 {
-    internal class FabricServerHelper : ServerHelper
+    internal class FabricServerHandler : ServerHandler
     {
-        public FabricServerHelper(string gameVersion) : base(gameVersion)
+        public FabricServerHandler(string gameVersion) : base(gameVersion)
         {
 
         }
 
-        public override ServerHelperFile Download(string dirPath)
+        public override ServerHandlerFile Download(string dirPath)
         {
             IFabric.ILoader[]? getLoaders = Fabric.GetLoaders(this.gameVersion);
             if (getLoaders == null) throw new Exception("rest error - Fabric.GetLoaders");

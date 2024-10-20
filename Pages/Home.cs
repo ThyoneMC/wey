@@ -9,31 +9,19 @@ namespace wey.Pages
 {
     public class Home : Command
     {
-        public override string GetName()
+        public Home() : base("wey")
         {
-            return "wey";
-        }
+            this.Description = "wey is the way to share minecraft mods";
 
-        public override IHelpCommand GetHelp()
-        {
-            return new()
-            {
-                Description = "wey is the way to share minecraft mods"
-            };
-        }
-
-        public override Command[] GetSubCommand()
-        {
-            return new Command[]
-            {
-                new Create(),
-                new Add()
-            };
+            this.Subcommand.Add(new Create());
+            this.Subcommand.Add(new Import());
+            this.Subcommand.Add(new Add());
+            this.Subcommand.Add(new Update());
         }
 
         public override void Execute()
         {
-            return;
+            
         }
     }
 }

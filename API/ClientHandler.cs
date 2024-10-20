@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace wey.API
 {
-    public abstract class ClientHelper
+    public abstract class ClientHandler
     {
         protected string gameVersion;
         protected string minecraftPath;
 
-        protected ClientHelper(string gameVersion, string? minecraftPath = null)
+        protected ClientHandler(string gameVersion, string? minecraftPath = null)
         {
             this.gameVersion = gameVersion;
-            this.minecraftPath = minecraftPath ?? Launcher.MinecraftPath;
+            this.minecraftPath = minecraftPath ?? Launcher.GameDirectoryPath;
         }
 
         // return gameVersionID

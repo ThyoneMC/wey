@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace wey.API
 {
-    public class ServerHelperFile
+    public class ServerHandlerFile
     {
         [JsonPropertyName("gameVersion")]
         public string GameVersion { get; set; } = string.Empty;
@@ -16,15 +16,15 @@ namespace wey.API
         public string FileName { get; set; } = string.Empty;
     }
 
-    public abstract class ServerHelper
+    public abstract class ServerHandler
     {
         protected string gameVersion;
 
-        protected ServerHelper(string gameVersion)
+        protected ServerHandler(string gameVersion)
         {
             this.gameVersion = gameVersion;
         }
 
-        public abstract ServerHelperFile Download(string jarPath);
+        public abstract ServerHandlerFile Download(string jarPath);
     }
 }

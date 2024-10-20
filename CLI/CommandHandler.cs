@@ -2,60 +2,84 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace wey.CLI
 {
     public static class CommandHandler
     {
-        static string NameBuilder(string name, string? description)
+        static void HandleHelpSubcommand(List<Command> commandList)
         {
-            string text = $"\t{name}";
+            if (commandList.Count == 0) return;
 
-            if (!string.IsNullOrWhiteSpace(description))
+            Console.WriteLine();
+            Console.WriteLine("SUB COMMAND:");
+
+            foreach (Command command in commandList)
             {
-                text += $" - {description}";
-            }
+                string text = $"\t{command.Name}";
 
-            return text;
+                if (!string.IsNullOrWhiteSpace(command.Description))
+                {
+                    text += $" - {command.Description}";
+                }
+
+                Console.WriteLine(text);
+            }
+        }
+
+        static void HandleHelpOption(List<CommandOptions> optionList)
+        {
+            if (optionList.Count == 0) return;
+
+            Console.WriteLine();
+            Console.WriteLine("OPTION:");
+
+            foreach (CommandOptions option in optionList)
+            {
+                string text = $"\t--{option.Name}={option.Type.ToString()}";
+
+                List<string> tags = new();
+                if (option.InConfigFile) tags.Add("config");
+                if (option.Optional) tags.Add("optional");
+
+                if (tags.Count > 0)
+                {
+                    text += $" ({string.Join(", ", tags)})";
+                }
+
+                Console.WriteLine(text);
+            }
+        }
+
+        static void HandleHelp(Command command)
+        {
+            Console.WriteLine("DESCRIPTION:");
+            Console.WriteLine($"\t{command.Description ?? "no description"}");
+
+            HandleHelpSubcommand(command.Subcommand);
+            HandleHelpOption(command.Options);
         }
 
         public static void Execute(Command command)
         {
-            string? subname = Arguments.Use();
+            string? subCommandUse = Arguments.Use();
 
-            if (Options.IsUsed("help") && subname == null)
+            if (Options.IsUsed("help") && subCommandUse == null)
             {
-                string des = command.GetDescription() ?? "no description";
-
-                Console.WriteLine("DESCRIPTION:");
-                Console.WriteLine($"\t{des}");
-
-                Command[] thisCmd = command.GetSubCommand();
-                if (thisCmd.Length > 0)
-                {
-                    Console.WriteLine();
-                    Console.WriteLine("SUB COMMAND:");
-                    
-                    foreach (Command subcommand in thisCmd)
-                    {
-                        Console.WriteLine(NameBuilder(subcommand.GetName(), subcommand.GetDescription()));
-                    }
-                }
-
+                HandleHelp(command);
                 return;
             }
 
             command.Execute();
 
-            Command[] commands = command.GetSubCommand();
-            if (commands.Length > 0)
+            if (command.Subcommand.Count > 0)
             {
-                if (subname == null) return;
-
-                foreach (Command subcommand in commands)
+                foreach (Command subcommand in command.Subcommand)
                 {
-                    if (subcommand.GetName() == subname)
+                    if (subcommand.Name == subCommandUse)
                     {
                         Execute(subcommand);
                         break;

@@ -71,12 +71,13 @@ namespace wey
 
     public static class Launcher
     {
-        public static readonly string MinecraftPath =
+        public static readonly string GameDirectoryPath =
+            Configuration.Read("minecraftDir") ??
             ApplicationDirectoryHelper.GetDirectoryByOS(windows: ".minecraft", macos: "minecraft", linux: ".minecraft");
 
         public static void EditProfile(Func<ILauncherProfile, ILauncherProfile> editor)
         {
-            string path = Path.Join(MinecraftPath, "launcher_profiles.json");
+            string path = Path.Join(GameDirectoryPath, "launcher_profiles.json");
 
             ILauncherProfile launcherProfile = FileHelper.ReadJSON<ILauncherProfile>(path) ?? new();
 
@@ -91,6 +92,12 @@ namespace wey
             public string? IconPath;
         }
 
+        public static string ImageToBase64(string filePath)
+        {
+            byte[] image = FileHelper.ReadBytes(filePath);
+            return $"data:image/{Path.GetExtension(filePath)};base64,{Convert.ToBase64String(image)}";
+        }
+
         public static void AddProfile(ProfileOptions options)
         {
             Console.WriteLine($"Create Launcher Profile: {options.Name}");
@@ -100,14 +107,13 @@ namespace wey
                 IProfile profile = new()
                 {
                     Name = options.Name,
-                    MinecraftPath = options.MinecraftPath ?? MinecraftPath,
+                    MinecraftPath = options.MinecraftPath ?? GameDirectoryPath,
                     GameVersionID = options.GameVersionID,
                 };
 
                 if (options.IconPath != null)
                 {
-                    byte[] image = FileHelper.ReadBytes(options.IconPath);
-                    profile.IconString = $"data:image/{Path.GetExtension(options.IconPath)};base64,{Convert.ToBase64String(image)}";
+                    profile.IconString = Launcher.ImageToBase64(options.IconPath);
                 }
 
                 launcherProfile.Profiles[options.Name] = profile;

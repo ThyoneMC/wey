@@ -16,8 +16,11 @@ namespace wey.IO
         [JsonPropertyName("gameVersion")]
         public required string GameVersion { get; set; }
 
+        [JsonPropertyName("launcherIcon")]
+        public string? LauncherIcon { get; set; } = null;
+
         [JsonPropertyName("mods")]
-        public List<ModHelperFile> Mods { get; set; } = new();
+        public List<ModHandlerFile> Mods { get; set; } = new();
     }
 
     public static class ProfileHandler
@@ -29,6 +32,11 @@ namespace wey.IO
             return Path.Join(dirPath, name);
         }
 
+        public static bool Exists(string name)
+        {
+            return Directory.GetFiles(dirPath).Contains(name);
+        }
+
         public static void Create(ISharedProfile profile)
         {
             FileHelper.UpdateJSON(GetPath(profile.Name), profile);
@@ -37,6 +45,11 @@ namespace wey.IO
         public static ISharedProfile? Read(string name)
         {
             return FileHelper.ReadJSON<ISharedProfile>(GetPath(name));
+        }
+
+        public static void Update(string name, ISharedProfile profile)
+        {
+            FileHelper.UpdateJSON(GetPath(name), profile);
         }
 
         public static void Edit(string name, Func<ISharedProfile, ISharedProfile> editor)

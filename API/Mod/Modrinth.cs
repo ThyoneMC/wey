@@ -188,21 +188,21 @@ namespace wey.API.Mod
             return rest.Get<IModrinth.IVersion[]>(request);
         }
 
-        public static IModrinth.IVersion[]? GetLatestVersionsByHashes(string[] hash, string gameVersion, string algorithm = "sha512")
+        public static Dictionary<string, IModrinth.IVersion>? GetLatestVersionsByHashes(string[] hash, string gameVersion, string algorithm = "sha512")
         {
             RestRequest request = new($"version_files/update");
 
-            request.AddBody("hashes", JsonSerializer.Serialize(hash));
+            var body = new
+            {
+                hashes = hash,
+                algorithm = algorithm,
+                loaders = new string[] { "fabric" },
+                game_versions = new string[] { gameVersion }
+            };
 
-            request.AddBody("algorithm", algorithm);
+            request.AddJsonBody(body);
 
-            string[] loaders = { "fabric" };
-            request.AddBody("loaders", JsonSerializer.Serialize(loaders));
-
-            string[] gameVersions = { gameVersion };
-            request.AddBody("game_versions", JsonSerializer.Serialize(gameVersions));
-
-            return rest.Post<IModrinth.IVersion[]>(request);
+            return rest.Post<Dictionary<string, IModrinth.IVersion>>(request);
         }
     }
 }

@@ -16,6 +16,19 @@ namespace wey
     {
         static void Main(string[] args)
         {
+            /*
+             * TODO:
+             * 
+             * 1. Config Command (Get, Set)
+             * 2. Duplicate Mod Detector (By Name, Hash)
+             * 3. Profile Importer (Local in Appdata, Local in Download, URL Download)
+             * 4. Better ".minecraft" Path Handling
+             * 5. Dynamic ModHandler (nowadays, handle one by one)
+             * 6. Dependency Mod Downloader
+             * 7. Incompatible Mod Detector
+             * 8. Launcher Profile Update Within Update Command
+             */
+
             foreach (string text in args)
             {
                 if (string.IsNullOrWhiteSpace(text)) continue;

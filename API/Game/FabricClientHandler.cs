@@ -9,9 +9,9 @@ using wey.IO;
 
 namespace wey.API.Game
 {
-    internal class FabricClientHelper : ClientHelper
+    internal class FabricClientHandler : ClientHandler
     {
-        public FabricClientHelper(string gameVersion, string? minecraftPath = null) : base(gameVersion, minecraftPath)
+        public FabricClientHandler(string gameVersion, string? minecraftPath = null) : base(gameVersion, minecraftPath)
         {
 
         }
@@ -20,7 +20,7 @@ namespace wey.API.Game
         {
             if (!Path.Exists(this.minecraftPath))
             {
-                this.minecraftPath = Launcher.MinecraftPath;
+                this.minecraftPath = Launcher.GameDirectoryPath;
             } 
 
             IFabric.ILoader[]? getLoaders = Fabric.GetLoaders(this.gameVersion);

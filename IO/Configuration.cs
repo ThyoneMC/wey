@@ -12,6 +12,13 @@ namespace wey.IO
         
     }
 
+    /*
+     * Known Config
+     * 
+     * 1. curseforgeApi
+     * 2. minecraftDir
+     */
+
     public static class Configuration
     {
         static string filePath;

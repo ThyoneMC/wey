@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace wey.API.Mod
 {
-    internal class CurseForgeHelper : ModHelper
+    internal class CurseForgeHandler : ModHandler
     {
-        public CurseForgeHelper(string gameVersion) : base(gameVersion)
+        public CurseForgeHandler(string gameVersion) : base(gameVersion)
         {
 
         }
 
-        public override ModHelperFile Get(string id)
+        public override ModHandlerFile Get(string id)
         {
             ICurseForge.IData<ICurseForge.IMod>? getMod = CurseForge.GetMod(int.Parse(id));
             if (getMod == null) throw new Exception("rest error - CurseForge.GetMod");
@@ -44,11 +44,11 @@ namespace wey.API.Mod
 
             return new()
             {
-                Provider = ModHelperProvider.CurseForge,
+                Provider = ModHandlerProvider.CurseForge,
                 ID = getMod.Data.ID.ToString(),
                 FileName = file.FileName,
                 FileID = file.ID.ToString(),
-                Hash = new ModHelperFileHash()
+                Hash = new ModHandlerFileHash()
                 {
                     Algorithm = "sha1",
                     Value = hash.Value,
@@ -61,7 +61,7 @@ namespace wey.API.Mod
             };
         }
 
-        public override ModHelperFile[] Update(ModHelperFile[] ids)
+        public override ModHandlerFile[] Update(ModHandlerFile[] ids)
         {
             for (int i = 0; i < ids.Length; i++)
             {

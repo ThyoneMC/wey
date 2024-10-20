@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace wey.API
 {
-    public class ModHelperFileHash
+    public class ModHandlerFileHash
     {
         [JsonPropertyName("algorithm")]
         public required string Algorithm { get; set; }
@@ -16,16 +16,16 @@ namespace wey.API
         public required string Value { get; set; }
     }
 
-    public enum ModHelperProvider
+    public enum ModHandlerProvider
     {
         Modrinth,
         CurseForge
     }
 
-    public class ModHelperFile
+    public class ModHandlerFile
     {
         [JsonPropertyName("provider")]
-        public required ModHelperProvider Provider { get; set; }
+        public required ModHandlerProvider Provider { get; set; }
 
         [JsonPropertyName("id")]
         public required string ID { get; set; }
@@ -37,7 +37,7 @@ namespace wey.API
         public string? FileID { get; set; } = null;
 
         [JsonPropertyName("hash")]
-        public required ModHelperFileHash Hash { get; set; }
+        public required ModHandlerFileHash Hash { get; set; }
 
         [JsonPropertyName("url")]
         public required string URL { get; set; }
@@ -55,17 +55,17 @@ namespace wey.API
         public string[] IncompatibleProjectIDs { get; set; } = Array.Empty<string>();
     }
 
-    public abstract class ModHelper
+    public abstract class ModHandler
     {
         protected string gameVersion;
 
-        protected ModHelper(string gameVersion)
+        protected ModHandler(string gameVersion)
         {
             this.gameVersion = gameVersion;
         }
 
-        public abstract ModHelperFile Get(string id);
+        public abstract ModHandlerFile Get(string id);
 
-        public abstract ModHelperFile[] Update(ModHelperFile[] ids);
+        public abstract ModHandlerFile[] Update(ModHandlerFile[] ids);
     }
 }

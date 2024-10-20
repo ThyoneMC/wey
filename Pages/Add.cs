@@ -9,31 +9,17 @@ namespace wey.Pages
 {
     public class Add : Command
     {
-        public override string GetName()
+        public Add() : base("add")
         {
-            return "add";
-        }
+            this.Description = "add mods";
 
-        public override IHelpCommand GetHelp()
-        {
-            return new()
-            {
-                Description = "add mods"
-            };
-        }
-
-        public override Command[] GetSubCommand()
-        {
-            return new Command[]
-            {
-                new AddCurseforge(),
-                new AddModrinth()
-            };
+            this.Subcommand.Add(new AddCurseforge());
+            this.Subcommand.Add(new AddModrinth());
         }
 
         public override void Execute()
         {
-            return;
+            
         }
     }
 }

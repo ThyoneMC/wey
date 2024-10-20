@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using wey.API;
+using wey.API.Mod;
 using wey.CLI;
 using wey.IO;
 
@@ -11,35 +13,26 @@ namespace wey.Pages
 {
     public class AddCurseforge : Command
     {
-        public override string GetName()
+        public AddCurseforge() : base("curseforge")
         {
-            return "curseforge";
-        }
-
-        public override IHelpCommand GetHelp()
-        {
-            return new()
+            this.Options.Add(new()
             {
-                Options = new IHelpOptions[]
-                {
-                    new()
-                    {
-                        Name = "ids",
-                        Type = IHelpOptionsType.IntArray,
-                    },
-                    new ()
-                    {
-                        Name = "curseforgeApi",
-                        Type = IHelpOptionsType.String,
-                        IsConfig = true
-                    }
-                }
-            };
-        }
+                Name = "curseforgeApi",
+                Type = CommandOptionsType.String,
+                InConfigFile = true
+            });
 
-        public override Command[] GetSubCommand()
-        {
-            return Array.Empty<Command>();
+            this.Options.Add(new()
+            {
+                Name = "ids",
+                Type = CommandOptionsType.IntegerArray
+            });
+
+            this.Options.Add(new()
+            {
+                Name = "name",
+                Type = CommandOptionsType.String
+            });
         }
 
         public override void Execute()
@@ -51,11 +44,33 @@ namespace wey.Pages
                 Configuration.Update("curseforgeApi", apiKey);
             }
 
+            string name = ConsoleHelper.ReadString("name");
+
+            ISharedProfile? profile = ProfileHandler.Read(name);
+            if (profile == null) throw new Exception("profile not found");
+
             int[] ids = ConsoleHelper.ReadDynamicIntArray("ids");
 
-            Console.WriteLine(JsonSerializer.Serialize(ids));
+            CurseForgeHandler handler = new(profile.GameVersion);
 
-            return;
+            foreach (int modId in ids)
+            {
+                ModHandlerFile file = handler.Get(modId.ToString());
+
+                int indx = profile.Mods.FindIndex(x => x.ID == modId.ToString());
+                int notFound = -1;
+
+                if (indx != notFound && profile.Mods[indx].Provider == ModHandlerProvider.CurseForge)
+                {
+                    profile.Mods[indx] = file;
+                }
+                else
+                {
+                    profile.Mods.Add(file);
+                }
+            }
+
+            ProfileHandler.Update(name, profile);
         }
     }
 }

@@ -111,7 +111,6 @@ namespace wey.API.Mod
 
             string API_KEY = Configuration.Read("curseforgeApi") ?? string.Empty;
             rest.AddDefaultHeader("x-api-key", API_KEY);
-            rest.AddDefaultHeader("x-api-key", API_KEY);
         }
 
         public static ICurseForge.IData<ICurseForge.IMod>? GetMod(int id)

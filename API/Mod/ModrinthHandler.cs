@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace wey.API.Mod
 {
-    public class IModrinthHelper
+    public class IModrinthHandler
     {
         public class IDependencies
         {
@@ -16,16 +16,16 @@ namespace wey.API.Mod
         }
     }
 
-    internal class ModrinthHelper : ModHelper
+    internal class ModrinthHandler : ModHandler
     {
-        public ModrinthHelper(string gameVersion) : base(gameVersion)
+        public ModrinthHandler(string gameVersion) : base(gameVersion)
         {
 
         }
 
-        public static IModrinthHelper.IDependencies GetDependencies(IModrinth.IVersionDependency[] dependencies)
+        public static IModrinthHandler.IDependencies GetDependencies(IModrinth.IVersionDependency[] dependencies)
         {
-            IModrinthHelper.IDependencies data = new();
+            IModrinthHandler.IDependencies data = new();
 
             foreach (IModrinth.IVersionDependency dependency in dependencies)
             {
@@ -47,7 +47,7 @@ namespace wey.API.Mod
             return data;
         }
 
-        public override ModHelperFile Get(string id)
+        public override ModHandlerFile Get(string id)
         {
             IModrinth.IProject? getProject = Modrinth.GetProject(id);
             if (getProject == null) throw new Exception("rest error - Modrinth.GetProject");
@@ -60,15 +60,15 @@ namespace wey.API.Mod
 
             IModrinth.IVersionFile file = version.Files.ElementAt(0);
 
-            IModrinthHelper.IDependencies dependency = ModrinthHelper.GetDependencies(version.Dependencies);
+            IModrinthHandler.IDependencies dependency = ModrinthHandler.GetDependencies(version.Dependencies);
 
             return new()
             {
-                Provider = ModHelperProvider.Modrinth,
+                Provider = ModHandlerProvider.Modrinth,
                 ID = getProject.ID,
                 FileName = file.FileName,
                 FileID = version.ID,
-                Hash = new ModHelperFileHash()
+                Hash = new ModHandlerFileHash()
                 {
                     Algorithm = "sha1",
                     Value = file.Hashes.SHA1,
@@ -81,17 +81,20 @@ namespace wey.API.Mod
             };
         }
 
-        public override ModHelperFile[] Update(ModHelperFile[] ids)
+        public override ModHandlerFile[] Update(ModHandlerFile[] ids)
         {
             if (ids.Length == 0) return ids;
 
-            IModrinth.IVersion[]? getVersions = Modrinth.GetLatestVersionsByHashes(ids.Select(x => x.Hash.Value).ToArray(), this.gameVersion, "sha1");
-            if (getVersions == null) throw new Exception("rest error - Modrinth.GetLatestVersionsByHashes");
+            Dictionary<string, IModrinth.IVersion>? getVersionsDictionary
+                = Modrinth.GetLatestVersionsByHashes(ids.Select(x => x.Hash.Value).ToArray(), this.gameVersion, "sha1");
+            if (getVersionsDictionary == null) throw new Exception("rest error - Modrinth.GetLatestVersionsByHashes");
+
+            IModrinth.IVersion[] getVersions = getVersionsDictionary.Values.ToArray();
 
             for (int i = 0; i < ids.Length; i++)
             {
                 IModrinth.IVersionFile file = getVersions[i].Files.ElementAt(0);
-                IModrinthHelper.IDependencies dependency = ModrinthHelper.GetDependencies(getVersions[i].Dependencies);
+                IModrinthHandler.IDependencies dependency = ModrinthHandler.GetDependencies(getVersions[i].Dependencies);
 
                 ids[i].FileName = file.FileName;
                 ids[i].FileID = getVersions[i].ID;

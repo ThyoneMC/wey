@@ -1,40 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace wey.CLI
 {
-    public enum IHelpOptionsType
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum CommandOptionsType
     {
         Boolean,
         String,
-        Int,
+        Integer,
         StringArray,
-        IntArray
+        IntegerArray
     }
 
-    public class IHelpOptions
+    public class CommandOptions
     {
         public required string Name { get; set; }
-        public required IHelpOptionsType Type { get; set; }
-        public bool IsConfig { get; set; } = false;
-    }
-
-    public class IHelpCommand
-    {
-        public string? Description { get; set; } = null;
-        public IHelpOptions[] Options { get; set;} = Array.Empty<IHelpOptions>();
+        public required CommandOptionsType Type { get; set; }
+        public bool InConfigFile { get; set; } = false;
+        public bool Optional { get; set; } = false;
     }
 
     public abstract class Command
     {
-        public abstract string GetName();
+        public string Name;
+        public string? Description = null;
+        public readonly List<CommandOptions> Options = new();
+        public readonly List<Command> Subcommand = new();
 
-        public abstract IHelpCommand GetHelp();
-
-        public abstract Command[] GetSubCommand();
+        protected Command(string name)
+        {
+            this.Name = name;
+        }
 
         public abstract void Execute();
     }

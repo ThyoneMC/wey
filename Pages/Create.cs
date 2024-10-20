@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wey.API;
 using wey.API.Game;
+using wey.API.Mod;
 using wey.CLI;
 using wey.IO;
 
@@ -11,27 +13,21 @@ namespace wey.Pages
 {
     public class Create : Command
     {
-        public override string GetName()
+        public Create() : base("create")
         {
-            return "create";
-        }
+            this.Description = "add mods";
 
-        public override string? GetDescription()
-        {
-            return "create new profile";
-        }
-
-        public override IHelpCommand GetHelp()
-        {
-            return new()
+            this.Options.Add(new()
             {
-                Description = "wey is the way to share minecraft mods"
-            };
-        }
+                Name = "gameVersion",
+                Type = CommandOptionsType.String
+            });
 
-        public override Command[] GetSubCommand()
-        {
-            return Array.Empty<Command>();
+            this.Options.Add(new()
+            {
+                Name = "name",
+                Type = CommandOptionsType.String
+            });
         }
 
         public override void Execute()
@@ -40,18 +36,21 @@ namespace wey.Pages
 
             IFabric.IVersion[]? versions = Fabric.GetGames();
             if (versions == null) throw new Exception("rest error - Fabric.GetGames");
-
-            if (!versions.Select(x => x.Version).Contains(gameVersion))
-            {
-                throw new Exception("game version not found");
-            }
+            if (!versions.Where(x => x.IsStable).Select(x => x.Version).Contains(gameVersion)) throw new Exception("game version not found");
 
             string name = ConsoleHelper.ReadString("name");
+
+            ModrinthHandler handler = new(gameVersion);
+            string fabricApiModId = "P7dR8mSH";
 
             ProfileHandler.Create(new()
             {
                 Name = name,
-                GameVersion = gameVersion
+                GameVersion = gameVersion,
+                Mods = new()
+                {
+                    handler.Get(fabricApiModId)
+                },
             });
 
             return;
