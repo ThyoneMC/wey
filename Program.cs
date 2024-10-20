@@ -8,6 +8,7 @@ using wey.API;
 using wey.API.Game;
 using wey.CLI;
 using wey.IO;
+using wey.Pages;
 
 namespace wey
 {
@@ -29,15 +30,7 @@ namespace wey
                 }
             }
 
-            string gameVersionID = new FabricClientHelper("1.20.6").Download();
-
-            Launcher.AddProfile(new Launcher.ProfileOptions()
-            {
-                Name = "KiewCraft",
-                MinecraftPath = Launcher.MinecraftPath,
-                GameVersionID = gameVersionID,
-                IconPath = ""
-            });
+            CommandHandler.Execute(new Home());
         }
     }
 }

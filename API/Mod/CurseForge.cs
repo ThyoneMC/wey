@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using wey.IO;
 
 namespace wey.API.Mod
 {
@@ -108,7 +109,8 @@ namespace wey.API.Mod
 
             rest = new(options);
 
-            string API_KEY = "";
+            string API_KEY = Configuration.Read("curseforgeApi") ?? string.Empty;
+            rest.AddDefaultHeader("x-api-key", API_KEY);
             rest.AddDefaultHeader("x-api-key", API_KEY);
         }
 

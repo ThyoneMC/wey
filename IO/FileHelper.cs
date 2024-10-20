@@ -40,7 +40,15 @@ namespace wey.IO
 
         public static T? ReadJSON<T>(string path)
         {
-            return JsonSerializer.Deserialize<T>(Read(path));
+            string content = Read(path);
+
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                // null
+                return default;
+            }
+
+            return JsonSerializer.Deserialize<T>(content);
         }
 
         public static void Update(string path, string data)

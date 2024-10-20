@@ -15,9 +15,9 @@ namespace wey.API.Game
 
         }
 
-        public override ServerHelperFile Download(string gameVersion, string dirPath)
+        public override ServerHelperFile Download(string dirPath)
         {
-            IFabric.ILoader[]? getLoaders = Fabric.GetLoaders(gameVersion);
+            IFabric.ILoader[]? getLoaders = Fabric.GetLoaders(this.gameVersion);
             if (getLoaders == null) throw new Exception("rest error - Fabric.GetLoaders");
 
             IFabric.IVersion[]? getInstallers = Fabric.GetInstallers();
@@ -26,7 +26,7 @@ namespace wey.API.Game
             string loader = getLoaders.ElementAt(0).Loader.Version;
             string installer = getInstallers.ElementAt(0).Version;
 
-            byte[]? data = Fabric.DownloadServer(gameVersion, loader, installer);
+            byte[]? data = Fabric.DownloadServer(this.gameVersion, loader, installer);
             if (data == null) throw new Exception("rest error - Fabric.DownloadServer");
 
             string fileName = "server.jar";
@@ -34,14 +34,9 @@ namespace wey.API.Game
 
             return new()
             {
-                GameVersion = gameVersion,
+                GameVersion = this.gameVersion,
                 FileName = fileName,
             };
-        }
-
-        public override ServerHelperFile Update(ServerHelperFile data, string gameVersion)
-        {
-            throw new NotImplementedException();
         }
     }
 }

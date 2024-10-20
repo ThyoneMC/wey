@@ -25,8 +25,6 @@ namespace wey.API
             this.gameVersion = gameVersion;
         }
 
-        public abstract ServerHelperFile Download(string gameVersion, string jarPath);
-
-        public abstract ServerHelperFile Update(ServerHelperFile data, string gameVersion);
+        public abstract ServerHelperFile Download(string jarPath);
     }
 }
