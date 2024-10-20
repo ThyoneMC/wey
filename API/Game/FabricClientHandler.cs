@@ -11,18 +11,13 @@ namespace wey.API.Game
 {
     internal class FabricClientHandler : ClientHandler
     {
-        public FabricClientHandler(string gameVersion, string? minecraftPath = null) : base(gameVersion, minecraftPath)
+        public FabricClientHandler(string gameVersion) : base(gameVersion)
         {
 
         }
 
         public override string Download()
         {
-            if (!Path.Exists(this.minecraftPath))
-            {
-                this.minecraftPath = Launcher.GameDirectoryPath;
-            } 
-
             IFabric.ILoader[]? getLoaders = Fabric.GetLoaders(this.gameVersion);
             if (getLoaders == null) throw new Exception("rest error - Fabric.GetLoaders");
 
@@ -42,7 +37,7 @@ namespace wey.API.Game
             string[] dirArr = Directory.GetDirectories(extractPath);
             if (dirArr.Length != 1) throw new Exception("zip error");
 
-            DirectoryHelper.Clone(dirArr[0], Path.Join(this.minecraftPath, "versions", zipName));
+            DirectoryHelper.Clone(dirArr[0], Path.Join(Launcher.GameDirectoryPath, "versions", zipName));
 
             return zipName;
         }

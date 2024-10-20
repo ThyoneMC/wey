@@ -10,12 +10,10 @@ namespace wey.API
     public abstract class ClientHandler
     {
         protected string gameVersion;
-        protected string minecraftPath;
 
-        protected ClientHandler(string gameVersion, string? minecraftPath = null)
+        protected ClientHandler(string gameVersion)
         {
             this.gameVersion = gameVersion;
-            this.minecraftPath = minecraftPath ?? Launcher.GameDirectoryPath;
         }
 
         // return gameVersionID

@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace wey.CLI
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum CommandOptionsType
     {
         Boolean,
