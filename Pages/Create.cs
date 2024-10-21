@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using wey.API;
 using wey.API.Game;
@@ -15,7 +16,7 @@ namespace wey.Pages
     {
         public Create() : base("create")
         {
-            this.Description = "add mods";
+            this.Description = "new profile";
 
             this.Options.Add(new()
             {
@@ -33,12 +34,10 @@ namespace wey.Pages
         public override void Execute()
         {
             string gameVersion = ConsoleHelper.ReadString("gameVersion");
-
-            IFabric.IVersion[]? versions = Fabric.GetGames();
-            if (versions == null) throw new Exception("rest error - Fabric.GetGames");
-            if (!versions.Where(x => x.IsStable).Select(x => x.Version).Contains(gameVersion)) throw new Exception("game version not found");
+            if (!new FabricClientHandler(gameVersion).ContainsGameVersion()) throw new Exception("game version not found");
 
             string name = ConsoleHelper.ReadString("name");
+            if (ProfileHandler.Exists(name)) throw new Exception("profile already exists");
 
             ModrinthHandler handler = new(gameVersion);
             string fabricApiModId = "P7dR8mSH";

@@ -24,6 +24,9 @@ namespace wey.API
 
     public class ModHandlerFile
     {
+        [JsonPropertyName("name")]
+        public required string Name { get; set; }
+
         [JsonPropertyName("provider")]
         public required ModHandlerProvider Provider { get; set; }
 
@@ -49,10 +52,10 @@ namespace wey.API
         public required bool ServerSide { get; set; }
 
         [JsonPropertyName("dependencies")]
-        public string[] DependencyProjectIDs { get; set; } = Array.Empty<string>();
+        public ModHandlerFile[] Dependencies { get; set; } = Array.Empty<ModHandlerFile>();
 
         [JsonPropertyName("incompatible")]
-        public string[] IncompatibleProjectIDs { get; set; } = Array.Empty<string>();
+        public ModHandlerFile[] Incompatibles { get; set; } = Array.Empty<ModHandlerFile>();
     }
 
     public abstract class ModHandler

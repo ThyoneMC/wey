@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using wey.API;
@@ -29,12 +30,7 @@ namespace wey.IO
 
         static string GetPath(string name)
         {
-            return Path.Join(dirPath, name);
-        }
-
-        public static bool Exists(string name)
-        {
-            return Directory.GetFiles(dirPath).Contains(name);
+            return Path.Join(dirPath, Path.ChangeExtension(name, "json"));
         }
 
         public static void Create(ISharedProfile profile)
@@ -65,6 +61,11 @@ namespace wey.IO
         public static void Delete(string name)
         {
             FileHelper.Delete(GetPath(name));
+        }
+
+        public static bool Exists(string name)
+        {
+            return Read(name) != null;
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wey.API;
+using wey.API.Game;
 using wey.API.Mod;
 using wey.CLI;
 using wey.IO;
@@ -39,7 +40,10 @@ namespace wey.Pages
 
             if (CLI.Options.HasValue("gameVersion"))
             {
-                profile.GameVersion = CLI.Options.Get("gameVersion") ?? string.Empty;
+                string gameVersion = CLI.Options.Get("gameVersion") ?? string.Empty;
+                if (!new FabricClientHandler(gameVersion).ContainsGameVersion()) throw new Exception("game version not found");
+
+                profile.GameVersion = gameVersion;
             }
 
             ModHandlerFile[] modrinthMods = profile.Mods.Where(x => x.Provider == ModHandlerProvider.Modrinth).ToArray();

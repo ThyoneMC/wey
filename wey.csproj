@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Quickenshtein" Version="1.5.1" />
     <PackageReference Include="RestSharp" Version="112.1.0" />
   </ItemGroup>
 

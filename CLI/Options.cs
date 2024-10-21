@@ -65,5 +65,21 @@ namespace wey.CLI
         {
             return data.GetValueOrDefault(name, null);
         }
+
+        public static bool GetBool(string name, bool nonUsedOrDefaultValue)
+        {
+            string? value = Get(name);
+            if (String.Equals(value, bool.TrueString, StringComparison.OrdinalIgnoreCase)) return true;
+            if (String.Equals(value, bool.FalseString, StringComparison.OrdinalIgnoreCase)) return false;
+
+            if (IsUsed(name))
+            {
+                return !nonUsedOrDefaultValue;
+            }
+            else
+            {
+                return nonUsedOrDefaultValue;
+            }
+        }
     }
 }

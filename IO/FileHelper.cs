@@ -78,6 +78,21 @@ namespace wey.IO
             UpdateJSON(path, editor.Invoke(data));
         }
 
+        public static void Clone(string sourcePath, string destinationPath)
+        {
+            if (!File.Exists(sourcePath)) return;
+
+            if (File.Exists(destinationPath))
+            {
+                UpdateBytes(destinationPath, ReadBytes(sourcePath));
+            }
+            else
+            {
+                // i just want to use built-in
+                File.Copy(sourcePath, destinationPath);
+            }
+        }
+
         public static void Delete(string path)
         {
             if (!File.Exists(path)) return;

@@ -45,7 +45,7 @@ namespace wey.API.Game
 
         public static IFabric.IVersion[]? GetGames()
         {
-            RestRequest request = new($"game/yarn");
+            RestRequest request = new($"game");
             return rest.Get<IFabric.IVersion[]>(request);
         }
 

@@ -60,10 +60,11 @@ namespace wey.API.Mod
 
             IModrinth.IVersionFile file = version.Files.ElementAt(0);
 
-            IModrinthHandler.IDependencies dependency = ModrinthHandler.GetDependencies(version.Dependencies);
+            IModrinthHandler.IDependencies dependency = GetDependencies(version.Dependencies);
 
             return new()
             {
+                Name = getProject.Title,
                 Provider = ModHandlerProvider.Modrinth,
                 ID = getProject.ID,
                 FileName = file.FileName,
@@ -76,8 +77,8 @@ namespace wey.API.Mod
                 URL = file.URL,
                 ClientSide = IModrinth.IsDownloadableProjectEnvironment(getProject.ClientSide),
                 ServerSide = IModrinth.IsDownloadableProjectEnvironment(getProject.ServerSide),
-                DependencyProjectIDs = dependency.dependencies.ToArray(),
-                IncompatibleProjectIDs = dependency.incompatible.ToArray()
+                Dependencies = dependency.dependencies.Select(Get).ToArray(),
+                Incompatibles = dependency.incompatible.Select(Get).ToArray()
             };
         }
 
@@ -100,8 +101,8 @@ namespace wey.API.Mod
                 ids[i].FileID = getVersions[i].ID;
                 ids[i].Hash.Value = file.Hashes.SHA1;
                 ids[i].URL = file.URL;
-                ids[i].DependencyProjectIDs = dependency.dependencies.ToArray();
-                ids[i].IncompatibleProjectIDs = dependency.incompatible.ToArray();
+                ids[i].Dependencies = dependency.dependencies.Select(Get).ToArray();
+                ids[i].Incompatibles = dependency.incompatible.Select(Get).ToArray();
             }
 
             return ids;

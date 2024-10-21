@@ -51,9 +51,6 @@ namespace wey.API.Mod
 
             [JsonPropertyName("title")]
             public string Title { get; set; } = string.Empty;
-
-            [JsonPropertyName("versions")]
-            public string[] Versions { get; set; } = Array.Empty<string>();
         }
 
         public class IVersionFileHash

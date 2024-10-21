@@ -36,14 +36,8 @@ namespace wey.IO
             foreach (string fileName in Directory.GetFiles(sourcePath))
             {
                 string destFileName = Path.Join(destinationPath, Path.GetFileName(fileName));
-                if (File.Exists(destFileName))
-                {
-                    FileHelper.UpdateBytes(destFileName, FileHelper.ReadBytes(fileName));
-                }
-                else
-                {
-                    File.Copy(fileName, destFileName);
-                }
+
+                FileHelper.Clone(fileName, destFileName);
             }
 
             foreach (string directory in Directory.GetDirectories(sourcePath))
