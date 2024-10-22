@@ -9,12 +9,11 @@ using wey.IO;
 
 namespace wey.API
 {
-    // rename to restUtils?
-    public static class Downloader
+    public static class RestUtils
     {
         static readonly RestClient rest;
 
-        static Downloader()
+        static RestUtils()
         {
             RestClientOptions options = new()
             {

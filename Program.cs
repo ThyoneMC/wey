@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,6 @@ using wey.API.Game;
 using wey.CLI;
 using wey.IO;
 using wey.Pages;
-using static wey.API.Mod.ICurseForge;
 
 namespace wey
 {

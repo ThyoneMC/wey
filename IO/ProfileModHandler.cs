@@ -55,7 +55,7 @@ namespace wey.IO
 
                 string filePath = Path.Join(dirPath, mod.FileName);
 
-                Downloader.Download(filePath, mod.URL);
+                RestUtils.Download(filePath, mod.URL);
                 data.Add(mod);
 
                 Download(dirPath, mod.Dependencies);

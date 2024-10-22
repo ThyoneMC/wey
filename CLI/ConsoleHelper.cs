@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -32,6 +33,20 @@ namespace wey.CLI
             return builder.ToString();
         }
 
+        static string FormatValueStringArray(string str)
+        {
+            str = str
+                .Trim()
+                .Replace("[", string.Empty)
+                .Replace("]", string.Empty)
+                .Replace("\"", string.Empty)
+                .Replace("\'", string.Empty);
+
+            string[] item = str.Split(',').Select(x => $"\"{x}\"").ToArray();
+
+            return $"[{String.Join(',', item)}]";
+        }
+
         public static string ReadString(string key)
         {
             if (Options.HasValue(key))
@@ -53,7 +68,7 @@ namespace wey.CLI
 
         public static string[] ReadStringArray(string key)
         {
-            string content = ReadString(key);
+            string content = FormatValueStringArray(ReadString(key));
 
             string[]? arr = JsonSerializer.Deserialize<string[]>(content);
             if (arr == null) throw new Exception("console error - ConsoleHelper.ReadStringArray");
@@ -147,7 +162,7 @@ namespace wey.CLI
         {
             string path = ReadString(key);
 
-            Uri? uri = Downloader.ParseUri(path);
+            Uri? uri = RestUtils.ParseUri(path);
             if (uri == null)
             {
                 return Path.GetFullPath(path);
@@ -156,7 +171,7 @@ namespace wey.CLI
             {
                 string filePath = Path.Join(ApplicationDirectoryHelper.Temporary, $"file-{DateTime.Now.ToFileTimeUtc()}");
 
-                Downloader.Download(filePath, path);
+                RestUtils.Download(filePath, path);
 
                 return filePath;
             }

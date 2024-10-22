@@ -27,7 +27,7 @@ namespace wey.IO
 
                 // likely to be char difference
                 int distance = Levenshtein.GetDistance(file.Name, mod.Name);
-                float distanceRatio = distance / Math.Max(file.Name.Length, mod.Name.Length);
+                float distanceRatio = (float)distance / Math.Max(file.Name.Length, mod.Name.Length);
                 float score = (1 - distanceRatio) * 100;
                 if (score >= MaxSimilarityScore) return i;
             }
@@ -51,11 +51,13 @@ namespace wey.IO
             int indx = IndexOf(file);
             if (indx == notFound)
             {
-                Add(file);
+                base.Add(file);
             }
             else
             {
                 this[indx] = file;
+
+                Console.WriteLine($"mod \"{file.Name}\" has been replaced by \"{this[indx].Name}\"");
             }
 
             AddRange(file.Dependencies);
