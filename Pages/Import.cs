@@ -7,6 +7,7 @@ using wey.API;
 using wey.API.Game;
 using wey.CLI;
 using wey.IO;
+using static wey.ILauncher;
 
 namespace wey.Pages
 {
@@ -18,35 +19,16 @@ namespace wey.Pages
 
             this.Options.Add(new()
             {
-                Name = "url",
-                Type = CommandOptionsType.String,
-                Optional = true
-            });
-
-            this.Options.Add(new()
-            {
                 Name = "path",
-                Type = CommandOptionsType.String,
-                Optional = true
+                Type = CommandOptionsType.String
             });
         }
 
         public override void Execute()
         {
-            string importPath;
+            string filePath = ConsoleHelper.ReadFilePath("path");
 
-            if (CLI.Options.HasValue("url"))
-            {
-                string url = CLI.Options.Get("url") ?? string.Empty;
-
-                importPath = Downloader.Download(url, $"profile-{DateTime.Now.ToFileTimeUtc()}");
-            }
-            else
-            {
-                importPath = Path.GetFullPath(ConsoleHelper.ReadString("path"));
-            }
-
-            ISharedProfile? profile = FileHelper.ReadJSON<ISharedProfile>(importPath);
+            ISharedProfile? profile = FileHelper.ReadJSON<ISharedProfile>(filePath);
             if (profile == null) throw new Exception("can not read profile");
             if (!new FabricClientHandler(profile.GameVersion).ContainsGameVersion()) throw new Exception("game version not found");
 

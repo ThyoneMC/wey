@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Quickenshtein;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -57,17 +58,7 @@ namespace wey.Pages
             {
                 ModHandlerFile file = handler.Get(modId.ToString());
 
-                int indx = profile.Mods.FindIndex(x => x.ID == modId.ToString());
-                int notFound = -1;
-
-                if (indx != notFound && profile.Mods[indx].Provider == ModHandlerProvider.CurseForge)
-                {
-                    profile.Mods[indx] = file;
-                }
-                else
-                {
-                    profile.Mods.Add(file);
-                }
+                profile.Mods.Add(file);
             }
 
             ProfileHandler.Update(name, profile);

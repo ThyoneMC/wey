@@ -84,37 +84,20 @@ namespace wey
             FileHelper.UpdateJSON(path, editor.Invoke(launcherProfile));
         }
 
-        public class ProfileOptions
-        {
-            public required string Name;
-            public string? MinecraftPath;
-            public required string GameVersionID;
-            public string? IconPath;
-        }
-
-        public static string ImageToBase64(string filePath)
-        {
-            byte[] image = FileHelper.ReadBytes(filePath);
-            return $"data:image/{Path.GetExtension(filePath)};base64,{Convert.ToBase64String(image)}";
-        }
-
-        public static void AddProfile(ProfileOptions options)
+        public static void AddProfile(ISharedProfile options)
         {
             Console.WriteLine($"Create Launcher Profile: {options.Name}");
+
+            string defaultIconString = "Grass";
 
             EditProfile((launcherProfile) =>
             {
                 IProfile profile = new()
                 {
                     Name = options.Name,
-                    MinecraftPath = options.MinecraftPath ?? GameDirectoryPath,
-                    GameVersionID = options.GameVersionID,
+                    GameVersionID = options.GameVersion,
+                    IconString = options.LauncherIconString ?? defaultIconString
                 };
-
-                if (options.IconPath != null)
-                {
-                    profile.IconString = Launcher.ImageToBase64(options.IconPath);
-                }
 
                 launcherProfile.Profiles[options.Name] = profile;
 

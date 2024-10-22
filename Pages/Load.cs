@@ -30,8 +30,10 @@ namespace wey.Pages
             ISharedProfile? profile = ProfileHandler.Read(name);
             if (profile == null) throw new Exception("profile not found");
 
-            ProfileModHandler.Download(profile.Mods.ToArray());
+            ProfileModHandler.Download(ApplicationDirectoryHelper.Temporary, profile.Mods.ToArray());
             DirectoryHelper.Clone(ApplicationDirectoryHelper.Temporary, Path.Join(ApplicationDirectoryHelper.Appdata, "mods"));
+
+            Launcher.AddProfile(profile);
         }
     }
 }

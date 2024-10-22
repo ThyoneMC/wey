@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Quickenshtein;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,66 @@ using wey.API;
 
 namespace wey.IO
 {
+    public class ModHandlerFileList : List<ModHandlerFile>
+    {
+        // return -1 when not found
+        public new int IndexOf(ModHandlerFile file)
+        {
+            float MaxSimilarityScore = 80;
+
+            for (int i = 0; i < Count; i++)
+            {
+                ModHandlerFile mod = this[i];
+
+                if (file.FileName == mod.FileName) return i;
+                if (string.Equals(file.Hash.Algorithm, mod.Hash.Algorithm, StringComparison.OrdinalIgnoreCase) && file.Hash.Value == mod.Hash.Value) return i;
+                if (file.Provider == mod.Provider && file.ID == mod.ID) return i;
+
+                // likely to be char difference
+                int distance = Levenshtein.GetDistance(file.Name, mod.Name);
+                float distanceRatio = distance / Math.Max(file.Name.Length, mod.Name.Length);
+                float score = (1 - distanceRatio) * 100;
+                if (score >= MaxSimilarityScore) return i;
+            }
+
+            return -1;
+        }
+
+        public new void Add(ModHandlerFile file)
+        {
+            int notFound = -1;
+
+            foreach (ModHandlerFile mod in file.Incompatibles)
+            {
+                int indxErr = IndexOf(mod);
+                if (indxErr != notFound)
+                {
+                    Console.WriteLine($"mod \"{this[indxErr].Name}\" expect incompatible by \"{file.Name}\"");
+                }
+            }
+
+            int indx = IndexOf(file);
+            if (indx == notFound)
+            {
+                Add(file);
+            }
+            else
+            {
+                this[indx] = file;
+            }
+
+            AddRange(file.Dependencies);
+        }
+
+        public new void AddRange(IEnumerable<ModHandlerFile> files)
+        {
+            foreach (ModHandlerFile mod in files)
+            {
+                Add(mod);
+            }
+        }
+    }
+
     public class ISharedProfile
     {
         [JsonPropertyName("name")]
@@ -18,10 +79,10 @@ namespace wey.IO
         public required string GameVersion { get; set; }
 
         [JsonPropertyName("launcherIcon")]
-        public string? LauncherIcon { get; set; } = null;
+        public string? LauncherIconString { get; set; } = null;
 
         [JsonPropertyName("mods")]
-        public List<ModHandlerFile> Mods { get; set; } = new();
+        public ModHandlerFileList Mods { get; set; } = new();
     }
 
     public static class ProfileHandler

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -51,6 +52,12 @@ namespace wey.IO
             return JsonSerializer.Deserialize<T>(content);
         }
 
+        public static string ReadImageToBase64(string path)
+        {
+            byte[] image = ReadBytes(path);
+            return $"data:image/{Path.GetExtension(path)};base64,{Convert.ToBase64String(image)}";
+        }
+
         public static void Update(string path, string data)
         {
             Create(path);
@@ -98,6 +105,20 @@ namespace wey.IO
             if (!File.Exists(path)) return;
 
             File.Delete(path);
+        }
+
+        public static void Unzip(string sourceFile, string destinationDir)
+        {
+            DirectoryHelper.Create(destinationDir);
+            ZipFile.ExtractToDirectory(sourceFile, destinationDir);
+        }
+
+        public static void UnzipBytes(string destinationDir, byte[] data)
+        {
+            string filePath = Path.Combine(ApplicationDirectoryHelper.Temporary, $"zip-{DateTime.Now.ToFileTimeUtc()}");
+            UpdateBytes(filePath, data);
+
+            Unzip(filePath, destinationDir);
         }
     }
 }

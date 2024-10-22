@@ -42,17 +42,7 @@ namespace wey.Pages
             {
                 ModHandlerFile file = handler.Get(modId);
 
-                int indx = profile.Mods.FindIndex(x => x.ID == modId);
-                int notFound = -1;
-
-                if (indx != notFound && profile.Mods[indx].Provider == ModHandlerProvider.Modrinth)
-                {
-                    profile.Mods[indx] = file;
-                }
-                else
-                {
-                    profile.Mods.Add(file);
-                }
+                profile.Mods.Add(file);
             }
 
             ProfileHandler.Update(name, profile);

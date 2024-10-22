@@ -1,5 +1,4 @@
-﻿using Quickenshtein;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -35,57 +34,31 @@ namespace wey.IO
             }
         }
 
-        static ModHandlerFile? Find(ModHandlerFile file)
+        static bool Contains(ModHandlerFile file)
         {
-            float MaxSimilarityScore = 80;
-
             foreach (ModHandlerFile mod in data)
             {
-                if (file.FileName == mod.FileName) return mod;
-                if (file.Hash.Algorithm.ToLower() == mod.Hash.Algorithm.ToLower() && file.Hash.Value == mod.Hash.Value) return mod;
-                if (file.Provider == mod.Provider && file.ID == mod.ID) return mod;
-
-                // likely to be char difference
-                int distance = Levenshtein.GetDistance(file.Name, mod.Name);
-                float distanceRatio = distance / Math.Max(file.Name.Length, mod.Name.Length);
-                float score = (1 - distanceRatio) * 100;
-                if (score >= MaxSimilarityScore) return mod;
+                if (file.FileName == mod.FileName) return true;
+                if (string.Equals(file.Hash.Algorithm, mod.Hash.Algorithm, StringComparison.OrdinalIgnoreCase) && file.Hash.Value == mod.Hash.Value) return true;
             }
 
-            return null;
+            return false;
         }
-
-        // file will save in "ApplicationDirectoryHelper.Temporary"
-        public static void Download(ModHandlerFile[] files)
+        
+        public static void Download(string dirPath, ModHandlerFile[] files)
         {
             if (files.Length == 0) return;
 
-            List<ModHandlerFile> incompatibles = new();
-
             foreach (ModHandlerFile mod in files)
             {
-                ModHandlerFile? findMod = Find(mod);
-                if (findMod != null)
-                {
-                    Console.WriteLine($"expect duplicate mod ({findMod.ID})");
-                    continue;
-                }
+                if (Contains(mod)) continue;
 
-                Downloader.Download(mod.URL, mod.FileName);
+                string filePath = Path.Join(dirPath, mod.FileName);
+
+                Downloader.Download(filePath, mod.URL);
                 data.Add(mod);
 
-                Download(mod.Dependencies);
-                incompatibles.AddRange(mod.Incompatibles);
-            }
-
-            foreach (ModHandlerFile mod in incompatibles)
-            {
-                ModHandlerFile? findMod = Find(mod);
-                if (findMod != null)
-                {
-                    // #! Add what mod is incompatible with?
-                    Console.WriteLine($"expect incompatible mod ({findMod.ID})");
-                }
+                Download(dirPath, mod.Dependencies);
             }
 
             FileHelper.UpdateJSON(filePath, data);

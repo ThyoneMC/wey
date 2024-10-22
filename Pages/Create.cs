@@ -29,6 +29,13 @@ namespace wey.Pages
                 Name = "name",
                 Type = CommandOptionsType.String
             });
+
+            this.Options.Add(new()
+            {
+                Name = "iconPath",
+                Type = CommandOptionsType.String,
+                Optional = true
+            });
         }
 
         public override void Execute()
@@ -42,7 +49,7 @@ namespace wey.Pages
             ModrinthHandler handler = new(gameVersion);
             string fabricApiModId = "P7dR8mSH";
 
-            ProfileHandler.Create(new()
+            ISharedProfile profile = new()
             {
                 Name = name,
                 GameVersion = gameVersion,
@@ -50,7 +57,16 @@ namespace wey.Pages
                 {
                     handler.Get(fabricApiModId)
                 },
-            });
+            };
+
+            if (CLI.Options.HasValue("iconPath"))
+            {
+                string iconPath = ConsoleHelper.ReadFilePath("iconPath");
+
+                profile.LauncherIconString = FileHelper.ReadImageToBase64(iconPath);
+            }
+
+            ProfileHandler.Create(profile);
 
             return;
         }

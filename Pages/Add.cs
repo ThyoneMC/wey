@@ -13,8 +13,8 @@ namespace wey.Pages
         {
             this.Description = "add mods";
 
-            this.Subcommand.Add(new AddCurseforge());
             this.Subcommand.Add(new AddModrinth());
+            this.Subcommand.Add(new AddCurseforge());
         }
 
         public override void Execute()

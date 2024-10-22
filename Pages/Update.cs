@@ -55,7 +55,7 @@ namespace wey.Pages
             modrinthMods = modrinthHandler.Update(modrinthMods);
             curseforgeMods = curseForgeHandler.Update(curseforgeMods);
 
-            profile.Mods = modrinthMods.Union(curseforgeMods).ToList();
+            profile.Mods = (ModHandlerFileList)modrinthMods.Union(curseforgeMods).ToList();
 
             ProfileHandler.Update(name, profile);
         }

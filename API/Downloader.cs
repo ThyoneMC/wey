@@ -1,6 +1,7 @@
 ﻿using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using wey.IO;
 
 namespace wey.API
 {
+    // rename to restUtils?
     public static class Downloader
     {
         static readonly RestClient rest;
@@ -24,18 +26,37 @@ namespace wey.API
             rest = new(options);
         }
 
-        // return "filePath"
-        public static string Download(string url, string fileName)
+        public static Uri? ParseUri(string path)
         {
-            RestRequest request = new(url);
+            UriKind fullUrlStructureType = UriKind.Absolute;
+
+            if (
+                    Uri.TryCreate(path, fullUrlStructureType, out Uri? uri) &&
+                    uri != null &&
+                    (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
+                )
+            {
+                return uri;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public static void Download(string filePath, string url)
+        {
+            Download(filePath, new Uri(url));
+        }
+
+        public static void Download(string filePath, Uri uri)
+        {
+            RestRequest request = new(uri);
 
             byte[]? data = rest.DownloadData(request);
             if (data == null) throw new Exception("downloader error - Downloader.Download");
 
-            string path = Path.Join(ApplicationDirectoryHelper.Temporary, fileName);
-            FileHelper.UpdateBytes(path, data);
-
-            return path;
+            FileHelper.UpdateBytes(filePath, data);
         }
     }
 }

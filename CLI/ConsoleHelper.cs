@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using wey.API;
 using wey.IO;
 
 namespace wey.CLI
@@ -140,6 +141,25 @@ namespace wey.CLI
             }
 
             return data.ToArray();
+        }
+
+        public static string ReadFilePath(string key)
+        {
+            string path = ReadString(key);
+
+            Uri? uri = Downloader.ParseUri(path);
+            if (uri == null)
+            {
+                return Path.GetFullPath(path);
+            }
+            else
+            {
+                string filePath = Path.Join(ApplicationDirectoryHelper.Temporary, $"file-{DateTime.Now.ToFileTimeUtc()}");
+
+                Downloader.Download(filePath, path);
+
+                return filePath;
+            }
         }
     }
 }
