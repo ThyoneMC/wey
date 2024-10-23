@@ -29,16 +29,5 @@ namespace wey.CLI
 
             return data.Dequeue();
         }
-
-        // return -1 when not found otherwise return position of args
-        public static int Get(string name)
-        {
-            if (!IsUsed(name))
-            {
-                return -1;
-            }
-
-            return data.ToList().IndexOf(name) + 1;
-        }
     }
 }

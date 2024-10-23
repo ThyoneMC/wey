@@ -89,15 +89,7 @@ namespace wey.IO
         {
             if (!File.Exists(sourcePath)) return;
 
-            if (File.Exists(destinationPath))
-            {
-                UpdateBytes(destinationPath, ReadBytes(sourcePath));
-            }
-            else
-            {
-                // i just want to use built-in
-                File.Copy(sourcePath, destinationPath);
-            }
+            UpdateBytes(destinationPath, ReadBytes(sourcePath));
         }
 
         public static void Delete(string path)
