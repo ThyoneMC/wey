@@ -35,10 +35,10 @@ namespace wey
             public string IconString { get; set; } = string.Empty;
 
             [JsonPropertyName("created")]
-            public DateTime Created { get; set; }
+            public DateTime Created { get; set; } = DateTime.UtcNow;
 
             [JsonPropertyName("lastUsed")]
-            public DateTime LastUsed { get; set; }
+            public DateTime LastUsed { get; set; } = DateTime.UtcNow;
         }
 
         public class IProfileSettings
@@ -84,7 +84,14 @@ namespace wey
             FileHelper.UpdateJSON(path, editor.Invoke(launcherProfile));
         }
 
-        public static void AddProfile(ISharedProfile options)
+        public class ProfileOptions
+        {
+            public required string Name;
+            public required string GameVersionID; // .minecraft/versions/gameVersionId
+            public string? IconString;
+        }
+
+        public static void AddProfile(ProfileOptions options)
         {
             Console.WriteLine($"Create Launcher Profile: {options.Name}");
 
@@ -95,8 +102,8 @@ namespace wey
                 IProfile profile = new()
                 {
                     Name = options.Name,
-                    GameVersionID = options.GameVersion,
-                    IconString = options.LauncherIconString ?? defaultIconString
+                    GameVersionID = options.GameVersionID,
+                    IconString = options.IconString ?? defaultIconString
                 };
 
                 launcherProfile.Profiles[options.Name] = profile;

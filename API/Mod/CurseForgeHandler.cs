@@ -20,6 +20,7 @@ namespace wey.API.Mod
 
             ICurseForge.IData<ICurseForge.IFile[]>? getFiles = CurseForge.GetModFilesByGameVersion(getMod.Data.ID, this.gameVersion);
             if (getFiles == null) throw new Exception("rest error - CurseForge.GetModFilesByGameVersion");
+            if (getFiles.Data.Length == 0) throw new Exception($"mod {getMod.Data.Name} ({getMod.Data.ID}) not found for {this.gameVersion}");
 
             ICurseForge.IFile file = getFiles.Data.OrderBy(x => (int)x.ReleaseType).ElementAt(0);
             ICurseForge.IFileHash hash = file.Hashes.First(x => x.Algorithm == ICurseForge.IFileHashAlgorithm.SHA1);

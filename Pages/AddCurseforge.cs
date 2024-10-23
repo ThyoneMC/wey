@@ -59,9 +59,9 @@ namespace wey.Pages
                 ModHandlerFile file = handler.Get(modId.ToString());
 
                 profile.Mods.Add(file);
-            }
 
-            ProfileHandler.Update(name, profile);
+                ProfileHandler.Update(name, profile);
+            }
         }
     }
 }

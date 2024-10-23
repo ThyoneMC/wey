@@ -16,7 +16,7 @@ namespace wey.API
             this.gameVersion = gameVersion;
         }
 
-        public abstract void Download();
+        public abstract string DownloadAndReturnVersionDir();
 
         public abstract bool ContainsGameVersion();
     }

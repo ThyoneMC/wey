@@ -54,6 +54,7 @@ namespace wey.API.Mod
 
             IModrinth.IVersion[]? getVersions = Modrinth.GetVersionsByProject(getProject.ID, this.gameVersion);
             if (getVersions == null) throw new Exception("rest error - Modrinth.GetVersionsByProject");
+            if (getVersions.Length == 0) throw new Exception($"mod {getProject.Title} ({getProject.ID}) not found for {this.gameVersion}");
 
             IModrinth.IVersion version;
 

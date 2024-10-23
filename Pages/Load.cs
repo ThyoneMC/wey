@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using wey.API;
+using wey.API.Game;
 using wey.CLI;
 using wey.IO;
 
@@ -30,10 +31,33 @@ namespace wey.Pages
             ISharedProfile? profile = ProfileHandler.Read(name);
             if (profile == null) throw new Exception("profile not found");
 
-            ProfileModHandler.Download(ApplicationDirectoryHelper.Temporary, profile.Mods.ToArray());
-            DirectoryHelper.Clone(ApplicationDirectoryHelper.Temporary, Path.Join(ApplicationDirectoryHelper.Appdata, "mods"));
+            ModHandlerFile[] clientMods = profile.Mods.Where(x => x.ClientSide).ToArray();
 
-            Launcher.AddProfile(profile);
+            string saveModsPath = Path.Join(ApplicationDirectoryHelper.Appdata, "mods");
+            ProfileModHandler.Download(saveModsPath, clientMods);
+
+            string gameModsPath = Path.Join(Launcher.GameDirectoryPath, "mods");
+
+            string[] oldModFiles = Directory.GetFiles(gameModsPath);
+            if (oldModFiles.Length > 0)
+            {
+                string newOldModsDir = Path.Join(gameModsPath, $"mods-{DateTime.Now.ToFileTimeUtc()}");
+                DirectoryHelper.CloneFiles(gameModsPath, newOldModsDir);
+                FileHelper.Delete(oldModFiles);
+
+                Console.WriteLine($"old mods has been moved to {newOldModsDir}");
+            }
+
+            ProfileModHandler.Load(saveModsPath, gameModsPath, clientMods);
+
+            string gameVersionDir = new FabricClientHandler(profile.GameVersion).DownloadAndReturnVersionDir();
+
+            Launcher.AddProfile(new()
+            {
+                Name = profile.Name,
+                GameVersionID = DirectoryHelper.GetRootDirectoryName(gameVersionDir),
+                IconString = profile.LauncherIconString
+            });
         }
     }
 }

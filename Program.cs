@@ -21,8 +21,9 @@ namespace wey
             /*
              * TODO:
              * 
-             * 4. Better ".minecraft" Path Handling
-             * 5. Dynamic ModHandler (nowadays, handle one by one)
+             * 1. Better dependency handling
+             * 2. Better ".minecraft" Path Handling
+             * 3. ModHandlerFactory (nowadays, handle one by one)
              */
 
             foreach (string text in args)

@@ -59,8 +59,6 @@ namespace wey.IO
 
                 Console.WriteLine($"mod \"{file.Name}\" has been replaced by \"{this[indx].Name}\"");
             }
-
-            AddRange(file.Dependencies);
         }
 
         public new void AddRange(IEnumerable<ModHandlerFile> files)

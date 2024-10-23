@@ -99,6 +99,14 @@ namespace wey.IO
             File.Delete(path);
         }
 
+        public static void Delete(string[] paths)
+        {
+            foreach (string path in paths)
+            {
+                Delete(path);
+            }
+        }
+
         public static void Unzip(string sourceFile, string destinationDir)
         {
             DirectoryHelper.Create(destinationDir);

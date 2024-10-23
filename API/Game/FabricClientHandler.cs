@@ -17,7 +17,7 @@ namespace wey.API.Game
 
         }
 
-        public override void Download()
+        public override string DownloadAndReturnVersionDir()
         {
             IFabric.ILoader[]? getLoaders = Fabric.GetLoaders(this.gameVersion);
             if (getLoaders == null) throw new Exception("rest error - Fabric.GetLoaders");
@@ -34,6 +34,8 @@ namespace wey.API.Game
             if (dirArr.Length != 1) throw new Exception("unzip error");
 
             DirectoryHelper.Clone(dirArr[0], Path.Join(Launcher.GameDirectoryPath, "versions", DirectoryHelper.GetRootDirectoryName(dirArr[0])));
+
+            return dirArr[0];
         }
 
         public override bool ContainsGameVersion()

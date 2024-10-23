@@ -55,6 +55,8 @@ namespace wey.IO
 
                 string filePath = Path.Join(dirPath, mod.FileName);
 
+                Console.WriteLine($"download {mod.FileName}");
+
                 RestUtils.Download(filePath, mod.URL);
                 data.Add(mod);
 
@@ -62,6 +64,19 @@ namespace wey.IO
             }
 
             FileHelper.UpdateJSON(filePath, data);
+        }
+
+        public static void Load(string srcPath, string dstPath, ModHandlerFile[] files)
+        {
+            foreach (ModHandlerFile mod in files)
+            {
+                string srcFile = Path.Join(srcPath, mod.FileName);
+                string dstFile = Path.Combine(dstPath, mod.FileName);
+
+                FileHelper.Clone(srcFile, dstFile);
+
+                Load(srcPath, dstPath, mod.Dependencies);
+            }
         }
     }
 }

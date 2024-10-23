@@ -30,15 +30,8 @@ namespace wey.IO
         public static void Clone(string sourcePath, string destinationPath)
         {
             if (!Directory.Exists(sourcePath)) return;
-            
-            Create(destinationPath);
 
-            foreach (string fileName in Directory.GetFiles(sourcePath))
-            {
-                string destFileName = Path.Join(destinationPath, Path.GetFileName(fileName));
-
-                FileHelper.Clone(fileName, destFileName);
-            }
+            CloneFiles(sourcePath, destinationPath);
 
             foreach (string directory in Directory.GetDirectories(sourcePath))
             {
@@ -48,6 +41,20 @@ namespace wey.IO
                         Path.Join(sourcePath, directoryName),
                         Path.Join(destinationPath, directoryName)
                     );
+            }
+        }
+
+        public static void CloneFiles(string sourcePath, string destinationPath)
+        {
+            if (!Directory.Exists(sourcePath)) return;
+
+            Create(destinationPath);
+
+            foreach (string fileName in Directory.GetFiles(sourcePath))
+            {
+                string destFileName = Path.Join(destinationPath, Path.GetFileName(fileName));
+
+                FileHelper.Clone(fileName, destFileName);
             }
         }
 
