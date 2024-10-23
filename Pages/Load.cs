@@ -32,9 +32,10 @@ namespace wey.Pages
             if (profile == null) throw new Exception("profile not found");
 
             ModHandlerFile[] clientMods = profile.Mods.Where(x => x.ClientSide).ToArray();
+            ModHandlerFileExternal[] clientExternal = profile.ExternalMods.Where(x => x.ClientSide).ToArray();
 
             string saveModsPath = Path.Join(ApplicationDirectoryHelper.Appdata, "mods");
-            ProfileModHandler.Download(saveModsPath, clientMods);
+            ProfileModHandler.Download(saveModsPath, clientMods, clientExternal);
 
             string gameModsPath = Path.Join(Launcher.GameDirectoryPath, "mods");
 
@@ -48,7 +49,7 @@ namespace wey.Pages
                 Console.WriteLine($"old mods has been moved to {newOldModsDir}");
             }
 
-            ProfileModHandler.Load(saveModsPath, gameModsPath, clientMods);
+            ProfileModHandler.Load(saveModsPath, gameModsPath, clientMods, clientExternal);
 
             string gameVersionDir = new FabricClientHandler(profile.GameVersion).DownloadAndReturnVersionDir();
 

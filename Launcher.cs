@@ -35,10 +35,10 @@ namespace wey
             public string IconString { get; set; } = string.Empty;
 
             [JsonPropertyName("created")]
-            public DateTime Created { get; set; } = DateTime.UtcNow;
+            public string Created { get; set; } = string.Empty;
 
             [JsonPropertyName("lastUsed")]
-            public DateTime LastUsed { get; set; } = DateTime.UtcNow;
+            public string LastUsed { get; set; } = string.Empty;
         }
 
         public class IProfileSettings

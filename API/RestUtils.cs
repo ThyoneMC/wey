@@ -50,6 +50,8 @@ namespace wey.API
 
         public static void Download(string filePath, Uri uri)
         {
+            if (File.Exists(filePath)) return;
+
             RestRequest request = new(uri);
 
             byte[]? data = rest.DownloadData(request);

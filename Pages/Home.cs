@@ -16,6 +16,7 @@ namespace wey.Pages
             this.Subcommand.Add(new Create());
             this.Subcommand.Add(new Import());
             this.Subcommand.Add(new Add());
+            this.Subcommand.Add(new Append());
             this.Subcommand.Add(new Update());
             this.Subcommand.Add(new Load());
             this.Subcommand.Add(new List());

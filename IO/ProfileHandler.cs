@@ -70,6 +70,24 @@ namespace wey.IO
         }
     }
 
+    public class ModHandlerFileExternal
+    {
+        [JsonPropertyName("fileName")]
+        public string FileName { get; set; } = $"mod-external-{DateTime.Now.ToFileTimeUtc()}.jar";
+
+        [JsonPropertyName("url")]
+        public required string URL { get; set; }
+
+        [JsonPropertyName("replaceModId")]
+        public string? ReplacementModID { get; set; } = null;
+
+        [JsonPropertyName("clientSide")]
+        public bool ClientSide { get; set; } = true;
+
+        [JsonPropertyName("serverSide")]
+        public bool ServerSide { get; set; } = true;
+    }
+
     public class ISharedProfile
     {
         [JsonPropertyName("name")]
@@ -83,6 +101,9 @@ namespace wey.IO
 
         [JsonPropertyName("mods")]
         public ModHandlerFileList Mods { get; set; } = new();
+
+        [JsonPropertyName("externalMods")]
+        public List<ModHandlerFileExternal> ExternalMods { get; set; } = new();
     }
 
     public static class ProfileHandler
