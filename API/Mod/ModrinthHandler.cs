@@ -62,11 +62,11 @@ namespace wey.API.Mod
 
             if (versionIndx == IndxFindNotFound)
             {
-                version = getVersions.ElementAt(0);
+                version = getVersions[0];
             }
             else
             {
-                version = getVersions.First(x => x.VersionType == IModrinth.IVersionType.Release);
+                version = getVersions[versionIndx];
             }
 
             IModrinth.IVersionFile file = version.Files.ElementAt(0);

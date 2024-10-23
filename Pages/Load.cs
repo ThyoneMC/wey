@@ -18,14 +18,14 @@ namespace wey.Pages
 
             this.Options.Add(new()
             {
-                Name = "name",
+                Name = "profile",
                 Type = CommandOptionsType.String
             });
         }
 
         public override void Execute()
         {
-            string name = ConsoleHelper.ReadString("name");
+            string name = ConsoleHelper.ReadString("profile");
 
             ISharedProfile? profile = ProfileHandler.Read(name);
             if (profile == null) throw new Exception("profile not found");

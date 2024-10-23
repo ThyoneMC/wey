@@ -1,7 +1,7 @@
 [license_image]: https://badgen.net/badge/license/MIT/blue
-[license_url]: https://github.com/valapi/.github/blob/main/LICENSE
+[license_url]: https://github.com/ThyoneMC/wey/blob/main/LICENSE
 [github_image]: https://badgen.net/badge/icon/github?icon=github&label
-[github_url]: https://github.com/valapi/node-valapi
+[github_url]: https://github.com/thyonemc/wey
 [discord_image]: https://badgen.net/badge/icon/discord?icon=discord&label
 [discord_url]: https://discord.gg/pbyWbUYjyt
 
@@ -25,7 +25,7 @@
 
 ## Install Mods
 
-1st Method: **Local Create**
+**Local Create**
 
 ```bash
 wey create
@@ -33,11 +33,24 @@ wey add modrinth|curseforge
 wey load
 ```
 
-2nd Method: **Import**
+**Import**
 
 ```bash
 wey import
+wey load
+```
+
+**Update Mods**
+
+```bash
 wey update
+wey load
+```
+
+**Update Game Version**
+
+```bash
+wey update --gameVersion=1.20.6
 wey load
 ```
 
@@ -89,7 +102,7 @@ add mods to the profile
 
 Arguments:
   
-- name (string)
+- profile (string)
 - ids (string[])
 - curseforgeApi (string)
 
@@ -110,7 +123,8 @@ update mods in the profile
 
 Arguments:
   
-- name (string)
+- profile (string)
+- gameVersion* (string)
 
 </details>
  
@@ -121,6 +135,6 @@ download mods from the profile and create minecraft launcher profile
 
 Arguments:
   
-- name (string)
+- profile (string)
 
 </details>

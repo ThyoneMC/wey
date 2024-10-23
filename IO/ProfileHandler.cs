@@ -106,6 +106,25 @@ namespace wey.IO
             return FileHelper.ReadJSON<ISharedProfile>(GetPath(name));
         }
 
+        public static ISharedProfile[] ReadAll()
+        {
+            List<ISharedProfile> profiles = new();
+
+            foreach (string filePath in Directory.GetFiles(dirPath))
+            {
+                try
+                {
+                    ISharedProfile? pf = Read(Path.GetFileName(filePath));
+                    if (pf == null) throw new Exception();
+
+                    profiles.Add(pf);
+                }
+                catch { }
+            }
+
+            return profiles.ToArray();
+        }
+
         public static void Update(string name, ISharedProfile profile)
         {
             FileHelper.UpdateJSON(GetPath(name), profile);

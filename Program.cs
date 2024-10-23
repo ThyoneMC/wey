@@ -23,7 +23,6 @@ namespace wey
              * 
              * 4. Better ".minecraft" Path Handling
              * 5. Dynamic ModHandler (nowadays, handle one by one)
-             * 8. 
              */
 
             foreach (string text in args)
