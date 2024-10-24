@@ -8,14 +8,16 @@ using wey.IO;
 
 namespace wey.API.Game
 {
-    internal class FabricServerHandler : ServerHandler
+    internal class FabricServerHandler
     {
-        public FabricServerHandler(string gameVersion) : base(gameVersion)
-        {
+        string gameVersion;
 
+        public FabricServerHandler(string gameVersion)
+        {
+            this.gameVersion = gameVersion;
         }
 
-        public override ServerHandlerFile Download(string dirPath)
+        public string DownloadAndReturnServerFile(string dirPath)
         {
             IFabric.ILoader[]? getLoaders = Fabric.GetLoaders(this.gameVersion);
             if (getLoaders == null) throw new Exception("rest error - Fabric.GetLoaders");
@@ -32,11 +34,7 @@ namespace wey.API.Game
             string fileName = "server.jar";
             FileHelper.UpdateBytes(Path.Join(dirPath, fileName), data);
 
-            return new()
-            {
-                GameVersion = this.gameVersion,
-                FileName = fileName,
-            };
+            return fileName;
         }
     }
 }

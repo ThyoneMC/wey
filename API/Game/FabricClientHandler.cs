@@ -10,14 +10,16 @@ using wey.IO;
 
 namespace wey.API.Game
 {
-    internal class FabricClientHandler : ClientHandler
+    internal class FabricClientHandler
     {
-        public FabricClientHandler(string gameVersion) : base(gameVersion)
-        {
+        string gameVersion;
 
+        public FabricClientHandler(string gameVersion)
+        {
+            this.gameVersion = gameVersion;
         }
 
-        public override string DownloadAndReturnVersionDir()
+        public string DownloadAndReturnVersionDir()
         {
             IFabric.ILoader[]? getLoaders = Fabric.GetLoaders(this.gameVersion);
             if (getLoaders == null) throw new Exception("rest error - Fabric.GetLoaders");
@@ -38,7 +40,7 @@ namespace wey.API.Game
             return dirArr[0];
         }
 
-        public override bool ContainsGameVersion()
+        public bool ContainsGameVersion()
         {
             IFabric.IVersion[]? getGameVersions = Fabric.GetGames();
             if (getGameVersions == null) throw new Exception("rest error - Fabric.GetGames");

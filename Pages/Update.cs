@@ -46,16 +46,21 @@ namespace wey.Pages
                 profile.GameVersion = gameVersion;
             }
 
-            ModHandlerFile[] modrinthMods = profile.Mods.Where(x => x.Provider == ModHandlerProvider.Modrinth).ToArray();
-            ModHandlerFile[] curseforgeMods = profile.Mods.Where(x => x.Provider == ModHandlerProvider.CurseForge).ToArray();
+            ModHandlerProvider[] providerName = profile.Mods.Select(x => x.Provider).Distinct().ToArray();
+            List<ModHandlerFile> updatedMods = new();
 
-            ModrinthHandler modrinthHandler = new(profile.GameVersion);
-            CurseForgeHandler curseForgeHandler = new(profile.GameVersion);
+            foreach (ModHandlerProvider provider in providerName)
+            {
+                ModHandlerFile[] mods = profile.Mods.Where(x => x.Provider == provider).ToArray();
 
-            modrinthMods = modrinthHandler.Update(modrinthMods);
-            curseforgeMods = curseForgeHandler.Update(curseforgeMods);
+                ModHandler handler = ModHandlerFactory.Get(provider, profile.GameVersion);
 
-            profile.Mods = (ModHandlerFileList)modrinthMods.Union(curseforgeMods).ToList();
+                mods = handler.Update(mods);
+
+                updatedMods.AddRange(mods);
+            }
+
+            profile.Mods = (ModHandlerFileList)updatedMods;
 
             ProfileHandler.Update(name, profile);
         }
