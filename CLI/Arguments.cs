@@ -20,6 +20,8 @@ namespace wey.CLI
             return data.Contains(name);
         }
 
+        static string? lastUseStr = null;
+
         public static string? Use()
         {
             if (data.Count == 0)
@@ -27,7 +29,14 @@ namespace wey.CLI
                 return null;
             }
 
-            return data.Dequeue();
+            string str = data.Dequeue();
+            lastUseStr = str;
+            return str;
+        }
+
+        public static string? LastUse()
+        {
+            return lastUseStr;
         }
     }
 }

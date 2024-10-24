@@ -39,6 +39,8 @@ namespace wey.IO
 
             foreach (ModHandlerFileExternal mod in externalMods)
             {
+                Console.WriteLine($"download {mod.FileName}");
+
                 string dirEx = Path.Join(dirPath, mod.FileName);
                 RestUtils.Download(dirEx, mod.URL);
             }

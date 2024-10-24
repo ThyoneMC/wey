@@ -16,12 +16,6 @@ namespace wey.API
         public required string Value { get; set; }
     }
 
-    public enum ModHandlerProvider
-    {
-        Modrinth,
-        CurseForge
-    }
-
     public class ModHandlerFile
     {
         [JsonPropertyName("name")]

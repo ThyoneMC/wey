@@ -40,4 +40,17 @@ namespace wey.CLI
 
         public abstract void Execute();
     }
+
+    public class CommandByName : Command
+    {
+        public CommandByName(string name) : base(name)
+        {
+
+        }
+
+        public override void Execute()
+        {
+            
+        }
+    }
 }

@@ -56,19 +56,7 @@ namespace wey.API.Mod
             if (getVersions == null) throw new Exception("rest error - Modrinth.GetVersionsByProject");
             if (getVersions.Length == 0) throw new Exception($"mod {getProject.Title} ({getProject.ID}) not found for {this.gameVersion}");
 
-            IModrinth.IVersion version;
-
-            int versionIndx = getVersions.ToList().FindIndex(x => x.VersionType == IModrinth.IVersionType.Release);
-            int IndxFindNotFound = -1;
-
-            if (versionIndx == IndxFindNotFound)
-            {
-                version = getVersions[0];
-            }
-            else
-            {
-                version = getVersions[versionIndx];
-            }
+            IModrinth.IVersion version = getVersions[0];
 
             IModrinth.IVersionFile file = version.Files.ElementAt(0);
 
@@ -106,6 +94,8 @@ namespace wey.API.Mod
 
             for (int i = 0; i < ids.Length; i++)
             {
+                if (getVersions[i].Files.Length == 0) throw new Exception($"mod {ids[i].Name} ({ids[i].ID}) not found for {this.gameVersion}");
+
                 IModrinth.IVersionFile file = getVersions[i].Files.ElementAt(0);
                 IModrinthHandler.IDependencies dependency = ModrinthHandler.GetDependencies(getVersions[i].Dependencies);
 
