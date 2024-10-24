@@ -93,7 +93,7 @@ namespace wey
 
         public static void AddProfile(ProfileOptions options)
         {
-            Console.WriteLine($"Create Launcher Profile: {options.Name}");
+            Console.WriteLine($"Launcher Profile: {options.Name}");
 
             string defaultIconString = "Grass";
 

@@ -35,9 +35,13 @@ namespace wey.API.Game
             string[] dirArr = Directory.GetDirectories(extractDir);
             if (dirArr.Length != 1) throw new Exception("unzip error");
 
-            DirectoryHelper.Clone(dirArr[0], Path.Join(Launcher.GameDirectoryPath, "versions", DirectoryHelper.GetRootDirectoryName(dirArr[0])));
+            string gameVersionDir = Path.Join(Launcher.GameDirectoryPath, "versions", DirectoryHelper.GetRootDirectoryName(dirArr[0]));
+            if (!Directory.Exists(gameVersionDir))
+            {
+                DirectoryHelper.Clone(dirArr[0], gameVersionDir);
+            }
 
-            return dirArr[0];
+            return gameVersionDir;
         }
 
         public bool ContainsGameVersion()
