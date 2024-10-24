@@ -36,7 +36,7 @@ namespace wey.Pages
 
             this.Options.Add(new()
             {
-                Name = "replaceModId",
+                Name = "replaceId",
                 Type = CommandOptionsType.String,
                 Optional = true
             });
@@ -67,7 +67,7 @@ namespace wey.Pages
             {
                 FileName = Path.ChangeExtension(ConsoleHelper.ReadString("fileName"), "jar"),
                 URL = ConsoleHelper.ReadString("url"),
-                ReplacementModID = CLI.Options.Get("replaceModId") ?? null,
+                ReplacementID = CLI.Options.Get("replaceId") ?? null,
                 ClientSide = CLI.Options.GetBool("nonClientSide", true),
                 ServerSide = CLI.Options.GetBool("nonServerSide", true)
             };
@@ -77,9 +77,9 @@ namespace wey.Pages
             for (int i = 0; i < profile.ExternalMods.Count; i++)
             {
                 ModHandlerFileExternal mod = profile.ExternalMods[i];
-                if (string.IsNullOrWhiteSpace(file.ReplacementModID)) continue;
+                if (string.IsNullOrWhiteSpace(file.ReplacementID)) continue;
 
-                if (file.ReplacementModID == mod.ReplacementModID)
+                if (file.ReplacementID == mod.ReplacementID)
                 {
                     contain = true;
 

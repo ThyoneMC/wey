@@ -13,12 +13,12 @@ namespace wey.IO
         {
             if (files.Length == 0) return;
 
-            ModHandlerFileExternal[] replacementMods = externals.Where(x => !string.IsNullOrWhiteSpace(x.ReplacementModID)).ToArray();
+            ModHandlerFileExternal[] replacementMods = externals.Where(x => !string.IsNullOrWhiteSpace(x.ReplacementID)).ToArray();
             ModHandlerFileExternal[] externalMods = externals.Where(x => !replacementMods.Contains(x)).ToArray();
 
             foreach (ModHandlerFile mod in files)
             {
-                ModHandlerFileExternal? modReplace = replacementMods.FirstOrDefault(x => x != null && x.ReplacementModID == mod.ID, null);
+                ModHandlerFileExternal? modReplace = replacementMods.FirstOrDefault(x => x != null && x.ReplacementID == mod.ID, null);
                 if (modReplace != null)
                 {
                     Console.WriteLine($"download {mod.FileName} -> {modReplace.FileName}");
@@ -48,14 +48,14 @@ namespace wey.IO
 
         public static void Load(string srcPath, string dstPath, ModHandlerFile[] files, ModHandlerFileExternal[] externals)
         {
-            ModHandlerFileExternal[] replacementMods = externals.Where(x => !string.IsNullOrWhiteSpace(x.ReplacementModID)).ToArray();
+            ModHandlerFileExternal[] replacementMods = externals.Where(x => !string.IsNullOrWhiteSpace(x.ReplacementID)).ToArray();
             ModHandlerFileExternal[] externalMods = externals.Where(x => !replacementMods.Contains(x)).ToArray();
 
             foreach (ModHandlerFile mod in files)
             {
                 string fileName = mod.FileName;
 
-                ModHandlerFileExternal? modReplace = replacementMods.FirstOrDefault(x => x != null && x.ReplacementModID == mod.ID, null);
+                ModHandlerFileExternal? modReplace = replacementMods.FirstOrDefault(x => x != null && x.ReplacementID == mod.ID, null);
                 if (modReplace != null)
                 {
                     fileName = modReplace.FileName;

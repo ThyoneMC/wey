@@ -78,8 +78,8 @@ namespace wey.IO
         [JsonPropertyName("url")]
         public required string URL { get; set; }
 
-        [JsonPropertyName("replaceModId")]
-        public string? ReplacementModID { get; set; } = null;
+        [JsonPropertyName("replaceId")]
+        public string? ReplacementID { get; set; } = null;
 
         [JsonPropertyName("clientSide")]
         public bool ClientSide { get; set; } = true;
