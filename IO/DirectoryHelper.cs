@@ -14,9 +14,9 @@ namespace wey.IO
             return Path.GetDirectoryName(path) ?? string.Empty;
         }
 
-        public static string GetRootDirectoryName(string path)
+        public static string GetDirectoryName(string path)
         {
-            return Path.GetFileName(GetRootDirectory(path)) ?? string.Empty;
+            return Path.GetFileName(path) ?? string.Empty;
         }
 
         public static void Create(string path)
@@ -35,7 +35,7 @@ namespace wey.IO
 
             foreach (string directory in Directory.GetDirectories(sourcePath))
             {
-                string directoryName = GetRootDirectoryName(directory);
+                string directoryName = GetDirectoryName(directory);
 
                 Clone(
                         Path.Join(sourcePath, directoryName),

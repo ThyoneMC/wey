@@ -55,7 +55,7 @@ namespace wey.Pages
             Launcher.AddProfile(new()
             {
                 Name = profile.Name,
-                GameVersionID = DirectoryHelper.GetRootDirectoryName(gameVersionDir),
+                GameVersionID = DirectoryHelper.GetDirectoryName(gameVersionDir),
                 IconString = profile.LauncherIconString
             });
         }
