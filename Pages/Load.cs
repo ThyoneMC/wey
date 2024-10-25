@@ -15,7 +15,7 @@ namespace wey.Pages
     {
         public Load() : base("load")
         {
-            this.Description = "download mods";
+            this.Description = "download mods for client";
 
             this.Options.Add(new()
             {
@@ -34,8 +34,7 @@ namespace wey.Pages
             ModHandlerFile[] clientMods = profile.Mods.Where(x => x.ClientSide).ToArray();
             ModHandlerFileExternal[] clientExternal = profile.ExternalMods.Where(x => x.ClientSide).ToArray();
 
-            string saveModsPath = Path.Join(ApplicationDirectoryHelper.Appdata, "mods");
-            ProfileModHandler.Download(saveModsPath, clientMods, clientExternal);
+            ProfileModHandler.Download(clientMods, clientExternal);
 
             string gameModsPath = Path.Join(Launcher.GameDirectoryPath, "mods");
 
@@ -49,7 +48,7 @@ namespace wey.Pages
                 Console.WriteLine($"old mods has been moved to {newOldModsDir}");
             }
 
-            ProfileModHandler.Load(saveModsPath, gameModsPath, clientMods, clientExternal);
+            ProfileModHandler.Load(gameModsPath, clientMods, clientExternal);
 
             string gameVersionDir = new FabricClientHandler(profile.GameVersion).DownloadAndReturnVersionDir();
 

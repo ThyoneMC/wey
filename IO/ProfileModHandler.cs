@@ -8,8 +8,10 @@ using wey.API;
 namespace wey.IO
 {
     public static class ProfileModHandler
-    {        
-        public static void Download(string dirPath, ModHandlerFile[] files, ModHandlerFileExternal[] externals)
+    {
+        static string dirPath = Path.Join(ApplicationDirectoryHelper.Appdata, "mods");
+
+        public static void Download(ModHandlerFile[] files, ModHandlerFileExternal[] externals)
         {
             if (files.Length == 0) return;
 
@@ -34,7 +36,7 @@ namespace wey.IO
                 string filePath = Path.Join(dirPath, mod.FileName);
                 RestUtils.Download(filePath, mod.URL);
 
-                Download(dirPath, mod.Dependencies, externals);
+                Download(mod.Dependencies, externals);
             }
 
             foreach (ModHandlerFileExternal mod in externalMods)
@@ -46,7 +48,7 @@ namespace wey.IO
             }
         }
 
-        public static void Load(string srcPath, string dstPath, ModHandlerFile[] files, ModHandlerFileExternal[] externals)
+        public static void Load(string dstPath, ModHandlerFile[] files, ModHandlerFileExternal[] externals)
         {
             ModHandlerFileExternal[] replacementMods = externals.Where(x => !string.IsNullOrWhiteSpace(x.ReplacementID)).ToArray();
             ModHandlerFileExternal[] externalMods = externals.Where(x => !replacementMods.Contains(x)).ToArray();
@@ -61,17 +63,17 @@ namespace wey.IO
                     fileName = modReplace.FileName;
                 }
 
-                string srcFile = Path.Combine(srcPath, fileName);
+                string srcFile = Path.Combine(dirPath, fileName);
                 string dstFile = Path.Combine(dstPath, fileName);
 
                 FileHelper.Clone(srcFile, dstFile);
 
-                Load(srcPath, dstPath, mod.Dependencies, externals);
+                Load(dstPath, mod.Dependencies, externals);
             }
 
             foreach (ModHandlerFileExternal mod in externalMods)
             {
-                string srcFile = Path.Combine(srcPath, mod.FileName);
+                string srcFile = Path.Combine(dirPath, mod.FileName);
                 string dstFile = Path.Combine(dstPath, mod.FileName);
 
                 FileHelper.Clone(srcFile, dstFile);
