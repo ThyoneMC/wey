@@ -23,6 +23,7 @@ namespace wey
              * 
              * 1. Better dependency handling
              * 2. Better ".minecraft" Path Handling
+             * 3. Server Download
              */
 
             foreach (string text in args)

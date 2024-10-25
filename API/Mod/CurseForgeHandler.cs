@@ -63,14 +63,23 @@ namespace wey.API.Mod
             };
         }
 
-        public override ModHandlerFile[] Update(ModHandlerFile[] ids)
+        public override ModHandlerFile[] Update(ModHandlerFile[] files)
         {
-            for (int i = 0; i < ids.Length; i++)
+            List<ModHandlerFile> fileList = new();
+
+            foreach (ModHandlerFile mod in files)
             {
-                ids[i] = Get(ids[i].ID);
+                try
+                {
+                    fileList.Add(Get(mod.ID));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
 
-            return ids;
+            return fileList.ToArray();
         }
     }
 }

@@ -19,6 +19,14 @@ namespace wey.Pages
 
             this.Options.Add(new()
             {
+                Name = "curseforgeApi",
+                Type = CommandOptionsType.String,
+                Optional = true,
+                InConfigFile = true
+            });
+
+            this.Options.Add(new()
+            {
                 Name = "profile",
                 Type = CommandOptionsType.String
             });
@@ -37,6 +45,8 @@ namespace wey.Pages
 
             ISharedProfile? profile = ProfileHandler.Read(name);
             if (profile == null) throw new Exception("profile not found");
+
+            ProfileHandler.CreateBackup(profile);
 
             if (CLI.Options.HasValue("gameVersion"))
             {
@@ -60,7 +70,8 @@ namespace wey.Pages
                 updatedMods.AddRange(mods);
             }
 
-            profile.Mods = (ModHandlerFileList)updatedMods;
+            profile.Mods.Clear();
+            profile.Mods.InsertRange(0, updatedMods);
 
             ProfileHandler.Update(name, profile);
         }

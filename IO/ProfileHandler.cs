@@ -159,6 +159,15 @@ namespace wey.IO
             FileHelper.UpdateJSON(path, editor.Invoke(profile));
         }
 
+        public static void CreateBackup(ISharedProfile profile)
+        {
+            profile.Name = $"{profile.Name}-{DateTime.Now.ToFileTimeUtc()}";
+
+            ProfileHandler.Update(profile.Name, profile);
+
+            Console.WriteLine($"Create Backup Profile name \"{profile.Name}\"");
+        }
+
         public static void Delete(string name)
         {
             FileHelper.Delete(GetPath(name));

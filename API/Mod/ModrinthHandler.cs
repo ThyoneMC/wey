@@ -82,32 +82,38 @@ namespace wey.API.Mod
             };
         }
 
-        public override ModHandlerFile[] Update(ModHandlerFile[] ids)
+        public override ModHandlerFile[] Update(ModHandlerFile[] files)
         {
-            if (ids.Length == 0) return ids;
+            if (files.Length == 0) return files;
 
-            Dictionary<string, IModrinth.IVersion>? getVersionsDictionary
-                = Modrinth.GetLatestVersionsByHashes(ids.Select(x => x.Hash.Value).ToArray(), this.gameVersion, "sha1");
-            if (getVersionsDictionary == null) throw new Exception("rest error - Modrinth.GetLatestVersionsByHashes");
+            Dictionary<string, IModrinth.IVersion>? getVersions
+                = Modrinth.GetLatestVersionsByHashes(files.Select(x => x.Hash.Value).ToArray(), this.gameVersion, "sha1");
+            if (getVersions == null) throw new Exception("rest error - Modrinth.GetLatestVersionsByHashes");
 
-            IModrinth.IVersion[] getVersions = getVersionsDictionary.Values.ToArray();
+            List<ModHandlerFile> fileList = new();
 
-            for (int i = 0; i < ids.Length; i++)
+            foreach (ModHandlerFile mod in files)
             {
-                if (getVersions[i].Files.Length == 0) throw new Exception($"mod {ids[i].Name} ({ids[i].ID}) not found for {this.gameVersion}");
+                if (!getVersions.TryGetValue(mod.Hash.Value, out IModrinth.IVersion? version) || version == null)
+                {
+                    Console.WriteLine($"mod {mod.Name} ({mod.ID}) not found for {this.gameVersion}");
+                    continue;
+                }
 
-                IModrinth.IVersionFile file = getVersions[i].Files.ElementAt(0);
-                IModrinthHandler.IDependencies dependency = ModrinthHandler.GetDependencies(getVersions[i].Dependencies);
+                IModrinth.IVersionFile file = version.Files.ElementAt(0);
+                IModrinthHandler.IDependencies dependency = GetDependencies(version.Dependencies);
 
-                ids[i].FileName = file.FileName;
-                ids[i].FileID = getVersions[i].ID;
-                ids[i].Hash.Value = file.Hashes.SHA1;
-                ids[i].URL = file.URL;
-                ids[i].Dependencies = dependency.dependencies.Select(Get).ToArray();
-                ids[i].Incompatibles = dependency.incompatible.Select(Get).ToArray();
+                mod.FileName = file.FileName;
+                mod.FileID = version.ID;
+                mod.Hash.Value = file.Hashes.SHA1;
+                mod.URL = file.URL;
+                mod.Dependencies = dependency.dependencies.Select(Get).ToArray();
+                mod.Incompatibles = dependency.incompatible.Select(Get).ToArray();
+
+                fileList.Add(mod);
             }
 
-            return ids;
+            return fileList.ToArray();
         }
     }
 }
